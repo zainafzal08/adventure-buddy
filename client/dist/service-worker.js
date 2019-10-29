@@ -1,0 +1,1 @@
+// Here so we become a PWA :3

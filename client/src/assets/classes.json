@@ -1,0 +1,38 @@
+{
+    "barbarian": {
+        "icon": "boxing-glove"
+    },
+    "bard": {
+        "icon": "music"
+    },
+    "cleric": {
+        "icon": "hand-heart"
+    },
+    "druid": {
+        "icon": "leaf"
+    },
+    "fighter": {
+        "icon": "sword-cross"
+    },
+    "monk": {
+        "icon": "karate"
+    },
+    "paladin": {
+        "icon": "shield-cross-outline"
+    },
+    "ranger": {
+        "icon": "bullseye-arrow"
+    },
+    "rogue": {
+        "icon": "knife-military"
+    },
+    "sorcerer": {
+        "icon": "fire"
+    },
+    "warlock": {
+        "icon": "eye-circle-outline"
+    },
+    "wizard": {
+        "icon": "auto-fix"
+    }
+}

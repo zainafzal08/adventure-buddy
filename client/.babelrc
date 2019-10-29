@@ -1,0 +1,18 @@
+{
+    "presets": [
+      [
+        "@babel/env",
+        {
+          "modules": false,
+          "targets": {
+            "esmodules": true
+          }
+      }],
+      "@babel/typescript"
+    ],
+    "plugins": [
+      ["@babel/proposal-decorators", { "legacy": true }],
+      ["@babel/proposal-class-properties", { "loose" : true }],
+      "@babel/proposal-object-rest-spread"
+    ]
+  }
