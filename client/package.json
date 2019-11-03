@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc --noEmit && ./build.sh"
+    "build": "tsc --noEmit && ./build.sh",
+    "watch": "rollup -c -w",
+    "dev": "python3 devserver.py"
   },
   "browser": "dist/app.js",
   "author": "Zain Afzal",

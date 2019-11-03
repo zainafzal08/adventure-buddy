@@ -7,31 +7,19 @@ export class CharacterTitle extends LitElement {
   @property({type: String}) descriptor = '';
   static get styles() {
       return css`
-          /* 800px+ */
           :host {
+            --img-size: 72px;
+            --img-pad: 32px;
+            --name-hpad: 16px;
+            --name-font-size: 1.8rem;
+            --descriptor-hpad: 0px;
+            --descriptor-font-size: .8rem;
             width: 100%;
             height: 250px;
             display: flex;
             justify-content: center;
             align-items: center;
             flex-direction: column;
-          }
-          /* lower then 800 px */
-          @media (max-width: 800px) {
-            :host {
-
-            }
-          }
-          /* lower then 500 px */
-          @media (max-width: 500px) {
-            :host {
-              --img-size: 72px;
-              --img-pad: 32px;
-              --name-hpad: 16px;
-              --name-font-size: 1.8rem;
-              --descriptor-hpad: 0px;
-              --descriptor-font-size: .8rem;
-            }
           }
           .img-wrapper {
             width: calc(var(--img-size) + 2*var(--img-pad));

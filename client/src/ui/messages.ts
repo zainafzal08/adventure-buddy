@@ -1,0 +1,1 @@
+export const UNKNOWN_ROUTE_MSG = 'Sorry! There isn\'t anything at this URL';

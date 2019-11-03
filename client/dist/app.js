@@ -66,6 +66,51 @@
    * http://polymer.github.io/PATENTS.txt
    */
   const directives = new WeakMap();
+  /**
+   * Brands a function as a directive factory function so that lit-html will call
+   * the function during template rendering, rather than passing as a value.
+   *
+   * A _directive_ is a function that takes a Part as an argument. It has the
+   * signature: `(part: Part) => void`.
+   *
+   * A directive _factory_ is a function that takes arguments for data and
+   * configuration and returns a directive. Users of directive usually refer to
+   * the directive factory as the directive. For example, "The repeat directive".
+   *
+   * Usually a template author will invoke a directive factory in their template
+   * with relevant arguments, which will then return a directive function.
+   *
+   * Here's an example of using the `repeat()` directive factory that takes an
+   * array and a function to render an item:
+   *
+   * ```js
+   * html`<ul><${repeat(items, (item) => html`<li>${item}</li>`)}</ul>`
+   * ```
+   *
+   * When `repeat` is invoked, it returns a directive function that closes over
+   * `items` and the template function. When the outer template is rendered, the
+   * return directive function is called with the Part for the expression.
+   * `repeat` then performs it's custom logic to render multiple items.
+   *
+   * @param f The directive factory function. Must be a function that returns a
+   * function of the signature `(part: Part) => void`. The returned function will
+   * be called with the part object.
+   *
+   * @example
+   *
+   * import {directive, html} from 'lit-html';
+   *
+   * const immutable = directive((v) => (part) => {
+   *   if (part.value !== v) {
+   *     part.setValue(v)
+   *   }
+   * });
+   */
+  const directive = (f) => ((...args) => {
+      const d = f(...args);
+      directives.set(d, true);
+      return d;
+  });
   const isDirective = (o) => {
       return typeof o === 'function' && directives.has(o);
   };
@@ -90,6 +135,18 @@
   const isCEPolyfill = window.customElements !== undefined &&
       window.customElements.polyfillWrapFlushCallback !==
           undefined;
+  /**
+   * Reparents nodes, starting from `start` (inclusive) to `end` (exclusive),
+   * into another container (could be the same container), before `before`. If
+   * `before` is null, it appends the nodes to the container.
+   */
+  const reparentNodes = (container, start, end = null, before = null) => {
+      while (start !== end) {
+          const n = start.nextSibling;
+          container.insertBefore(start, before);
+          start = n;
+      }
+  };
   /**
    * Removes nodes, starting from `start` (inclusive) to `end` (exclusive), from
    * `container`.
@@ -2595,7 +2652,7 @@
   }
 
   function _templateObject() {
-    var data = _taggedTemplateLiteral(["\n          /* 800px+ */\n          :host {\n            width: 100%;\n            height: 250px;\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            flex-direction: column;\n          }\n          /* lower then 800 px */\n          @media (max-width: 800px) {\n            :host {\n\n            }\n          }\n          /* lower then 500 px */\n          @media (max-width: 500px) {\n            :host {\n              --img-size: 72px;\n              --img-pad: 32px;\n              --name-hpad: 16px;\n              --name-font-size: 1.8rem;\n              --descriptor-hpad: 0px;\n              --descriptor-font-size: .8rem;\n            }\n          }\n          .img-wrapper {\n            width: calc(var(--img-size) + 2*var(--img-pad));\n            height: calc(var(--img-size) + 2*var(--img-pad));\n            background: var(--theme-gradient);\n            border-radius: 50%;\n            display: flex;\n            align-items: center;\n            justify-content: center;\n          }\n          .img-wrapper img {\n            width: var(--img-size);\n            height: var(--img-size);\n            border-radius: 50%;\n            filter: invert();\n            opacity: 0.45;\n          }\n          h1 {\n            width: 100%;\n            text-align: center;\n            color: #444;\n            font-weight: 100;\n            font-family: 'Montserrat', sans-serif;\n            margin: var(--name-hpad) 0px;\n            font-size: var(--name-font-size);\n          }\n          p {\n            width: 100%;\n            text-align: center;\n            color: #999;\n            font-family: 'Montserrat', sans-serif;\n            margin: var(--descriptor-hpad) 0px;\n            font-size: var(--descriptor-font-size);\n          }\n      "]);
+    var data = _taggedTemplateLiteral(["\n          :host {\n            --img-size: 72px;\n            --img-pad: 32px;\n            --name-hpad: 16px;\n            --name-font-size: 1.8rem;\n            --descriptor-hpad: 0px;\n            --descriptor-font-size: .8rem;\n            width: 100%;\n            height: 250px;\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            flex-direction: column;\n          }\n          .img-wrapper {\n            width: calc(var(--img-size) + 2*var(--img-pad));\n            height: calc(var(--img-size) + 2*var(--img-pad));\n            background: var(--theme-gradient);\n            border-radius: 50%;\n            display: flex;\n            align-items: center;\n            justify-content: center;\n          }\n          .img-wrapper img {\n            width: var(--img-size);\n            height: var(--img-size);\n            border-radius: 50%;\n            filter: invert();\n            opacity: 0.45;\n          }\n          h1 {\n            width: 100%;\n            text-align: center;\n            color: #444;\n            font-weight: 100;\n            font-family: 'Montserrat', sans-serif;\n            margin: var(--name-hpad) 0px;\n            font-size: var(--name-font-size);\n          }\n          p {\n            width: 100%;\n            text-align: center;\n            color: #999;\n            font-family: 'Montserrat', sans-serif;\n            margin: var(--descriptor-hpad) 0px;\n            font-size: var(--descriptor-font-size);\n          }\n      "]);
 
     _templateObject = function _templateObject() {
       return data;
@@ -2740,10 +2797,10 @@
     initializer: null
   })), _class2$1)) || _class$1);
 
-  var _dec$2, _dec2$2, _class$2, _class2$2, _descriptor$2, _temp$2;
+  var _dec$2, _class$2;
 
   function _templateObject2$2() {
-    var data = _taggedTemplateLiteral(["\n      <style>\n        :host {\n          --theme-gradient: var(--", "-theme-gradient)\n        }\n      </style>\n      <character-sheet></character-sheet>\n    "]);
+    var data = _taggedTemplateLiteral(["\n      <p> hello sir i am a handbook :3 </p>\n    "]);
 
     _templateObject2$2 = function _templateObject2() {
       return data;
@@ -2753,7 +2810,7 @@
   }
 
   function _templateObject$2() {
-    var data = _taggedTemplateLiteral(["\n      :host {\n        --peach-theme-gradient: linear-gradient(110deg, #f2709c, #ff9472);\n        --fresh-theme-gradient: linear-gradient(45deg, #67b26f, #4ca2cd);\n      }\n    "]);
+    var data = _taggedTemplateLiteral(["\n\n      "]);
 
     _templateObject$2 = function _templateObject() {
       return data;
@@ -2761,32 +2818,392 @@
 
     return data;
   }
-  var AppView = (_dec$2 = customElement('app-view'), _dec2$2 = query('character-sheet'), _dec$2(_class$2 = (_class2$2 = (_temp$2 = class AppView extends LitElement {
-    constructor() {
-      super(...arguments);
-
-      _initializerDefineProperty(this, "characterSheet", _descriptor$2, this);
-
-      this.theme = 'peach';
-    }
-
+  var DmHandbook = (_dec$2 = customElement('dm-handbook'), _dec$2(_class$2 = class DmHandbook extends LitElement {
     static get styles() {
       return css(_templateObject$2());
     }
 
     render() {
-      // This will edventually have a bunch of top level routes
-      // and the login flow leading to the home page where you can
-      // create new character sheets / characters
-      return html(_templateObject2$2(), this.theme);
+      return html(_templateObject2$2());
     }
 
-  }, _temp$2), (_descriptor$2 = _applyDecoratedDescriptor(_class2$2.prototype, "characterSheet", [_dec2$2], {
+  }) || _class$2);
+
+  var _dec$3, _dec2$2, _class$3, _class2$2, _descriptor$2, _temp$2;
+
+  function _templateObject2$3() {
+    var data = _taggedTemplateLiteral(["\n      <a @click=", ">\n        <slot></slot>\n      </a>\n    "]);
+
+    _templateObject2$3 = function _templateObject2() {
+      return data;
+    };
+
+    return data;
+  }
+
+  function _templateObject$3() {
+    var data = _taggedTemplateLiteral(["\n      :host {\n        cursor: pointer;\n      }\n    "]);
+
+    _templateObject$3 = function _templateObject() {
+      return data;
+    };
+
+    return data;
+  }
+  var AppLink = (_dec$3 = customElement('app-link'), _dec2$2 = property({
+    type: String
+  }), _dec$3(_class$3 = (_class2$2 = (_temp$2 = class AppLink extends LitElement {
+    constructor() {
+      super(...arguments);
+
+      _initializerDefineProperty(this, "target", _descriptor$2, this);
+    }
+
+    static get styles() {
+      // Theme definition
+      return css(_templateObject$3());
+    }
+
+    navigate() {
+      var event = new CustomEvent('navigate', {
+        bubbles: true,
+        composed: true,
+        detail: {
+          target: this.target
+        }
+      });
+      this.dispatchEvent(event);
+    }
+
+    render() {
+      return html(_templateObject2$3(), this.navigate);
+    }
+
+  }, _temp$2), (_descriptor$2 = _applyDecoratedDescriptor(_class2$2.prototype, "target", [_dec2$2], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: null
-  })), _class2$2)) || _class$2);
+    initializer: function initializer() {
+      return '/';
+    }
+  })), _class2$2)) || _class$3);
+
+  var _dec$4, _dec2$3, _class$4, _class2$3, _descriptor$3, _temp$3;
+
+  function _templateObject2$4() {
+    var data = _taggedTemplateLiteral(["\n      <div class=\"cover\">\n        <p> ", " </p>\n        <app-link target='/'>\n          <button>Go Home</button>\n        </app-link>\n      </div>\n    "]);
+
+    _templateObject2$4 = function _templateObject2() {
+      return data;
+    };
+
+    return data;
+  }
+
+  function _templateObject$4() {
+    var data = _taggedTemplateLiteral(["\n        .cover {\n          width: 100%;\n          height: calc(100vh - var(--navbar-height));\n          background: #FAFAFA;\n          display: flex;\n          align-items: center;\n          justify-content: center;\n          flex-direction: column;\n        }\n        p {\n          font-family: 'Montserrat', sans-serif;\n          font-size: 3rem;\n          color: var(--theme-primary);\n          padding: 0;\n          margin: 2rem;\n          text-align: center;\n        }\n        button {\n          padding: .5rem 1rem;\n          background: white;\n          border-radius: 5px;\n          color: var(--theme-primary);\n          font-family: 'Montserrat', sans-serif;\n          font-size: 1rem;\n          border: 2px solid var(--theme-primary);\n          cursor: pointer;\n        }\n        button:hover {\n          color: white;\n          background: var(--theme-primary);\n        }\n        button:focus {\n          outline: none;\n        }\n      "]);
+
+    _templateObject$4 = function _templateObject() {
+      return data;
+    };
+
+    return data;
+  }
+  var ErrorPage = (_dec$4 = customElement('error-page'), _dec2$3 = property({
+    type: String
+  }), _dec$4(_class$4 = (_class2$3 = (_temp$3 = class ErrorPage extends LitElement {
+    constructor() {
+      super(...arguments);
+
+      _initializerDefineProperty(this, "message", _descriptor$3, this);
+    }
+
+    static get styles() {
+      return css(_templateObject$4());
+    }
+
+    render() {
+      return html(_templateObject2$4(), this.message);
+    }
+
+  }, _temp$3), (_descriptor$3 = _applyDecoratedDescriptor(_class2$3.prototype, "message", [_dec2$3], {
+    configurable: true,
+    enumerable: true,
+    writable: true,
+    initializer: function initializer() {
+      return 'Uh oh! Something went wrong';
+    }
+  })), _class2$3)) || _class$4);
+
+  var _dec$5, _class$5;
+
+  function _templateObject2$5() {
+    var data = _taggedTemplateLiteral(["\n      <p> hello sir i am a user profile page :3 </p>\n    "]);
+
+    _templateObject2$5 = function _templateObject2() {
+      return data;
+    };
+
+    return data;
+  }
+
+  function _templateObject$5() {
+    var data = _taggedTemplateLiteral(["\n\n      "]);
+
+    _templateObject$5 = function _templateObject() {
+      return data;
+    };
+
+    return data;
+  }
+  var UserProfile = (_dec$5 = customElement('user-profile'), _dec$5(_class$5 = class UserProfile extends LitElement {
+    static get styles() {
+      return css(_templateObject$5());
+    }
+
+    render() {
+      return html(_templateObject2$5());
+    }
+
+  }) || _class$5);
+
+  var _dec$6, _class$6;
+
+  function _templateObject2$6() {
+    var data = _taggedTemplateLiteral(["\n      <div class=\"left\">\n        <app-link target='/'>Home</app-link>\n        <app-link target='/handbook'>Handbook</app-link>\n      </div>\n      <div class=\"right\">\n        <app-link target='/profile'>\n          <div class=\"profile\">\n            <img src=\"icons/account.svg\"/>\n          </div>\n        </app-link>\n      </div>\n    "]);
+
+    _templateObject2$6 = function _templateObject2() {
+      return data;
+    };
+
+    return data;
+  }
+
+  function _templateObject$6() {
+    var data = _taggedTemplateLiteral(["\n          :host {\n            width: calc(100% - 30px);\n            padding: 0 15px;\n            height: var(--navbar-height);\n            border-bottom: 2px solid #EBEBEB;\n            display: flex;\n            align-items: center;\n            justify-content: space-between;\n          }\n          .left {\n            height: 100%;\n            display: flex;\n            align-items: center;\n            justify-content: flex-start;\n          }\n          .right {\n            height: 100%;\n            display: flex;\n            align-items: center;\n            justify-content: flex-end;\n          }\n          .profile {\n            width: 30px;\n            height: 30px;\n            background: var(--theme-primary);\n            border-radius: 50%;\n            display: flex;\n            align-items: center;\n            justify-content: center;\n          }\n          .profile img {\n            height: 20px;\n            filter: invert();\n            opacity: .65;\n            margin-bottom: 2px;\n          }\n          app-link {\n            font-family: 'Montserrat', sans-serif;\n            font-weight: bold;\n            color: var(--theme-primary);\n            margin: 0 .5rem;\n          }\n      "]);
+
+    _templateObject$6 = function _templateObject() {
+      return data;
+    };
+
+    return data;
+  }
+  var AppNav = (_dec$6 = customElement('app-nav'), _dec$6(_class$6 = class AppNav extends LitElement {
+    static get styles() {
+      return css(_templateObject$6());
+    }
+
+    render() {
+      return html(_templateObject2$6());
+    }
+
+  }) || _class$6);
+
+  /**
+   * @license
+   * Copyright (c) 2018 The Polymer Project Authors. All rights reserved.
+   * This code may only be used under the BSD style license found at
+   * http://polymer.github.io/LICENSE.txt
+   * The complete set of authors may be found at
+   * http://polymer.github.io/AUTHORS.txt
+   * The complete set of contributors may be found at
+   * http://polymer.github.io/CONTRIBUTORS.txt
+   * Code distributed by Google as part of the polymer project is also
+   * subject to an additional IP rights grant found at
+   * http://polymer.github.io/PATENTS.txt
+   */
+  const templateCaches$1 = new WeakMap();
+  /**
+   * Enables fast switching between multiple templates by caching the DOM nodes
+   * and TemplateInstances produced by the templates.
+   *
+   * Example:
+   *
+   * ```
+   * let checked = false;
+   *
+   * html`
+   *   ${cache(checked ? html`input is checked` : html`input is not checked`)}
+   * `
+   * ```
+   */
+  const cache = directive((value) => (part) => {
+      if (!(part instanceof NodePart)) {
+          throw new Error('cache can only be used in text bindings');
+      }
+      let templateCache = templateCaches$1.get(part);
+      if (templateCache === undefined) {
+          templateCache = new WeakMap();
+          templateCaches$1.set(part, templateCache);
+      }
+      const previousValue = part.value;
+      // First, can we update the current TemplateInstance, or do we need to move
+      // the current nodes into the cache?
+      if (previousValue instanceof TemplateInstance) {
+          if (value instanceof TemplateResult &&
+              previousValue.template === part.options.templateFactory(value)) {
+              // Same Template, just trigger an update of the TemplateInstance
+              part.setValue(value);
+              return;
+          }
+          else {
+              // Not the same Template, move the nodes from the DOM into the cache.
+              let cachedTemplate = templateCache.get(previousValue.template);
+              if (cachedTemplate === undefined) {
+                  cachedTemplate = {
+                      instance: previousValue,
+                      nodes: document.createDocumentFragment(),
+                  };
+                  templateCache.set(previousValue.template, cachedTemplate);
+              }
+              reparentNodes(cachedTemplate.nodes, part.startNode.nextSibling, part.endNode);
+          }
+      }
+      // Next, can we reuse nodes from the cache?
+      if (value instanceof TemplateResult) {
+          const template = part.options.templateFactory(value);
+          const cachedTemplate = templateCache.get(template);
+          if (cachedTemplate !== undefined) {
+              // Move nodes out of cache
+              part.setValue(cachedTemplate.nodes);
+              part.commit();
+              // Set the Part value to the TemplateInstance so it'll update it.
+              part.value = cachedTemplate.instance;
+          }
+      }
+      part.setValue(value);
+  });
+  //# sourceMappingURL=cache.js.map
+
+  var UNKNOWN_ROUTE_MSG = 'Sorry! There isn\'t anything at this URL';
+
+  var _dec$7, _class$7, _temp$4;
+
+  function _templateObject6() {
+    var data = _taggedTemplateLiteral(["\n      <style>\n        :host {\n          --theme-gradient: var(--", "-theme-gradient);\n          --theme-primary: var(--", "-theme-primary);\n        }\n      </style>\n      <app-nav></app-nav>\n      ", "\n    "]);
+
+    _templateObject6 = function _templateObject6() {
+      return data;
+    };
+
+    return data;
+  }
+
+  function _templateObject5() {
+    var data = _taggedTemplateLiteral(["\n      :host {\n        --peach-theme-gradient: linear-gradient(110deg, #f2709c, #ff9472);\n        --peach-theme-primary: #f2709c;\n        --fresh-theme-gradient: linear-gradient(110deg, #67b26f, #4ca2cd);\n        --fresh-theme-primary: #67b26f;\n        --navbar-height: 50px;\n        display: flex;\n        flex-direction: column;\n        width: 100%;\n      }\n    "]);
+
+    _templateObject5 = function _templateObject5() {
+      return data;
+    };
+
+    return data;
+  }
+
+  function _templateObject4() {
+    var data = _taggedTemplateLiteral(["<error-page message=", "></error-page>"]);
+
+    _templateObject4 = function _templateObject4() {
+      return data;
+    };
+
+    return data;
+  }
+
+  function _templateObject3() {
+    var data = _taggedTemplateLiteral(["<user-profile></user-profile>"]);
+
+    _templateObject3 = function _templateObject3() {
+      return data;
+    };
+
+    return data;
+  }
+
+  function _templateObject2$7() {
+    var data = _taggedTemplateLiteral(["<dm-handbook></dm-handbook>"]);
+
+    _templateObject2$7 = function _templateObject2() {
+      return data;
+    };
+
+    return data;
+  }
+
+  function _templateObject$7() {
+    var data = _taggedTemplateLiteral(["<character-sheet></character-sheet>"]);
+
+    _templateObject$7 = function _templateObject() {
+      return data;
+    };
+
+    return data;
+  }
+  var AppView = (_dec$7 = customElement('app-view'), _dec$7(_class$7 = (_temp$4 = class AppView extends LitElement {
+    constructor() {
+      super(...arguments);
+      this.theme = 'peach';
+      this.shownView = void 0;
+    }
+
+    /**
+     * All routes that the app can handle, this is a array of objects
+     * which define a view function that returns a html template and a 
+     * route pattern which defined what url triggers the view to be
+     * visible.
+     */
+    static get routes() {
+      return [{
+        pattern: new RegExp('^\/$'),
+        view: () => html(_templateObject$7())
+      }, {
+        pattern: new RegExp('^\/handbook$'),
+        view: () => html(_templateObject2$7())
+      }, {
+        pattern: new RegExp('^\/profile$'),
+        view: () => html(_templateObject3())
+      }];
+    }
+    /**
+     * The default error page which we show if the route can't be resolved
+     */
+
+
+    static unknownRouteView() {
+      return html(_templateObject4(), UNKNOWN_ROUTE_MSG);
+    }
+
+    static get styles() {
+      // Theme definition
+      return css(_templateObject5());
+    }
+
+    connectedCallback() {
+      super.connectedCallback();
+      this.addEventListener('navigate', e => {
+        document.location.pathname = e.detail.target;
+        this.changeRoute(e.detail.target);
+      });
+      this.changeRoute(document.location.pathname);
+    }
+
+    changeRoute(location) {
+      for (var route of AppView.routes) {
+        if (route.pattern.exec(location)) {
+          this.shownView = route.view;
+          return;
+        }
+      }
+
+      this.shownView = AppView.unknownRouteView;
+    }
+
+    render() {
+      // This will edventually have a login flow leading to the home page
+      // where you can create new character sheets / characters
+      return html(_templateObject6(), this.theme, this.theme, cache(this.shownView()));
+    }
+
+  }, _temp$4)) || _class$7);
 
 }());
 //# sourceMappingURL=app.js.map

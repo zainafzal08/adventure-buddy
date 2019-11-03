@@ -28,7 +28,8 @@ This is the frontend which is build on Lit elements. We use babel and rollup to 
 1. Have node and npm install
 2. do `npm run install`
 3. to build do `npm run build`, output files are put into dist
-4. to run a dev server do `npm run dev`, note this will watch all the files in src/ but any changes outside of this folder will not be noticed i.e index.html
+4. to have the frontend auto build with changes do `npm run watch`, note this will watch all the files in src/ but any changes outside of this folder will not be noticed i.e index.html. 
+5. To launch a dev server to serve out of dist do `npm run dev`
 
 # Milestones
 
@@ -45,17 +46,18 @@ List of things that the sheet should show
 - [X] Character Level
 - [ ] Character Stats (str, wis, etc.)
 - [ ] HP
-- [ ] Hit Dice
-- [ ] Spell Slots
-- [ ] Spells (empty field for V.0)
-- [ ] Skills
-- [ ] Saving Throws
 - [ ] Inspiration
 - [ ] Proficiency Bonus
 - [ ] Perception
+- [ ] Hit Dice
+- [ ] Spell Slots
+- [ ] Spells (Text field entry for V.0)
+- [ ] Skills
+- [ ] Saving Throws
 - [ ] Equipment
 - [ ] Attacks
 - [ ] Other information (just a text field which supports markdown)
+- [ ] Death Rolls
 
 
 # V.1
@@ -67,6 +69,9 @@ The aim of this milestone is to give the user features that a paper sheet does n
     - Clicking on a spell should give detailed information about the spell
 - Give the user a easy way to roll dice, such as a text field which parses input such as "3d8 + d5 + 8" (there are npm packages that do this for us).
     - Additionally allow users to quickily roll initative / saving throws by automatically adding the relevant modifiers.
+- Let the user enter temporary stats such as the effects of a spell like shield of faith
+- Give quick methods to trigger a hit (lose HP) or a rest (gain HP + spell slots)
+- Give a quick method to cast a spell and use up a spell slot
 
 # V.2
 To be fleshed out...
@@ -74,6 +79,7 @@ To be fleshed out...
 - Have a login
 - Have a basic dashboard after login
 - let users upload a image for their character sheet
+- Have a easy to search DM handbook for querys about resting, magic, death, combat, stealth etc.
 
 # V.3
 To be fleshed out...
@@ -85,3 +91,7 @@ To be fleshed out...
 To be fleshed out...
 
 - Proper DM features (console etc.)
+
+# debt
+
+- Need to make routing use push / pop history and listen to foward and back buttons
