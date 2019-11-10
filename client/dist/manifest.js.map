@@ -1,0 +1,1 @@
+{"version":3,"sources":["manifest.json"],"names":["module","exports"],"mappings":"AAAAA,MAAM,CAACC,OAAP,GAAiB,EAAjB","file":"manifest.js","sourceRoot":"..","sourcesContent":["module.exports = {\n    \n};"]}

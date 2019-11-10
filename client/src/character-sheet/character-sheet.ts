@@ -1,6 +1,8 @@
-import '../ui/character-title/character-title';
+import '../ui/section-title/section-title';
 
 import { LitElement, html, customElement, css, property, query } from 'lit-element';
+
+import icons from '../assets/icons/*.svg';
 
 @customElement('character-sheet')
 export class CharacterSheet extends LitElement {
@@ -48,14 +50,18 @@ export class CharacterSheet extends LitElement {
     return `Level ${d.level} ${d.race} ${d.class}`;
   }
 
+  private getIcon() {
+    return icons[this.data.class];
+  }
+
   render() {
     return html`
       <div class="page">
-        <character-title
-          name=${this.data.name}
-          class=${this.data.class}
-          descriptor=${this.getDescriptor()}
-          ></character-title>
+        <section-title
+            title=${this.data.name}
+            subtitle=${this.getDescriptor()}
+            icon=${this.getIcon()}
+          ></section-title>
           <character-quick-stats></character-quick-stats>
       </div>
     `;

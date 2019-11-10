@@ -2,11 +2,11 @@
 
 This is a app to help players play DnD and help Dm's run it. It's main goal is to provide a lot of the features other Dnd tools provide but to make the experience extremely simple and user friendly.
 
-It should make someones journey of playing DnD focused on the played and not on the math not paper keeping.
+It should make someones journey of playing DnD focused on the playing and not on the math or paper keeping.
 
 The app should be able to be used without ever having to google how to do it. If the application becomes difficult or confusing or overwhelming the features should be scaled back. The goal is to be easy to pick up and use over all else.
 
-The app is split up into the frontend and the backend. Each one has a dockerFile that does nothing for the moment. When ready for a production push both will be built into docker containers and combined via a docker-compose file into a app listening on a localhost. This can then be deployed on any box with a reverse proxy.
+The app is split up into the frontend and the backend. Each one has a dockerfile that does nothing for the moment. When ready for a production push both will be built into docker containers and combined via a docker-compose file into a app listening on a localhost. This can then be deployed on any box with a reverse proxy.
 
 # Tech Stack
 
@@ -28,14 +28,15 @@ This is the frontend which is build on Lit elements. We use babel and rollup to 
 1. Have node and npm install
 2. do `npm run install`
 3. to build do `npm run build`, output files are put into dist
-4. to have the frontend auto build with changes do `npm run watch`, note this will watch all the files in src/ but any changes outside of this folder will not be noticed i.e index.html. 
-5. To launch a dev server to serve out of dist do `npm run dev`
+4. to run the dev server do `npm run dev`
 
 # Milestones
 
 # V.0
 
-The aim of this milestone is to have just a basic page which mimics a character sheet. Users can edit the page just as they can fill in a sheet to update health, stats etc.
+The aim of this milestone is to have just a basic page which mimics a character sheet and a handbook people can use to quickly look up spells, items etc. This will involve setting up a basic database of all things Dnd which will server as a foundation for all future features. This database is likely to be incomplete but hopefully can be a good starting point, in future opensourcing the database so people can add to it is how i imagine it growing / being corrected.
+
+Users can edit the page just as they can fill in a sheet to update health, stats etc.
 
 After any change the sheet should save, for V.0 this is done just by giving the user a unique url at which their sheet is saved. In later milestones there will be a login flow where users can see all of their sheets.
 

@@ -1,10 +1,10 @@
 import { LitElement, html, customElement, css, property } from 'lit-element';
 
-@customElement('character-title')
-export class CharacterTitle extends LitElement {
-  @property({type: String}) name = '';
-  @property({type: String}) class = '';
-  @property({type: String}) descriptor = '';
+@customElement('section-title')
+export class SectionTitle extends LitElement {
+  @property({type: String}) title = '';
+  @property({type: String}) subtitle = '';
+  @property({type: String}) icon = '';
   static get styles() {
       return css`
           :host {
@@ -33,7 +33,6 @@ export class CharacterTitle extends LitElement {
           .img-wrapper img {
             width: var(--img-size);
             height: var(--img-size);
-            border-radius: 50%;
             filter: invert();
             opacity: 0.45;
           }
@@ -60,10 +59,10 @@ export class CharacterTitle extends LitElement {
   render() {
     return html`
       <div class="img-wrapper">
-          <img src="icons/${this.class}.svg"/>
+          <img src="${this.icon}"/>
       </div>
-      <h1>${this.name}</h1>
-      <p>${this.descriptor}</p>
+      <h1>${this.title}</h1>
+      <p>${this.subtitle}</p>
     `;
   }
 }

@@ -1,16 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/service-worker.js');
-    }
-  </script>
-
   <meta name="description" content="Adventure Buddy">
   <title>Adventure Buddy</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="manifest" href="/manifest.json">
   <link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <meta charset="UTF-8">
@@ -18,9 +11,10 @@
     body {
       margin: 0;
       padding: 0;
+      background: #FAFAFA;
     }
   </style>
-  <script type="module" src="app.js"></script>
+  <script src="./src/index.ts"></script>
 </head>
 <body>
   <noscript>

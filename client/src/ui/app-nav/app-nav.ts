@@ -1,4 +1,5 @@
 import { LitElement, html, customElement, css } from 'lit-element';
+import icons from '../../assets/icons/*.svg';
 
 @customElement('app-nav')
 export class AppNav extends LitElement {
@@ -13,6 +14,7 @@ export class AppNav extends LitElement {
             display: flex;
             align-items: center;
             justify-content: space-between;
+            background: white;
           }
           .left {
             height: 100%;
@@ -59,7 +61,7 @@ export class AppNav extends LitElement {
       <div class="right">
         <app-link target='/profile'>
           <div class="profile">
-            <img src="icons/account.svg"/>
+            <img src="${icons['account']}"/>
           </div>
         </app-link>
       </div>
