@@ -1,9 +1,9 @@
 import { LitElement, html, customElement, property, css } from 'lit-element';
-
+import { getNavigateEvent } from '../../util'
 @customElement('app-link')
 export class AppLink extends LitElement {
   @property({type: String}) target = '/';
-
+  @property({type: String}) tag:'a'|'div' = 'a';
   static get styles() {
     // Theme definition
     return css`
@@ -14,22 +14,13 @@ export class AppLink extends LitElement {
   }
 
   private navigate() {
-    const event = new CustomEvent('navigate', {
-      bubbles: true,
-      composed: true,
-      detail: {
-        target: this.target
-      }
-    });
-    this.dispatchEvent(event);
+    this.dispatchEvent(getNavigateEvent(this.target));
   }
 
   render() {
-    return html`
-      <a @click=${this.navigate}>
-        <slot></slot>
-      </a>
-    `;
+    return this.tag === 'a'
+        ? html`<a @click=${this.navigate}><slot></slot></a>`
+        : html`<div @click=${this.navigate}><slot></slot></div>`;
   }
 }
 

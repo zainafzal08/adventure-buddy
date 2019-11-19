@@ -1,10 +1,6 @@
-import { LitElement, html, customElement, css, TemplateResult, query, property } from 'lit-element';
+import { LitElement, html, customElement, css, query, property } from 'lit-element';
 import { Database, Topic, Table } from '../database';
 import icons from '../assets/icons/*.svg';
-
-interface Tag {
-  pattern: RegExp
-}
 
 const DEFAULT_HELP_MSG = html`
   <p>
@@ -13,6 +9,7 @@ const DEFAULT_HELP_MSG = html`
     to help narrow the results.
   </p>
 `
+const TOPIC_REGEX = /#[\w\>]+/;
 
 @customElement('dm-handbook')
 export class DmHandbook extends LitElement {
@@ -22,30 +19,11 @@ export class DmHandbook extends LitElement {
 
   private database = new Database();
 
-  private tags: Map<Topic, Tag> = new Map([
-    ['spells', { pattern: /(#spells?)|(#magic)/g }],
-    ['equipment', { pattern: /(#equip(ment)?)|(#items?)/g }],
-    ['combat', { pattern: /(#combat)|(#fight(ing)?)/g }],
-    ['magic', { pattern: /(#magic)|(#fight(ing)?)/g }],
-    ['features', { pattern: /(#feature?)|(#abilitys?)|(#skills?)/g }],
-    ['movement', { pattern: /#mov(e|(ing)|(ement))/g }],
-    ['resting', { pattern: /#rest(ing)?/g }],
-    ['enviornment', { pattern: /#(world)|(enviorn(ment)?)/g }],
-    ['death', { pattern: /#death/g }],
-    ['effects', { pattern: /#(effects?)|(conditions?)/g }]
-  ]);
-
   static get styles() {
     return css`
       :host {
         --page-vpad: 16px;
         --page-hpad: 48px;
-      }
-      .page {
-        width: calc(100% - 2 * var(--page-hpad));
-        padding: var(--page-vpad) var(--page-hpad);
-        height: calc(100vh - var(--page-hpad));
-        background: #fafafa;
         display: flex;
         justify-content: flex-start;
         align-items: center;
@@ -131,12 +109,12 @@ export class DmHandbook extends LitElement {
     }
 
     const tables = [];
-    for (const tag of this.tags) {
-      if (tag[1].pattern.exec(searchText)) {
-        searchText = searchText.replace(tag[1].pattern, '');
-        tables.push(tag[0]);
-      }
+    let match;
+    while (match = TOPIC_REGEX.exec(searchText)) {
+      searchText = searchText.replace(match[0], '');
+      tables.push(match[0]);
     }
+
     let topics = 'all topics'
     if (tables.length === 1) {
       topics = `the ${tables[0]} topic`;
@@ -160,25 +138,23 @@ export class DmHandbook extends LitElement {
 
   render() {
     return html`
-      <div class='page'>
-        <section-title
-          title='Dungeon Master Handbook'
-          subtitle='A quick way to search up rules,
-        spells and equipment'
-          icon=${icons['book']}
-        ></section-title>
-        <div class='search'>
-          <img src="${icons['search']}" />
-          <input />
-        </div>
-        <div class='help'>
-          ${this.searchHelp}
-        </div>
-        <div class='results'>
-          
-        </div>
+      <section-title
+        title='Dungeon Master Handbook'
+        subtitle='A quick way to search up rules,
+      spells and equipment'
+        icon=${icons['book']}
+      ></section-title>
+      <div class='search'>
+        <img src="${icons['search']}" />
+        <input maxlength="100"/>
       </div>
-    `;
+      <div class='help'>
+        ${this.searchHelp}
+      </div>
+      <div class='results'>
+        
+      </div>
+  `;
   }
 }
 

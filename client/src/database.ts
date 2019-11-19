@@ -1,3 +1,8 @@
+import icons from 'assets/icons/*.svg';
+import * as localForage from "localforage";
+import { uuid } from 'uuidv4';
+
+// TODO(zain): update to new topic syste,
 export type Topic =
   | "spells"
   | "equipment"
@@ -32,6 +37,46 @@ export interface Match {
   end: number;
 }
 
+export interface CharacterSheetDescriptor {
+  id: string|null;
+  name: string;
+  race: string;
+  class: string;
+  level: number;
+}
+
+export class CharacterSheetData {
+  id: string = '0';
+  name: string = '';
+  race: string = '';
+  class: string = '';
+  level: number = 1;
+
+  constructor (data:CharacterSheetDescriptor) {
+    if (!data.id) {
+      throw Error('Provided Id must be Non-null');
+    }
+    this.id = data.id;
+    this.name = data.name;
+    this.race = data.race;
+    this.class = data.class;
+    this.level = data.level;
+  }
+
+  getDescriptor() {
+    return `Level ${this.level} ${this.race} ${this.class}`;
+  }
+
+  getIcon() {
+    return icons[this.class];
+  }
+}
+
+export enum DatabaseState {
+  LOADING,
+  READY  
+}
+
 type resolver = (value?: void | PromiseLike<void> | undefined) => void;
 
 export class Database {
@@ -40,6 +85,11 @@ export class Database {
    */
   ready!:Promise<void>;
   
+  /**
+   * The state of the database
+   */
+  state:DatabaseState = DatabaseState.LOADING;
+
   /**
    * A function that resolves the ready promise, should be called when
    * the database has finished init.
@@ -53,44 +103,64 @@ export class Database {
     this.initialize()
       .then(() => {
         this.readyPromiseResolver();
+        this.state = DatabaseState.READY;
       })
   }
 
   async initialize() {
-    const localDbVersion = parseInt(localStorage.get('db_version'));
-    const remoteDbVersion = await this.getRemoteDbVersion();
-    
-    if (!localDbVersion || remoteDbVersion > localDbVersion) {
-      // May be replaced with a smaller 'diff' download in future
-      await this.clear();
-      await this.downloadRemoteDb();
+    const characters = await localForage.getItem('meta:characters');
+    if (!characters) {
+      await localForage.setItem('meta:characters', []);
     }
   }
 
-  /**
-   * Querys the server to ask if the database has updated.
-   * 
-   */
-  async getRemoteDbVersion() {
-    //TODO(zain): Change this to query the actual server.
-    return 1;
+  /** Convience Method for extracting a character from localForage */
+  async fetchCharacter(id:string):Promise<CharacterSheetData> {
+    const data = await localForage.getItem(`character:${id}`);
+    const descriptor = data as CharacterSheetDescriptor;
+    if (!descriptor) return null;
+    return new CharacterSheetData(descriptor);
   }
 
-  /**
-   * Clears the indexDB
-   */
+  /** Convience Method for adding metadata */
+  async appendToMeta(key:string, value:string) {
+    const array = await localForage
+      .getItem(`meta:${key}`)as Array<string>;
+    await localForage.setItem(`meta:${key}`, [...array, value]);
+  }
+
+  /** Get's all characters for the current user. */
+  async getAllCharacters():Promise<CharacterSheetData[]> {
+    const allCharacterIds = await localForage
+      .getItem(`meta:characters`) as Array<string>;
+
+    const allCharacters = [];
+    for (const id of allCharacterIds) {
+      allCharacters.push(await this.fetchCharacter(id));
+    }
+    return allCharacters;
+  }
+
+  /** Get's a character sheet by id. */
+  async getCharacterSheet(id: string):Promise<CharacterSheetData|null> {
+    return await this.fetchCharacter(id);
+  }
+
+  /** Create a new character. */
+  async createCharacterSheet(descriptor:CharacterSheetDescriptor) {
+    if (descriptor.id === null) {
+      descriptor.id = uuid();
+    }
+    this.appendToMeta('characters', descriptor.id);
+    await localForage.setItem(`character:${descriptor.id}`, descriptor);
+    return descriptor.id;
+  }
+
+  /** Clear the database. */
   async clear() {
-    //TODO(zain): this.
+    await localForage.clear();
   }
-
-  /**
-   * Downloads the remote database down in json format and inserts it 
-   * into the local indexdb.
-   */
-  async downloadRemoteDb() {
-    //TODO(zain): Change this to query the actual server.
-  }
-
+  
   /**
    * Takes a string and searches the database for all enteries which 
    * match. Can take a optional secondary options argument which 
@@ -101,11 +171,10 @@ export class Database {
     return [];
   }
 
-  /**
-   * Returns all tables in the database with all of their enteries.
-   */
-  dump():Table[] {
-    //TODO(zain): this
-    return [];
-  }
+}
+
+const database = new Database();
+
+export function getDatabase():Database {
+  return database;
 }

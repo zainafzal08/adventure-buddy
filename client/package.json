@@ -30,6 +30,9 @@
     "Chrome > 50"
   ],
   "dependencies": {
-    "lit-element": "^2.2.1"
+    "@types/localforage": "0.0.34",
+    "lit-element": "^2.2.1",
+    "localforage": "^1.7.3",
+    "uuidv4": "^6.0.0"
   }
 }

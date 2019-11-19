@@ -5,6 +5,8 @@ export class SectionTitle extends LitElement {
   @property({type: String}) title = '';
   @property({type: String}) subtitle = '';
   @property({type: String}) icon = '';
+  @property({type: String, reflect: true}) size = 'large';
+
   static get styles() {
       return css`
           :host {
@@ -15,7 +17,12 @@ export class SectionTitle extends LitElement {
             --descriptor-hpad: 0px;
             --descriptor-font-size: .8rem;
             width: 100%;
-            height: 250px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+          }
+          .text {
             display: flex;
             justify-content: center;
             align-items: center;
@@ -53,6 +60,32 @@ export class SectionTitle extends LitElement {
             margin: var(--descriptor-hpad) 0px;
             font-size: var(--descriptor-font-size);
           }
+
+          :host([size='small']) {
+            --img-size: 32px;
+            --img-pad: 12px;
+            --name-hpad: 4px;
+            --name-font-size: 1rem;
+            --descriptor-hpad: 0px;
+            --descriptor-font-size: .7rem;
+            flex-direction: row;
+            justify-content: flex-start;
+          }
+          :host([size='small']) .text {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            flex-direction: column;
+          }
+          :host([size='small']) .img-wrapper {
+            margin-right: 16px;
+          }
+          :host([size='small']) p {
+            text-align: left;
+          }
+          :host([size='small']) h1 {
+            margin-top: 0;
+          }
       `;
   }
 
@@ -61,8 +94,10 @@ export class SectionTitle extends LitElement {
       <div class="img-wrapper">
           <img src="${this.icon}"/>
       </div>
-      <h1>${this.title}</h1>
-      <p>${this.subtitle}</p>
+      <div class="text">
+        <h1>${this.title}</h1>
+        <p>${this.subtitle}</p>
+      </div>
     `;
   }
 }

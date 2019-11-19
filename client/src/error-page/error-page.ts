@@ -10,7 +10,7 @@ export class ErrorPage extends LitElement {
       return css`
         .cover {
           width: 100%;
-          height: calc(100vh - var(--navbar-height));
+          height: calc(100vh - 2*var(--page-hpad) - var(--navbar-height) - 1px);
           background: #FAFAFA;
           display: flex;
           align-items: center;
