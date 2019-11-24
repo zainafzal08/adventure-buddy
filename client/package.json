@@ -34,5 +34,11 @@
     "lit-element": "^2.2.1",
     "localforage": "^1.7.3",
     "uuidv4": "^6.0.0"
+  },
+  "prettier": {
+    "trailingComma": "es5",
+    "tabWidth": 2,
+    "printWidth": 72,
+    "singleQuote": true
   }
 }

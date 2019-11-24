@@ -3778,90 +3778,93 @@ let SectionTitle = class SectionTitle extends _litElement.LitElement {
 
   static get styles() {
     return _litElement.css`
-          :host {
-            --img-size: 72px;
-            --img-pad: 32px;
-            --name-hpad: 16px;
-            --name-font-size: 1.8rem;
-            --descriptor-hpad: 0px;
-            --descriptor-font-size: .8rem;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-          }
-          .text {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-          }
-          .img-wrapper {
-            width: calc(var(--img-size) + 2*var(--img-pad));
-            height: calc(var(--img-size) + 2*var(--img-pad));
-            background: var(--theme-gradient);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          }
-          .img-wrapper img {
-            width: var(--img-size);
-            height: var(--img-size);
-            filter: invert();
-            opacity: 0.45;
-          }
-          h1 {
-            width: 100%;
-            text-align: center;
-            color: #444;
-            font-weight: 100;
-            font-family: 'Montserrat', sans-serif;
-            margin: var(--name-hpad) 0px;
-            font-size: var(--name-font-size);
-          }
-          p {
-            width: 100%;
-            text-align: center;
-            color: #999;
-            font-family: 'Montserrat', sans-serif;
-            margin: var(--descriptor-hpad) 0px;
-            font-size: var(--descriptor-font-size);
-          }
+      :host {
+        --img-size: 72px;
+        --img-pad: 32px;
+        --name-hpad: 16px;
+        --name-font-size: 1.8rem;
+        --descriptor-hpad: 0px;
+        --descriptor-font-size: 0.8rem;
+        margin: 32px 0;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      }
+      .text {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      }
+      .img-wrapper {
+        width: calc(var(--img-size) + 2 * var(--img-pad));
+        height: calc(var(--img-size) + 2 * var(--img-pad));
+        background: var(--theme-gradient);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .img-wrapper img {
+        width: var(--img-size);
+        height: var(--img-size);
+        filter: invert();
+        opacity: 0.45;
+      }
+      h1 {
+        width: 500px;
+        text-align: center;
+        color: #444;
+        font-weight: 100;
+        font-family: 'Montserrat', sans-serif;
+        margin: var(--name-hpad) 0px;
+        font-size: var(--name-font-size);
+      }
+      p {
+        width: 100%;
+        text-align: center;
+        color: #999;
+        font-family: 'Montserrat', sans-serif;
+        margin: var(--descriptor-hpad) 0px;
+        font-size: var(--descriptor-font-size);
+      }
 
-          :host([size='small']) {
-            --img-size: 32px;
-            --img-pad: 12px;
-            --name-hpad: 4px;
-            --name-font-size: 1rem;
-            --descriptor-hpad: 0px;
-            --descriptor-font-size: .7rem;
-            flex-direction: row;
-            justify-content: flex-start;
-          }
-          :host([size='small']) .text {
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-            flex-direction: column;
-          }
-          :host([size='small']) .img-wrapper {
-            margin-right: 16px;
-          }
-          :host([size='small']) p {
-            text-align: left;
-          }
-          :host([size='small']) h1 {
-            margin-top: 0;
-          }
-      `;
+      :host([size='small']) {
+        --img-size: 32px;
+        --img-pad: 12px;
+        --name-hpad: 4px;
+        --name-font-size: 1rem;
+        --descriptor-hpad: 0px;
+        --descriptor-font-size: 0.7rem;
+        margin: 0 0;
+        flex-direction: row;
+        justify-content: flex-start;
+      }
+      :host([size='small']) .text {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        flex-direction: column;
+      }
+      :host([size='small']) .img-wrapper {
+        margin-right: 16px;
+      }
+      :host([size='small']) p {
+        text-align: left;
+      }
+      :host([size='small']) h1 {
+        margin-top: 0;
+        width: 100%;
+      }
+    `;
   }
 
   render() {
     return _litElement.html`
       <div class="img-wrapper">
-          <img src="${this.icon}"/>
+        <img src="${this.icon}" />
       </div>
       <div class="text">
         <h1>${this.title}</h1>
@@ -3898,6 +3901,10 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.getNavigateEvent = getNavigateEvent;
+exports.renderModifier = renderModifier;
+exports.exhaustiveCheck = exhaustiveCheck;
+
+var _litHtml = require("lit-html");
 
 function getNavigateEvent(target) {
   return new CustomEvent('navigate', {
@@ -3908,7 +3915,307 @@ function getNavigateEvent(target) {
     }
   });
 }
-},{}],"src/ui/app-link/app-link.ts":[function(require,module,exports) {
+
+function renderModifier(n, emphasis = false) {
+  const val = n > 0 ? `+${n}` : `${n}`;
+  let color = 'var(--theme-emphasis-low)';
+
+  if (emphasis) {
+    color = 'var(--theme-emphasis)';
+  } else if (n > 0) {
+    color = 'var(--theme-emphasis-high)';
+  }
+
+  return _litHtml.html`
+    <span style="color: ${color}">${val}</span>
+  `;
+}
+
+function exhaustiveCheck(param) {}
+},{"lit-html":"node_modules/lit-html/lit-html.js"}],"src/ui/quick-stats/quick-stats.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.QuickStats = void 0;
+
+var _litElement = require("lit-element");
+
+var _util = require("../../util");
+
+var __decorate = void 0 && (void 0).__decorate || function (decorators, target, key, desc) {
+  var c = arguments.length,
+      r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc,
+      d;
+  if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+  return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+
+let QuickStats = class QuickStats extends _litElement.LitElement {
+  static get styles() {
+    return _litElement.css`
+      :host {
+        --box-size: 64px;
+        --focused-box-size: 96px;
+        --inbetween-margin: 16px;
+        --stat-font-size: 1.5rem;
+        --focused-stat-font-size: 2.2rem;
+        --label-font-size: 0.7rem;
+        margin: 48px 0;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: 'Montserrat', sans-serif;
+      }
+      .container {
+        height: 100%;
+        margin: 0 var(--inbetween-margin);
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+      }
+      small {
+        color: #777;
+        margin: 8px 0;
+        font-size: var(--label-font-size);
+      }
+      .mod-neutral {
+        color: #ccc;
+      }
+      .mod-low {
+        color: var(--theme-emphasis-low);
+      }
+      .mod-high {
+        color: var(--theme-emphasis-high);
+      }
+      .stat {
+        width: var(--box-size);
+        height: var(--box-size);
+        background: white;
+        border: 2px solid #ebebeb;
+        border-radius: 5px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: var(--stat-font-size);
+        color: var(--theme-emphasis);
+      }
+      .focused {
+        width: var(--focused-box-size);
+        height: var(--focused-box-size);
+        font-size: var(--focused-stat-font-size);
+      }
+
+      @media all and (max-width: 550px) {
+        :host {
+          --inbetween-margin: 8px;
+          --box-size: 52px;
+          --focused-box-size: 64px;
+          --stat-font-size: 1.2rem;
+          --focused-stat-font-size: 1.8rem;
+        }
+      }
+      @media all and (max-width: 370px) {
+        :host {
+          --box-size: 48px;
+          --inbetween-margin: 8px;
+          --focused-box-size: 64px;
+          --stat-font-size: 1.2rem;
+          --focused-stat-font-size: 1.5rem;
+          --label-font-size: 0.5rem;
+        }
+      }
+    `;
+  }
+
+  render() {
+    return _litElement.html`
+      <div class="container">
+        <div class="stat">${this.sheet.getInitative()}</div>
+        <small> Inspiration </small>
+      </div>
+      <div class="container">
+        <div class="stat">
+          ${(0, _util.renderModifier)(this.sheet.getSkillModifier('perception'))}
+        </div>
+        <small> Perception </small>
+      </div>
+      <div class="container">
+        <div class="stat focused">${this.sheet.getArmorClass()}</div>
+        <small> Armor Class </small>
+      </div>
+      <div class="container">
+        <div class="stat">
+          ${(0, _util.renderModifier)(this.sheet.getInitative())}
+        </div>
+        <small> Initative </small>
+      </div>
+      <div class="container">
+        <div class="stat">${this.sheet.getSpeed()}</div>
+        <small> Speed </small>
+      </div>
+    `;
+  }
+
+};
+exports.QuickStats = QuickStats;
+
+__decorate([(0, _litElement.property)()], QuickStats.prototype, "sheet", void 0);
+
+exports.QuickStats = QuickStats = __decorate([(0, _litElement.customElement)('quick-stats')], QuickStats);
+},{"lit-element":"node_modules/lit-element/lit-element.js","../../util":"src/util.ts"}],"src/ui/stat-list/stat-list.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.StatList = void 0;
+
+var _litElement = require("lit-element");
+
+var _util = require("../../util");
+
+var _litHtml = require("lit-html");
+
+var __decorate = void 0 && (void 0).__decorate || function (decorators, target, key, desc) {
+  var c = arguments.length,
+      r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc,
+      d;
+  if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+  return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+
+let StatList = class StatList extends _litElement.LitElement {
+  constructor() {
+    super(...arguments);
+    this.cols = 1;
+  }
+
+  static get styles() {
+    return _litElement.css`
+      :host {
+        --heading-font-size: 1.2rem;
+        --row-height: 50px;
+        --item-title-font-size: 1rem;
+        --item-subtitle-font-size: 1rem;
+        font-family: var(--font-stack);
+      }
+
+      h1 {
+        border-bottom: 2px solid #ebebeb;
+        color: #444;
+        font-size: var(--heading-font-size);
+        font-weight: 100;
+        margin: 16px 0;
+        padding: 8px 0;
+        text-align: center;
+        width: 100%;
+      }
+      :host([cols='1']) .items {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 2px 1fr;
+        grid-auto-rows: var(--row-height);
+      }
+      :host([cols='2']) .items {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 2px 1fr 1fr 2px 1fr;
+        grid-auto-rows: var(--row-height);
+      }
+      .text {
+        padding-right: 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        justify-content: center;
+      }
+      p {
+        margin: 0;
+        padding: 0;
+        color: #555;
+        font-size: var(--item-title-font-size);
+        text-transform: capitalize;
+        text-align: right;
+      }
+      .subtitle {
+        color: #999;
+        font-size: var(--item-subtitle-font-size);
+      }
+      .sep {
+        height: 100%;
+        background: #ebebeb;
+      }
+      .sep.emphasis {
+        background: var(--theme-emphasis);
+      }
+      .value {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        padding-left: 1rem;
+        height: calc(100% - 4px);
+      }
+      .value span {
+        margin-left: 0.5em;
+        color: var(--theme-emphasis);
+        font-size: 0.9rem;
+      }
+      .value.emphasis {
+        background: var(--theme-emphasis-background);
+        border-top-right-radius: 10px;
+        border-bottom-right-radius: 10px;
+      }
+
+      @media all and (max-width: 1000px) {
+        :host {
+          --item-title-font-size: 0.9rem;
+          --item-subtitle-font-size: 0.9rem;
+        }
+      }
+    `;
+  }
+
+  renderItem(item) {
+    return _litElement.html`
+      <div class="text">
+        <p>${item.title}</p>
+        <p class="subtitle">${item.subtitle}</p>
+      </div>
+      <div class="sep ${item.proficient ? 'emphasis' : ''}"></div>
+      <div class="value ${item.proficient ? 'emphasis' : ''}">
+        ${(0, _util.renderModifier)(item.value, item.proficient)}
+        ${item.proficient ? _litElement.html`
+              <span>Proficient</span>
+            ` : _litHtml.nothing}
+      </div>
+    `;
+  }
+
+  render() {
+    return _litElement.html`
+      <h1>${this.title}</h1>
+      <div class="items">
+        ${this.items.map(e => this.renderItem(e))}
+      </div>
+    `;
+  }
+
+};
+exports.StatList = StatList;
+
+__decorate([(0, _litElement.property)()], StatList.prototype, "title", void 0);
+
+__decorate([(0, _litElement.property)()], StatList.prototype, "items", void 0);
+
+__decorate([(0, _litElement.property)({
+  reflect: true
+})], StatList.prototype, "cols", void 0);
+
+exports.StatList = StatList = __decorate([(0, _litElement.customElement)('stat-list')], StatList);
+},{"lit-element":"node_modules/lit-element/lit-element.js","../../util":"src/util.ts","lit-html":"node_modules/lit-html/lit-html.js"}],"src/ui/app-link/app-link.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7201,8 +7508,10 @@ exports.fromString = fromString;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.getAbilityDisplayName = getAbilityDisplayName;
+exports.getSkillAbility = getSkillAbility;
 exports.getDatabase = getDatabase;
-exports.Database = exports.DatabaseState = exports.CharacterSheetData = void 0;
+exports.Database = exports.DatabaseState = exports.CharacterSheetData = exports.Skill = void 0;
 
 var _ = _interopRequireDefault(require("assets/icons/*.svg"));
 
@@ -7220,14 +7529,124 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
+var Skill;
+exports.Skill = Skill;
+
+(function (Skill) {
+  Skill["ATHLETICS"] = "athletics";
+  Skill["ACROBATICS"] = "acrobatics";
+  Skill["SLEIGHT_OF_HAND"] = "sleight of hand";
+  Skill["STEALTH"] = "stealth";
+  Skill["ARCANA"] = "arcana";
+  Skill["HISTORY"] = "history";
+  Skill["INVESTIGATION"] = "investigation";
+  Skill["NATURE"] = "nature";
+  Skill["RELIGION"] = "religion";
+  Skill["ANIMAL_HANDLING"] = "animal handling";
+  Skill["INSIGHT"] = "insight";
+  Skill["MEDICINE"] = "medicine";
+  Skill["PERCEPTION"] = "perception";
+  Skill["SURVIVAL"] = "survival";
+  Skill["DECEPTION"] = "deception";
+  Skill["INTIMIDATION"] = "intimidation";
+  Skill["PERFORMANCE"] = "performance";
+  Skill["PERSUASION"] = "persuasion";
+})(Skill || (exports.Skill = Skill = {}));
+
+function getAbilityDisplayName(ability) {
+  switch (ability) {
+    case 'str':
+      return 'Strength';
+
+    case 'dex':
+      return 'Dexterity';
+
+    case 'con':
+      return 'Constitution';
+
+    case 'int':
+      return 'Intelligence';
+
+    case 'wis':
+      return 'Wisdom';
+
+    case 'chr':
+      return 'Charisma';
+
+    case 'spd':
+      return 'Speed';
+
+    case 'ac':
+      return 'Armour Class';
+
+    case 'prf':
+      return 'Proficiency Modifier';
+  }
+}
+
+function getSkillAbility(skill) {
+  switch (skill) {
+    case Skill.ATHLETICS:
+      return 'str';
+
+    case Skill.ACROBATICS:
+      return 'dex';
+
+    case Skill.SLEIGHT_OF_HAND:
+      return 'dex';
+
+    case Skill.STEALTH:
+      return 'dex';
+
+    case Skill.ARCANA:
+      return 'int';
+
+    case Skill.HISTORY:
+      return 'int';
+
+    case Skill.INVESTIGATION:
+      return 'int';
+
+    case Skill.NATURE:
+      return 'int';
+
+    case Skill.RELIGION:
+      return 'int';
+
+    case Skill.ANIMAL_HANDLING:
+      return 'wis';
+
+    case Skill.INSIGHT:
+      return 'wis';
+
+    case Skill.MEDICINE:
+      return 'wis';
+
+    case Skill.PERCEPTION:
+      return 'wis';
+
+    case Skill.SURVIVAL:
+      return 'wis';
+
+    case Skill.DECEPTION:
+      return 'chr';
+
+    case Skill.INTIMIDATION:
+      return 'chr';
+
+    case Skill.PERFORMANCE:
+      return 'chr';
+
+    case Skill.PERSUASION:
+      return 'chr';
+
+    default:
+      return `UNKNOWN SKILL ${skill} ${Skill.ATHLETICS}`;
+  }
+}
+
 class CharacterSheetData {
   constructor(data) {
-    this.id = '0';
-    this.name = '';
-    this.race = '';
-    this.class = '';
-    this.level = 1;
-
     if (!data.id) {
       throw Error('Provided Id must be Non-null');
     }
@@ -7237,6 +7656,43 @@ class CharacterSheetData {
     this.race = data.race;
     this.class = data.class;
     this.level = data.level;
+    this.ability = data.ability;
+    this.inspiration = 0;
+    this.specialBonus = Object.assign({
+      initative: 0,
+      speed: 0,
+      ac: 0
+    }, data.specialBonus);
+    this.temporaryBonus = {
+      initative: 0,
+      speed: 0,
+      ac: 0
+    };
+    this.proficiencies = new Set(data.proficiencies);
+  }
+
+  getInitative() {
+    return this.getModifier('dex') + this.specialBonus.initative + this.temporaryBonus.initative;
+  }
+
+  getSpeed() {
+    return this.ability['spd'] + this.specialBonus.speed + this.temporaryBonus.speed;
+  }
+
+  getArmorClass() {
+    // TODO(zain): Calculate this correctly.
+    const equipmentBonus = 0;
+    return this.ability['ac'] + equipmentBonus + this.specialBonus.ac + this.getModifier('dex');
+  }
+
+  getModifier(stat) {
+    return Math.floor((this.ability[stat] - 10) / 2);
+  }
+
+  getSkillModifier(skill) {
+    const base = this.getModifier(getSkillAbility(skill));
+    const bonus = this.proficiencies.has(skill) ? this.ability['prf'] : 0;
+    return base + bonus;
   }
 
   getDescriptor() {
@@ -7302,18 +7758,38 @@ class Database {
       yield localForage.setItem(`meta:${key}`, [...array, value]);
     })();
   }
+  /** Convience Method for getting metadata */
+
+
+  getMetadata(key) {
+    return _asyncToGenerator(function* () {
+      return yield localForage.getItem(`meta:${key}`);
+    })();
+  }
+  /** Get's number of characters */
+
+
+  numCharacters() {
+    var _this = this;
+
+    return _asyncToGenerator(function* () {
+      const characters = yield _this.getMetadata('characters');
+      return characters.length;
+    })();
+  }
   /** Get's all characters for the current user. */
 
 
   getAllCharacters() {
-    var _this = this;
+    var _this2 = this;
 
     return _asyncToGenerator(function* () {
       const allCharacterIds = yield localForage.getItem(`meta:characters`);
       const allCharacters = [];
 
       for (const id of allCharacterIds) {
-        allCharacters.push((yield _this.fetchCharacter(id)));
+        const character = yield _this2.fetchCharacter(id);
+        allCharacters.push(character);
       }
 
       return allCharacters;
@@ -7323,24 +7799,24 @@ class Database {
 
 
   getCharacterSheet(id) {
-    var _this2 = this;
+    var _this3 = this;
 
     return _asyncToGenerator(function* () {
-      return yield _this2.fetchCharacter(id);
+      return yield _this3.fetchCharacter(id);
     })();
   }
   /** Create a new character. */
 
 
   createCharacterSheet(descriptor) {
-    var _this3 = this;
+    var _this4 = this;
 
     return _asyncToGenerator(function* () {
       if (descriptor.id === null) {
         descriptor.id = (0, _uuidv.uuid)();
       }
 
-      _this3.appendToMeta('characters', descriptor.id);
+      _this4.appendToMeta('characters', descriptor.id);
 
       yield localForage.setItem(`character:${descriptor.id}`, descriptor);
       return descriptor.id;
@@ -7354,17 +7830,6 @@ class Database {
       yield localForage.clear();
     })();
   }
-  /**
-   * Takes a string and searches the database for all enteries which
-   * match. Can take a optional secondary options argument which
-   * specifies a more narrow search query.
-   */
-
-
-  search(searchText, options) {
-    //TODO(zain): this
-    return [];
-  }
 
 }
 
@@ -7374,21 +7839,21 @@ const database = new Database();
 function getDatabase() {
   return database;
 }
-},{"assets/icons/*.svg":"src/assets/icons/*.svg","localforage":"node_modules/localforage/dist/localforage.js","uuidv4":"node_modules/uuidv4/build/lib/uuidv4.js"}],"src/character-sheet/character-sheet.ts":[function(require,module,exports) {
+},{"assets/icons/*.svg":"src/assets/icons/*.svg","localforage":"node_modules/localforage/dist/localforage.js","uuidv4":"node_modules/uuidv4/build/lib/uuidv4.js"}],"src/AsyncElement.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.CharacterSheet = void 0;
-
-require("../ui/section-title/section-title");
-
-require("../error-page/error-page");
+exports.AsyncElement = void 0;
 
 var _litElement = require("lit-element");
 
-var _database = require("../database");
+var _litHtml = require("lit-html");
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
 var __decorate = void 0 && (void 0).__decorate || function (decorators, target, key, desc) {
   var c = arguments.length,
@@ -7398,65 +7863,247 @@ var __decorate = void 0 && (void 0).__decorate || function (decorators, target, 
   return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 
-let CharacterSheet = class CharacterSheet extends _litElement.LitElement {
+class AsyncElement extends _litElement.LitElement {
   constructor() {
     super(...arguments);
-    this.state = 'loading';
+    this.ready = false;
+    this.err = false;
+    this.errContext = null;
   }
 
-  static get styles() {
-    return _litElement.css`
-
-      `;
-  }
-
-  connectedCallback() {
-    super.connectedCallback();
-    (0, _database.getDatabase)().getCharacterSheet(this.id).then(sheet => {
-      if (!sheet) {
-        this.state = 'error';
-        return;
-      }
-
-      this.data = sheet;
-      this.state = 'ready';
+  firstUpdated() {
+    this.init().then(() => {
+      this.ready = true;
+    }).catch(e => {
+      this.fail(e);
     });
+  }
+  /**
+   * Where a element can do any async set up, when this function
+   * returns or raises a Error the element has this.ready set to true.
+   */
+
+
+  init() {
+    return _asyncToGenerator(function* () {})();
+  }
+  /**
+   * Function to call when initilisation has failed.
+   */
+
+
+  fail(context) {
+    this.err = true;
+    this.errContext = context;
+  }
+  /**
+   * What to render when the element is loading.
+   */
+
+
+  loading() {
+    return _litElement.html`
+      ${_litHtml.nothing}
+    `;
+  }
+  /**
+   * What to render when the element is ready.
+   */
+
+
+  template() {
+    return _litElement.html`
+      ${_litHtml.nothing}
+    `;
+  }
+  /**
+   * What to render when the element has failed to load.
+   */
+
+
+  error(context) {
+    return _litElement.html`
+      ${_litHtml.nothing}
+    `;
   }
 
   render() {
-    if (this.state === 'loading') {
-      return _litElement.html`<p>loading innit</p>`;
-    } else if (this.state === 'error') {
-      return _litElement.html`<error-page message='Oh No! There is no character with that id'></error-page>`;
-    } //TODO(zain): if unknown id show a error page.
+    if (!this.ready) return this.loading();
+    if (this.err) return this.error(this.errContext);
+    return this.template();
+  }
 
+}
 
+exports.AsyncElement = AsyncElement;
+
+__decorate([(0, _litElement.property)()], AsyncElement.prototype, "ready", void 0);
+
+__decorate([(0, _litElement.property)()], AsyncElement.prototype, "err", void 0);
+
+__decorate([(0, _litElement.property)()], AsyncElement.prototype, "errContext", void 0);
+},{"lit-element":"node_modules/lit-element/lit-element.js","lit-html":"node_modules/lit-html/lit-html.js"}],"src/character-sheet/character-sheet.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.CharacterSheet = void 0;
+
+require("../ui/section-title/section-title");
+
+require("../ui/quick-stats/quick-stats");
+
+require("../ui/stat-list/stat-list");
+
+require("../error-page/error-page");
+
+var _litElement = require("lit-element");
+
+var _database = require("../database");
+
+var _AsyncElement = require("../AsyncElement");
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+var __decorate = void 0 && (void 0).__decorate || function (decorators, target, key, desc) {
+  var c = arguments.length,
+      r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc,
+      d;
+  if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+  return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+
+let CharacterSheet = class CharacterSheet extends _AsyncElement.AsyncElement {
+  static get styles() {
+    return _litElement.css`
+      .row {
+        width: 100%;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-around;
+      }
+      .row stat-list:nth-child(1) {
+        width: 20%;
+      }
+      .row stat-list:nth-child(2) {
+        width: calc(60% - 96px);
+      }
+      .row stat-list:nth-child(3) {
+        width: 20%;
+      }
+      @media all and (max-width: 900px) {
+        .row {
+          flex-direction: column;
+        }
+        .row stat-list:nth-child(1) {
+          width: 100%;
+        }
+        .row stat-list:nth-child(2) {
+          width: 100%;
+        }
+        .row stat-list:nth-child(3) {
+          width: 100%;
+        }
+      }
+    `;
+  }
+
+  init() {
+    var _this = this;
+
+    return _asyncToGenerator(function* () {
+      const database = (0, _database.getDatabase)();
+      const sheet = yield database.getCharacterSheet(_this.id);
+
+      if (!sheet) {
+        _this.ready = true;
+
+        _this.fail('No character by that ID exists!');
+
+        return;
+      }
+
+      _this.sheet = sheet;
+    })();
+  }
+
+  loading() {
     return _litElement.html`
-        <section-title
-          title=${this.data.name}
-          subtitle=${this.data.getDescriptor()}
-          icon=${this.data.getIcon()}
-        ></section-title>
+      <p>Loading...</p>
+    `;
+  }
+
+  error(context) {
+    return _litElement.html`
+      <p>uh oh: ${context}</p>
+    `;
+  }
+
+  baseStats() {
+    const base = ['str', 'dex', 'con', 'int', 'wis', 'chr'];
+    return base.map(ability => {
+      return {
+        title: (0, _database.getAbilityDisplayName)(ability),
+        subtitle: this.sheet.ability[ability],
+        value: this.sheet.getModifier(ability)
+      };
+    });
+  }
+
+  skills() {
+    return Object.values(_database.Skill).map(skill => ({
+      title: skill.toLowerCase(),
+      subtitle: (0, _database.getSkillAbility)(skill),
+      value: this.sheet.getSkillModifier(skill),
+      proficient: this.sheet.proficiencies.has(skill)
+    }));
+  }
+
+  saving() {
+    const base = ['str', 'dex', 'con', 'int', 'wis', 'chr'];
+    return base.map(ability => ({
+      title: (0, _database.getAbilityDisplayName)(ability),
+      subtitle: this.sheet.ability[ability],
+      value: 2,
+      proficient: this.sheet.proficiencies.has(ability)
+    }));
+  }
+
+  template() {
+    return _litElement.html`
+      <section-title
+        title=${this.sheet.name}
+        subtitle=${this.sheet.getDescriptor()}
+        icon=${this.sheet.getIcon()}
+      ></section-title>
+      <quick-stats .sheet=${this.sheet}></quick-stats>
+      <div class="row">
+        <stat-list title="Stats" .items=${this.baseStats()}></stat-list>
+        <stat-list
+          title="Skills"
+          .items=${this.skills()}
+          cols=${2}
+        ></stat-list>
+        <stat-list
+          title="Saving Throws"
+          .items=${this.saving()}
+        ></stat-list>
+      </div>
     `;
   }
 
 };
 exports.CharacterSheet = CharacterSheet;
 
-__decorate([(0, _litElement.property)()], CharacterSheet.prototype, "data", void 0);
+__decorate([(0, _litElement.property)()], CharacterSheet.prototype, "sheet", void 0);
 
 __decorate([(0, _litElement.property)()], CharacterSheet.prototype, "id", void 0);
 
-__decorate([(0, _litElement.property)()], CharacterSheet.prototype, "state", void 0);
-
-__decorate([(0, _litElement.query)('.header .img-wrapper')], CharacterSheet.prototype, "imgWrapper", void 0);
-
-__decorate([(0, _litElement.query)('#character-img')], CharacterSheet.prototype, "characterImg", void 0);
-
-__decorate([(0, _litElement.query)('.character-name')], CharacterSheet.prototype, "characterName", void 0);
-
 exports.CharacterSheet = CharacterSheet = __decorate([(0, _litElement.customElement)('character-sheet')], CharacterSheet);
-},{"../ui/section-title/section-title":"src/ui/section-title/section-title.ts","../error-page/error-page":"src/error-page/error-page.ts","lit-element":"node_modules/lit-element/lit-element.js","../database":"src/database.ts"}],"src/dm-handbook/dm-handbook.ts":[function(require,module,exports) {
+},{"../ui/section-title/section-title":"src/ui/section-title/section-title.ts","../ui/quick-stats/quick-stats":"src/ui/quick-stats/quick-stats.ts","../ui/stat-list/stat-list":"src/ui/stat-list/stat-list.ts","../error-page/error-page":"src/error-page/error-page.ts","lit-element":"node_modules/lit-element/lit-element.js","../database":"src/database.ts","../AsyncElement":"src/AsyncElement.ts"}],"src/dm-handbook/dm-handbook.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7768,6 +8415,10 @@ var _util = require("../util");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
 var __decorate = void 0 && (void 0).__decorate || function (decorators, target, key, desc) {
   var c = arguments.length,
       r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc,
@@ -7786,50 +8437,50 @@ let AppHome = class AppHome extends _litElement.LitElement {
 
   static get styles() {
     return _litElement.css`
-        :host {
-          width: 100%;
-        }
-        h1 {
-          font-family: 'Montserrat', sans-serif;
-          font-size: 1.5rem;
-          font-weight: 100;
-          color: #444;
-          opacity: .8;
-        }
-        hr {
-          height: 3px;
-          background: #EBEBEB;
-          outline: none;
-          border: none;
-        }
-        .grid-view {
-          width: 100%;
-          padding-top: 32px;
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(330px, 350px));
-          grid-row-gap: 16px;
-        }
-        .new-character-sheet {
-          width: 300px;
-          height: 56px;
-          padding: 10px;
-          border-radius: 10px;
-          border: 2px solid #EBEBEB;
-          background: #FFF;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          opacity: .5;
-          cursor: pointer;
-        }
-        .new-character-sheet:hover {
-          opacity: 1;
-        }
-        .new-character-sheet img {
-          width: 38px;
-          opacity: .2;
-        }
-      `;
+      :host {
+        width: 100%;
+      }
+      h1 {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 1.5rem;
+        font-weight: 100;
+        color: #444;
+        opacity: 0.8;
+      }
+      hr {
+        height: 3px;
+        background: #ebebeb;
+        outline: none;
+        border: none;
+      }
+      .grid-view {
+        width: 100%;
+        padding-top: 32px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(330px, 350px));
+        grid-row-gap: 16px;
+      }
+      .new-character-sheet {
+        width: 300px;
+        height: 56px;
+        padding: 10px;
+        border-radius: 10px;
+        border: 2px solid #ebebeb;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.5;
+        cursor: pointer;
+      }
+      .new-character-sheet:hover {
+        opacity: 1;
+      }
+      .new-character-sheet img {
+        width: 38px;
+        opacity: 0.2;
+      }
+    `;
   }
 
   connectedCallback() {
@@ -7850,32 +8501,58 @@ let AppHome = class AppHome extends _litElement.LitElement {
     return new _characterPreview.CharacterPreview(data);
   }
 
+  createCharacter() {
+    var _this = this;
+
+    return _asyncToGenerator(function* () {
+      const count = yield _this.database.numCharacters();
+      const defaultDescriptor = {
+        id: null,
+        name: count > 0 ? `New Character ${count}` : 'New Character',
+        level: 1,
+        class: 'fighter',
+        race: 'human',
+        ability: {
+          str: 16,
+          dex: 13,
+          con: 11,
+          int: 12,
+          wis: 14,
+          chr: 8,
+          spd: 25,
+          ac: 10,
+          prf: 2
+        },
+        specialBonus: {},
+        proficiencies: [_database.Skill.ANIMAL_HANDLING, _database.Skill.ATHLETICS, _database.Skill.NATURE, _database.Skill.SLEIGHT_OF_HAND, _database.Skill.NATURE, 'wis', 'int']
+      };
+      const id = yield _this.database.createCharacterSheet(defaultDescriptor);
+
+      _this.dispatchEvent((0, _util.getNavigateEvent)(`/character/${id}`));
+    })();
+  }
+
   newCharacter() {
-    const defaultDescriptor = {
-      id: null,
-      name: 'New Character',
-      level: 1,
-      class: 'fighter',
-      race: 'human'
-    };
     this.ready = false;
-    this.database.createCharacterSheet(defaultDescriptor).then(id => {
-      this.dispatchEvent((0, _util.getNavigateEvent)(`/character/${id}`));
+    this.createCharacter().then(() => {
+      this.ready = true;
     });
   }
 
   render() {
     if (!this.ready) {
-      return _litElement.html`loading innit`;
+      return _litElement.html`
+        loading innit
+      `;
     }
 
     return _litElement.html`
-      <h1> Character Sheets </h1>
-      <hr>
+      <h1>Character Sheets</h1>
+      <hr />
       <div class="grid-view">
         ${this.userCharacters.map(this.renderPreview)}
         <div class="new-character-sheet" @click=${this.newCharacter}>
-          <img src="${_.default['plus']}"/>
+          <img src="${_.default['plus']}" />
         </div>
       </div>
     `;
@@ -8159,17 +8836,24 @@ let AppView = AppView_1 = class AppView extends _litElement.LitElement {
   static get routes() {
     return [{
       pattern: /^\/$/,
-      view: () => _litElement.html`<app-home></app-home>`
+      view: () => _litElement.html`
+            <app-home></app-home>
+          `
     }, {
-      pattern: /^\/character\/(\w\d-+)$/,
+      pattern: /^\/character\/([\w\-]+)$/,
       view: match => _litElement.html`
-          <character-sheet id="${match[1]}"></character-sheet>`
+          <character-sheet id="${match[1]}"></character-sheet>
+        `
     }, {
       pattern: /^\/handbook$/,
-      view: () => _litElement.html`<dm-handbook></dm-handbook>`
+      view: () => _litElement.html`
+            <dm-handbook></dm-handbook>
+          `
     }, {
       pattern: /^\/profile$/,
-      view: () => _litElement.html`<user-profile></user-profile>`
+      view: () => _litElement.html`
+            <user-profile></user-profile>
+          `
     }];
   }
   /**
@@ -8178,21 +8862,40 @@ let AppView = AppView_1 = class AppView extends _litElement.LitElement {
 
 
   static unknownRouteView() {
-    return _litElement.html`<error-page message=${_messages.UNKNOWN_ROUTE_MSG}></error-page>`;
+    return _litElement.html`
+      <error-page message=${_messages.UNKNOWN_ROUTE_MSG}></error-page>
+    `;
   }
 
   static get styles() {
     // Theme definition
     return _litElement.css`
       :host {
-        --peach-theme-gradient: linear-gradient(110deg, #f2709c, #ff9472);
+        --peach-theme-gradient: linear-gradient(
+          110deg,
+          #f2709c,
+          #ff9472
+        );
         --peach-theme-primary: #f2709c;
         --peach-theme-secondary: #ff9472;
-        --fresh-theme-gradient: linear-gradient(110deg, #67b26f, #4ca2cd);
+        --peach-theme-emphasis: #6cbee6;
+        --peach-theme-emphasis-background: #6cbee60f;
+        --peach-theme-emphasis-high: #6fcf97;
+        --peach-theme-emphasis-low: #ed6f6f;
+        --fresh-theme-gradient: linear-gradient(
+          110deg,
+          #67b26f,
+          #4ca2cd
+        );
         --fresh-theme-primary: #67b26f;
         --fresh-theme-secondary: #4ca2cd;
+        --fresh-theme-emphasis: #6cbee6;
+        --fresh-theme-emphasis-background: #6cbee60f;
+        --fresh-theme-emphasis-high: #6fcf97;
+        --fresh-theme-emphasis-low: #ed6f6f;
+
         --navbar-height: 50px;
-        --brand-gradient: linear-gradient(110deg, #B24592, #F15F79);
+        --brand-gradient: linear-gradient(110deg, #b24592, #f15f79);
         --page-vpad: 16px;
         --page-hpad: 48px;
         display: flex;
@@ -8202,9 +8905,17 @@ let AppView = AppView_1 = class AppView extends _litElement.LitElement {
       main {
         width: calc(100% - 2 * var(--page-hpad));
         padding: var(--page-vpad) var(--page-hpad);
-        min-height: calc(100% - 2 * var(--page-hpad) - var(--navbar-height) - 1px);
+        min-height: calc(
+          100% - 2 * var(--page-hpad) - var(--navbar-height) - 1px
+        );
         padding: var(--page-vpad) var(--page-hpad);
         background: #fafafa;
+      }
+      @media all and (max-width: 550px) {
+        :host {
+          --page-vpad: 4px;
+          --page-hpad: 12px;
+        }
       }
     `;
   }
@@ -8212,7 +8923,7 @@ let AppView = AppView_1 = class AppView extends _litElement.LitElement {
   connectedCallback() {
     super.connectedCallback();
     this.addEventListener('navigate', e => {
-      history.pushState({}, "", e.detail.target);
+      history.pushState({}, '', e.detail.target);
       this.changeRoute(e.detail.target);
     });
 
@@ -8246,7 +8957,9 @@ let AppView = AppView_1 = class AppView extends _litElement.LitElement {
 
   render() {
     if (!this.ready) {
-      return _litElement.html`<p>Doing a cheeky load innit</p>`;
+      return _litElement.html`
+        <p>Doing a cheeky load innit</p>
+      `;
     }
 
     return _litElement.html`
@@ -8255,6 +8968,16 @@ let AppView = AppView_1 = class AppView extends _litElement.LitElement {
           --theme-gradient: var(--${this.theme}-theme-gradient);
           --theme-primary: var(--${this.theme}-theme-primary);
           --theme-secondary: var(--${this.theme}-theme-secondary);
+          --theme-emphasis: var(--${this.theme}-theme-emphasis);
+          --theme-emphasis-background: var(
+            --${this.theme}-theme-emphasis-background
+          );
+          --theme-emphasis-high: var(
+            --${this.theme}-theme-emphasis-high
+          );
+          --theme-emphasis-low: var(--${this.theme}-theme-emphasis-low);
+          --neutral: #ccc;
+          --font-stack: 'Montserrat', sans-serif;
         }
       </style>
       <app-nav></app-nav>
@@ -8306,7 +9029,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56736" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51657" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
