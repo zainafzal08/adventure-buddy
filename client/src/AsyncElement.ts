@@ -11,7 +11,13 @@ export class AsyncElement extends LitElement {
   @property() err: boolean = false;
   @property() errContext: any = null;
 
-  firstUpdated() {
+  connectedCallback() {
+    super.connectedCallback();
+    // Being called again on a reconnect.
+    if (this.ready) {
+      return;
+    }
+
     this.init()
       .then(() => {
         this.ready = true;
@@ -31,6 +37,7 @@ export class AsyncElement extends LitElement {
    * Function to call when initilisation has failed.
    */
   fail(context: any) {
+    this.ready = true;
     this.err = true;
     this.errContext = context;
   }
@@ -60,6 +67,19 @@ export class AsyncElement extends LitElement {
     return html`
       ${nothing}
     `;
+  }
+
+  /**
+   * Register a promise which will block the component until resolved.
+   * Useful for pages which do server calls.
+   */
+  waitOn(p: Promise<any>) {
+    this.ready = false;
+    p.then(() => {
+      this.ready = true;
+    }).catch(e => {
+      this.fail(e);
+    });
   }
 
   render() {
