@@ -1,5 +1,11 @@
-import { LitElement, html, customElement, css, query, property } from 'lit-element';
-import { Database, Topic, Table } from '../database';
+import {
+  LitElement,
+  html,
+  customElement,
+  css,
+  query,
+  property,
+} from 'lit-element';
 import icons from '../assets/icons/*.svg';
 
 const DEFAULT_HELP_MSG = html`
@@ -8,16 +14,14 @@ const DEFAULT_HELP_MSG = html`
     <span> #spell #item #effect </span>
     to help narrow the results.
   </p>
-`
+`;
 const TOPIC_REGEX = /#[\w\>]+/;
 
-@customElement('dm-handbook')
+@customElement('dnd-handbook')
 export class DmHandbook extends LitElement {
-  @query('input') searchInput!:HTMLInputElement; 
-  
-  @property() searchHelp = DEFAULT_HELP_MSG;
+  @query('input') searchInput!: HTMLInputElement;
 
-  private database = new Database();
+  @property() searchHelp = DEFAULT_HELP_MSG;
 
   static get styles() {
     return css`
@@ -77,7 +81,7 @@ export class DmHandbook extends LitElement {
         display: flex;
         justify-content: center;
       }
-      .no-results{
+      .no-results {
         width: 60%;
         text-align: center;
         display: flex;
@@ -87,8 +91,8 @@ export class DmHandbook extends LitElement {
         font-family: 'Montserrat', sans-serif;
       }
       .help > p {
-        font-size: .8rem;
-        color: #BBB;
+        font-size: 0.8rem;
+        color: #bbb;
       }
       .help > p > span {
         color: var(--theme-primary);
@@ -110,12 +114,12 @@ export class DmHandbook extends LitElement {
 
     const tables = [];
     let match;
-    while (match = TOPIC_REGEX.exec(searchText)) {
+    while ((match = TOPIC_REGEX.exec(searchText))) {
       searchText = searchText.replace(match[0], '');
       tables.push(match[0]);
     }
 
-    let topics = 'all topics'
+    let topics = 'all topics';
     if (tables.length === 1) {
       topics = `the ${tables[0]} topic`;
     } else if (tables.length > 1) {
@@ -123,47 +127,31 @@ export class DmHandbook extends LitElement {
       const list = tables.join(', ');
       topics = `the ${list} and ${last} topics`;
     }
-    
-    searchText = searchText.replace(/(^\s+)|(\s+$)/,'');
+
+    searchText = searchText.replace(/(^\s+)|(\s+$)/, '');
     this.searchHelp = html`
       <p>
         Searching for '${searchText}' over <span>${topics}<span>
       </p>
-    `
-  }
-
-  private renderTable(result: Table) {
-    return html``;
+    `;
   }
 
   render() {
     return html`
       <section-title
-        title='Dungeon Master Handbook'
-        subtitle='A quick way to search up rules,
-      spells and equipment'
+        title="Handbook"
+        subtitle="A quick way to search up rules,
+      spells and equipment"
         icon=${icons['book']}
       ></section-title>
-      <div class='search'>
+      <div class="search">
         <img src="${icons['search']}" />
-        <input maxlength="100"/>
+        <input maxlength="100" />
       </div>
-      <div class='help'>
+      <div class="help">
         ${this.searchHelp}
       </div>
-      <div class='results'>
-        
-      </div>
-  `;
+      <div class="results"></div>
+    `;
   }
 }
-
-
-
-
-
-
-
-
-
-

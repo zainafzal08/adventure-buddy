@@ -6,7 +6,6 @@ import {
   property,
 } from 'lit-element';
 import { renderModifier } from '../../util';
-import { nothing } from 'lit-html';
 
 export interface StatItem {
   title: string;
@@ -50,7 +49,7 @@ export class StatList extends LitElement {
       :host([cols='2']) .items {
         width: 100%;
         display: grid;
-        grid-template-columns: 1fr 2px 1fr 1fr 2px 1fr;
+        grid-template-columns: repeat(2, 1fr 2px 1fr);
         grid-auto-rows: var(--row-height);
       }
       .text {
@@ -83,13 +82,8 @@ export class StatList extends LitElement {
         display: flex;
         align-items: center;
         justify-content: flex-start;
-        padding-left: 1rem;
+        padding-left: 0.7rem;
         height: calc(100% - 4px);
-      }
-      .value span {
-        margin-left: 0.5em;
-        color: var(--theme-emphasis);
-        font-size: 0.9rem;
       }
       .value.emphasis {
         background: var(--theme-emphasis-background);
@@ -101,6 +95,30 @@ export class StatList extends LitElement {
         :host {
           --item-title-font-size: 0.9rem;
           --item-subtitle-font-size: 0.9rem;
+        }
+      }
+      @media all and (max-width: 900px) {
+        :host([cols='1']) .items {
+          grid-template-columns: repeat(3, 1fr 2px 1fr);
+        }
+        :host([cols='2']) .items {
+          grid-template-columns: repeat(2, 1fr 2px 1fr);
+        }
+      }
+      @media all and (max-width: 750px) {
+        :host([cols='1']) .items {
+          grid-template-columns: repeat(2, 1fr 2px 1fr);
+        }
+        :host([cols='2']) .items {
+          grid-template-columns: repeat(2, 1fr 2px 1fr);
+        }
+      }
+      @media all and (max-width: 650px) {
+        :host([cols='1']) .items {
+          grid-template-columns: repeat(1, 1fr 2px 1fr);
+        }
+        :host([cols='2']) .items {
+          grid-template-columns: repeat(1, 1fr 2px 1fr);
         }
       }
     `;
@@ -115,11 +133,6 @@ export class StatList extends LitElement {
       <div class="sep ${item.proficient ? 'emphasis' : ''}"></div>
       <div class="value ${item.proficient ? 'emphasis' : ''}">
         ${renderModifier(item.value, item.proficient)}
-        ${item.proficient
-          ? html`
-              <span>Proficient</span>
-            `
-          : nothing}
       </div>
     `;
   }

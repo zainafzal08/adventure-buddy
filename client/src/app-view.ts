@@ -1,6 +1,6 @@
 // Imports with side effects.
 import './character-sheet/character-sheet';
-import './dm-handbook/dm-handbook';
+import './dnd-handbook/dnd-handbook';
 import './error-page/error-page';
 import './user-profile/user-profile';
 import './app-home/app-home';
@@ -75,7 +75,7 @@ export class AppView extends LitElement {
         pattern: /^\/handbook$/,
         view: () =>
           html`
-            <dm-handbook></dm-handbook>
+            <dnd-handbook></dnd-handbook>
           `,
       },
       {

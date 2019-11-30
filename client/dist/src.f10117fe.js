@@ -4077,8 +4077,6 @@ var _litElement = require("lit-element");
 
 var _util = require("../../util");
 
-var _litHtml = require("lit-html");
-
 var __decorate = void 0 && (void 0).__decorate || function (decorators, target, key, desc) {
   var c = arguments.length,
       r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc,
@@ -4122,7 +4120,7 @@ let StatList = class StatList extends _litElement.LitElement {
       :host([cols='2']) .items {
         width: 100%;
         display: grid;
-        grid-template-columns: 1fr 2px 1fr 1fr 2px 1fr;
+        grid-template-columns: repeat(2, 1fr 2px 1fr);
         grid-auto-rows: var(--row-height);
       }
       .text {
@@ -4155,13 +4153,8 @@ let StatList = class StatList extends _litElement.LitElement {
         display: flex;
         align-items: center;
         justify-content: flex-start;
-        padding-left: 1rem;
+        padding-left: 0.7rem;
         height: calc(100% - 4px);
-      }
-      .value span {
-        margin-left: 0.5em;
-        color: var(--theme-emphasis);
-        font-size: 0.9rem;
       }
       .value.emphasis {
         background: var(--theme-emphasis-background);
@@ -4173,6 +4166,30 @@ let StatList = class StatList extends _litElement.LitElement {
         :host {
           --item-title-font-size: 0.9rem;
           --item-subtitle-font-size: 0.9rem;
+        }
+      }
+      @media all and (max-width: 900px) {
+        :host([cols='1']) .items {
+          grid-template-columns: repeat(3, 1fr 2px 1fr);
+        }
+        :host([cols='2']) .items {
+          grid-template-columns: repeat(2, 1fr 2px 1fr);
+        }
+      }
+      @media all and (max-width: 750px) {
+        :host([cols='1']) .items {
+          grid-template-columns: repeat(2, 1fr 2px 1fr);
+        }
+        :host([cols='2']) .items {
+          grid-template-columns: repeat(2, 1fr 2px 1fr);
+        }
+      }
+      @media all and (max-width: 650px) {
+        :host([cols='1']) .items {
+          grid-template-columns: repeat(1, 1fr 2px 1fr);
+        }
+        :host([cols='2']) .items {
+          grid-template-columns: repeat(1, 1fr 2px 1fr);
         }
       }
     `;
@@ -4187,9 +4204,6 @@ let StatList = class StatList extends _litElement.LitElement {
       <div class="sep ${item.proficient ? 'emphasis' : ''}"></div>
       <div class="value ${item.proficient ? 'emphasis' : ''}">
         ${(0, _util.renderModifier)(item.value, item.proficient)}
-        ${item.proficient ? _litElement.html`
-              <span>Proficient</span>
-            ` : _litHtml.nothing}
       </div>
     `;
   }
@@ -4215,7 +4229,7 @@ __decorate([(0, _litElement.property)({
 })], StatList.prototype, "cols", void 0);
 
 exports.StatList = StatList = __decorate([(0, _litElement.customElement)('stat-list')], StatList);
-},{"lit-element":"node_modules/lit-element/lit-element.js","../../util":"src/util.ts","lit-html":"node_modules/lit-html/lit-html.js"}],"src/ui/app-link/app-link.ts":[function(require,module,exports) {
+},{"lit-element":"node_modules/lit-element/lit-element.js","../../util":"src/util.ts"}],"src/ui/app-link/app-link.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8103,7 +8117,7 @@ __decorate([(0, _litElement.property)()], CharacterSheet.prototype, "sheet", voi
 __decorate([(0, _litElement.property)()], CharacterSheet.prototype, "id", void 0);
 
 exports.CharacterSheet = CharacterSheet = __decorate([(0, _litElement.customElement)('character-sheet')], CharacterSheet);
-},{"../ui/section-title/section-title":"src/ui/section-title/section-title.ts","../ui/quick-stats/quick-stats":"src/ui/quick-stats/quick-stats.ts","../ui/stat-list/stat-list":"src/ui/stat-list/stat-list.ts","../error-page/error-page":"src/error-page/error-page.ts","lit-element":"node_modules/lit-element/lit-element.js","../database":"src/database.ts","../AsyncElement":"src/AsyncElement.ts"}],"src/dm-handbook/dm-handbook.ts":[function(require,module,exports) {
+},{"../ui/section-title/section-title":"src/ui/section-title/section-title.ts","../ui/quick-stats/quick-stats":"src/ui/quick-stats/quick-stats.ts","../ui/stat-list/stat-list":"src/ui/stat-list/stat-list.ts","../error-page/error-page":"src/error-page/error-page.ts","lit-element":"node_modules/lit-element/lit-element.js","../database":"src/database.ts","../AsyncElement":"src/AsyncElement.ts"}],"src/dnd-handbook/dnd-handbook.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8112,8 +8126,6 @@ Object.defineProperty(exports, "__esModule", {
 exports.DmHandbook = void 0;
 
 var _litElement = require("lit-element");
-
-var _database = require("../database");
 
 var _ = _interopRequireDefault(require("../assets/icons/*.svg"));
 
@@ -8139,7 +8151,6 @@ let DmHandbook = class DmHandbook extends _litElement.LitElement {
   constructor() {
     super(...arguments);
     this.searchHelp = DEFAULT_HELP_MSG;
-    this.database = new _database.Database();
   }
 
   static get styles() {
@@ -8200,7 +8211,7 @@ let DmHandbook = class DmHandbook extends _litElement.LitElement {
         display: flex;
         justify-content: center;
       }
-      .no-results{
+      .no-results {
         width: 60%;
         text-align: center;
         display: flex;
@@ -8210,8 +8221,8 @@ let DmHandbook = class DmHandbook extends _litElement.LitElement {
         font-family: 'Montserrat', sans-serif;
       }
       .help > p {
-        font-size: .8rem;
-        color: #BBB;
+        font-size: 0.8rem;
+        color: #bbb;
       }
       .help > p > span {
         color: var(--theme-primary);
@@ -8257,29 +8268,23 @@ let DmHandbook = class DmHandbook extends _litElement.LitElement {
     `;
   }
 
-  renderTable(result) {
-    return _litElement.html``;
-  }
-
   render() {
     return _litElement.html`
       <section-title
-        title='Dungeon Master Handbook'
-        subtitle='A quick way to search up rules,
-      spells and equipment'
+        title="Handbook"
+        subtitle="A quick way to search up rules,
+      spells and equipment"
         icon=${_.default['book']}
       ></section-title>
-      <div class='search'>
+      <div class="search">
         <img src="${_.default['search']}" />
-        <input maxlength="100"/>
+        <input maxlength="100" />
       </div>
-      <div class='help'>
+      <div class="help">
         ${this.searchHelp}
       </div>
-      <div class='results'>
-        
-      </div>
-  `;
+      <div class="results"></div>
+    `;
   }
 
 };
@@ -8289,8 +8294,8 @@ __decorate([(0, _litElement.query)('input')], DmHandbook.prototype, "searchInput
 
 __decorate([(0, _litElement.property)()], DmHandbook.prototype, "searchHelp", void 0);
 
-exports.DmHandbook = DmHandbook = __decorate([(0, _litElement.customElement)('dm-handbook')], DmHandbook);
-},{"lit-element":"node_modules/lit-element/lit-element.js","../database":"src/database.ts","../assets/icons/*.svg":"src/assets/icons/*.svg"}],"src/user-profile/user-profile.ts":[function(require,module,exports) {
+exports.DmHandbook = DmHandbook = __decorate([(0, _litElement.customElement)('dnd-handbook')], DmHandbook);
+},{"lit-element":"node_modules/lit-element/lit-element.js","../assets/icons/*.svg":"src/assets/icons/*.svg"}],"src/user-profile/user-profile.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8769,7 +8774,7 @@ exports.AppView = void 0;
 
 require("./character-sheet/character-sheet");
 
-require("./dm-handbook/dm-handbook");
+require("./dnd-handbook/dnd-handbook");
 
 require("./error-page/error-page");
 
@@ -8847,7 +8852,7 @@ let AppView = AppView_1 = class AppView extends _litElement.LitElement {
     }, {
       pattern: /^\/handbook$/,
       view: () => _litElement.html`
-            <dm-handbook></dm-handbook>
+            <dnd-handbook></dnd-handbook>
           `
     }, {
       pattern: /^\/profile$/,
@@ -8997,7 +9002,7 @@ __decorate([(0, _litElement.property)()], AppView.prototype, "shownView", void 0
 __decorate([(0, _litElement.property)()], AppView.prototype, "ready", void 0);
 
 exports.AppView = AppView = AppView_1 = __decorate([(0, _litElement.customElement)('app-view')], AppView);
-},{"./character-sheet/character-sheet":"src/character-sheet/character-sheet.ts","./dm-handbook/dm-handbook":"src/dm-handbook/dm-handbook.ts","./error-page/error-page":"src/error-page/error-page.ts","./user-profile/user-profile":"src/user-profile/user-profile.ts","./app-home/app-home":"src/app-home/app-home.ts","./ui/app-nav/app-nav":"src/ui/app-nav/app-nav.ts","lit-element":"node_modules/lit-element/lit-element.js","lit-html/directives/cache":"node_modules/lit-html/directives/cache.js","./ui/messages":"src/ui/messages.ts","lit-html":"node_modules/lit-html/lit-html.js","./database":"src/database.ts"}],"src/index.ts":[function(require,module,exports) {
+},{"./character-sheet/character-sheet":"src/character-sheet/character-sheet.ts","./dnd-handbook/dnd-handbook":"src/dnd-handbook/dnd-handbook.ts","./error-page/error-page":"src/error-page/error-page.ts","./user-profile/user-profile":"src/user-profile/user-profile.ts","./app-home/app-home":"src/app-home/app-home.ts","./ui/app-nav/app-nav":"src/ui/app-nav/app-nav.ts","lit-element":"node_modules/lit-element/lit-element.js","lit-html/directives/cache":"node_modules/lit-html/directives/cache.js","./ui/messages":"src/ui/messages.ts","lit-html":"node_modules/lit-html/lit-html.js","./database":"src/database.ts"}],"src/index.ts":[function(require,module,exports) {
 "use strict";
 
 require("./app-view.ts");
@@ -9029,7 +9034,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51657" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59121" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

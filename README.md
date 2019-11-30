@@ -34,11 +34,14 @@ This is the frontend which is build on Lit elements. We use babel and rollup to 
 
 # V.0
 
+**MVP**
+
 The aim of this milestone is to have just a basic page which mimics a character sheet and a handbook people can use to quickly look up spells, items etc. This will involve setting up a basic database of all things Dnd which will server as a foundation for all future features. This database is likely to be incomplete but hopefully can be a good starting point, in future opensourcing the database so people can add to it is how i imagine it growing / being corrected.
 
-Users can edit the page just as they can fill in a sheet to update health, stats etc.
+Users can edit the page just as they can fill in a sheet to update health, stats etc. Most of the page will (unlike a physical sheet) automatically update when base stats change, i.e all skills are auto calculated from
+prof bonus + stat.
 
-After any change the sheet should save, for V.0 this is done just by giving the user a unique url at which their sheet is saved. In later milestones there will be a login flow where users can see all of their sheets.
+After any change the sheet should save, for V.0 this is propegated to local storage. There is no server yet.
 
 List of things that the sheet should show
 
@@ -60,39 +63,44 @@ List of things that the sheet should show
 - [ ] Other information (just a text field which supports markdown)
 - [ ] Death Rolls
 
+**Additional features to make this a proper v.0**
+
+- Have an searchable spell list users can use to find spells to use
+    - Should automatically filter given their level / class.
+    - Clicking on a spell should give detailed information about the spell
+- Let the user enter temporary stats such as the effects of a spell like shield of faith
+- Delete and duplicate a character sheet
+- Better loading ui then 'loading innit'
+- Basic notes tab for players + DMs where you can title and tag enteries
+  and search for them in the DM handbook.
+      - Idea being that you can jot down story items like gladeron #city
+      king is a douchebag.
 
 # V.1
 
 The aim of this milestone is to give the user features that a paper sheet does not give.
 
-- Have an searchable spell list users can use to find spells to use
-    - Should automatically filter given their level / class.
-    - Clicking on a spell should give detailed information about the spell
 - Give the user a easy way to roll dice, such as a text field which parses input such as "3d8 + d5 + 8" (there are npm packages that do this for us).
     - Additionally allow users to quickily roll initative / saving throws by automatically adding the relevant modifiers.
-- Let the user enter temporary stats such as the effects of a spell like shield of faith
 - Give quick methods to trigger a hit (lose HP) or a rest (gain HP + spell slots)
 - Give a quick method to cast a spell and use up a spell slot
+- Have a login flow and upsync/downsync data from the server
+- Have shareable character sheets which are locked to read only
+- Improve database
+- Full tablet and mobile support
 
 # V.2
 To be fleshed out...
 
-- Have a login
-- Have a basic dashboard after login
+- Improve the home page.
 - let users upload a image for their character sheet
-- Have a easy to search DM handbook for querys about resting, magic, death, combat, stealth etc.
-
-# V.3
-To be fleshed out...
-
-- Have a new character flow
+- Have a new character flow to create a new character
 - store all changes to character sheet so we can make graphs of health and have stats like "# times died"
 
 # V.4
 To be fleshed out...
 
 - Proper DM features (console etc.)
-
-# debt
-
-- Need to make routing use push / pop history and listen to foward and back buttons
+    - Have a screen with all characters / monsters
+    - Keep track of initative and whose turn it is
+    - Quick monster generator
