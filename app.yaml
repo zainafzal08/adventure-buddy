@@ -1,9 +1,0 @@
-runtime: python37
-
-handlers:
-  - url: /(.*\..+)$ 
-    static_files: client/dist/\1
-    upload: client/dist/(.*\..+)$
-  - url: /
-    static_files: client/dist/index.html
-    upload: client/dist/index.html
