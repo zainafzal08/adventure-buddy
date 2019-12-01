@@ -1,5 +1,7 @@
 // Imports with side effects.
 import './pages/app-home/app-home';
+import './pages/login-page/login-page';
+import * as firebase from 'firebase/app';
 
 // Named imports.
 import {
@@ -71,6 +73,8 @@ export class AppView extends AsyncElement {
    */
   @property() private shownView: TemplateResult | {} = nothing;
 
+  private user: firebase.User | null = null;
+
   /**
    * All routes that the app can handle, this is a array of objects
    * which define a view function that returns a html template and a
@@ -102,7 +106,7 @@ export class AppView extends AsyncElement {
     return css`
       :host {
         --navbar-height: 50px;
-        --brand-gradient: linear-gradient(110deg, #b24592, #f15f79);
+        --brand-gradient: linear-gradient(to right, #b24592, #f15f79);
         --page-vpad: 16px;
         --page-hpad: 48px;
         display: flex;
@@ -116,7 +120,6 @@ export class AppView extends AsyncElement {
           100% - 2 * var(--page-hpad) - var(--navbar-height) - 1px
         );
         padding: var(--page-vpad) var(--page-hpad);
-        background: #fafafa;
       }
       @media all and (max-width: 550px) {
         :host {
@@ -133,6 +136,18 @@ export class AppView extends AsyncElement {
       this.changeRoute(e.detail.target);
     }) as EventListener);
 
+    this.addEventListener('login', ((e: CustomEvent) => {
+      this.user = e.detail.user;
+      this.changeRoute('/');
+    }) as EventListener);
+
+    this.addEventListener('logout', (() => {
+      firebase.auth().signOut();
+      this.user = null;
+      history.pushState({}, '', '/');
+      this.changeRoute('/');
+    }) as EventListener);
+
     window.onpopstate = () => {
       this.changeRoute(document.location.pathname);
     };
@@ -141,16 +156,29 @@ export class AppView extends AsyncElement {
     if (database.state !== DatabaseState.READY) {
       await database.ready;
     }
+    const fetchedUser = new Promise(resolve => {
+      firebase.auth().onAuthStateChanged(user => {
+        this.user = user;
+        resolve();
+      });
+    });
+    await fetchedUser;
+
     this.changeRoute(document.location.pathname);
   }
 
   changeRoute(location: string) {
     for (const route of AppView.routes) {
       const m = route.pattern.exec(location);
-      if (m) {
-        this.shownView = route.view(m);
+      if (!m) continue;
+      if (!this.user) {
+        this.shownView = html`
+          <login-page></login-page>
+        `;
         return;
       }
+      this.shownView = route.view(m);
+      return;
     }
     this.shownView = AppView.unknownRouteView();
   }
