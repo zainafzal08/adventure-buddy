@@ -4,7 +4,6 @@ import {
   TemplateResult,
   html,
 } from 'lit-element';
-import { nothing } from 'lit-html';
 
 export class AsyncElement extends LitElement {
   @property() ready: boolean = false;
@@ -47,7 +46,7 @@ export class AsyncElement extends LitElement {
    */
   loading(): TemplateResult {
     return html`
-      ${nothing}
+      DEFAULT LOADING ELEMENT
     `;
   }
 
@@ -56,7 +55,7 @@ export class AsyncElement extends LitElement {
    */
   template(): TemplateResult {
     return html`
-      ${nothing}
+      DEFAULT ELEMENT
     `;
   }
 
@@ -65,7 +64,7 @@ export class AsyncElement extends LitElement {
    */
   error(context: any): TemplateResult {
     return html`
-      ${nothing}
+      DEFAULT ERROR MESSAGE: ${context}
     `;
   }
 

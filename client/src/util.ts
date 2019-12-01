@@ -8,4 +8,6 @@ export function getNavigateEvent(target: string) {
   });
 }
 
-export function exhaustiveCheck(param: never) {}
+export function exhaustiveCheck(param: never) {
+  param;
+}
