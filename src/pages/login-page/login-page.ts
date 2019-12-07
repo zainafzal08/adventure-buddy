@@ -3,7 +3,7 @@ import * as firebase from 'firebase/app';
 
 import { AsyncElement } from '../../AsyncElement';
 import logo from '../../assets/logo.svg';
-import { getNavigateEvent, getLoginEvent } from '../../util';
+import { getLoginEvent } from '../../util';
 
 @customElement('login-page')
 export class LoginPage extends AsyncElement {
@@ -32,8 +32,8 @@ export class LoginPage extends AsyncElement {
         overflow: hidden;
       }
       .modal {
-        width: 300px;
-        height: 300px;
+        width: 280px;
+        height: 280px;
         background: #ffffff;
         border-radius: 15px;
         box-shadow: 5px 4px 5px rgba(0, 0, 0, 0.05);
@@ -42,6 +42,7 @@ export class LoginPage extends AsyncElement {
         align-items: center;
         justify-content: flex-start;
         flex-direction: column;
+        padding: 20px;
       }
       .stripe {
         height: 4000px;
@@ -51,11 +52,11 @@ export class LoginPage extends AsyncElement {
       }
       .modal img {
         width: 64px;
-        margin: 16px 0;
+        margin: 16px;
       }
       .modal h1 {
         margin: 0;
-        color: var(--theme-primary);
+        color: var(--brand-secondary);
         font-size: 1.5rem;
         font-weight: 100;
       }
@@ -68,7 +69,7 @@ export class LoginPage extends AsyncElement {
         width: 150px;
         font-size: 12px;
         color: white;
-        background: var(--theme-primary);
+        background: var(--brand-secondary-light);
         padding: 0.5rem 1rem;
         border-radius: 20px;
         outline: none;

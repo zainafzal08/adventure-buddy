@@ -107,6 +107,9 @@ export class AppView extends AsyncElement {
       :host {
         --navbar-height: 50px;
         --brand-gradient: linear-gradient(to right, #b24592, #f15f79);
+        --brand-primary: #b24592;
+        --brand-secondary: #f15f79;
+        --brand-secondary-light: #f15f79dd;
         --page-vpad: 16px;
         --page-hpad: 48px;
         display: flex;
