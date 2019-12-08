@@ -72,9 +72,6 @@ export class AppView extends AsyncElement {
    * the routes getter function.
    */
   @property() private shownView: TemplateResult | {} = nothing;
-
-  private user: firebase.User | null = null;
-
   /**
    * All routes that the app can handle, this is a array of objects
    * which define a view function that returns a html template and a
@@ -139,15 +136,15 @@ export class AppView extends AsyncElement {
       this.changeRoute(e.detail.target);
     }) as EventListener);
 
+    // todo(zain): Delegate all auth stuff to it's own global object?
     this.addEventListener('login', ((e: CustomEvent) => {
-      this.user = e.detail.user;
+      getDatabase().login(e.detail.user);
       this.changeRoute('/');
     }) as EventListener);
 
     this.addEventListener('logout', (() => {
       firebase.auth().signOut();
-      this.user = null;
-      history.pushState({}, '', '/');
+      getDatabase().logout();
       this.changeRoute('/');
     }) as EventListener);
 
@@ -161,20 +158,22 @@ export class AppView extends AsyncElement {
     }
     const fetchedUser = new Promise(resolve => {
       firebase.auth().onAuthStateChanged(user => {
-        this.user = user;
+        if (user) database.login(user);
         resolve();
       });
     });
     await fetchedUser;
 
-    this.changeRoute(document.location.pathname);
+    await this.changeRoute(document.location.pathname);
   }
 
-  changeRoute(location: string) {
+  async changeRoute(location: string) {
+    history.pushState({}, '', '/');
+    const user = await getDatabase().getUser();
     for (const route of AppView.routes) {
       const m = route.pattern.exec(location);
       if (!m) continue;
-      if (!this.user) {
+      if (!user) {
         this.shownView = html`
           <login-page></login-page>
         `;

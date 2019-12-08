@@ -29,6 +29,11 @@ export class Database {
    */
   private readyPromiseResolver!: resolver;
 
+  /**
+   * Currently logged in user.
+   */
+  private user: firebase.User | null = null;
+
   constructor() {
     this.ready = new Promise(resolve => {
       this.readyPromiseResolver = resolve;
@@ -44,6 +49,21 @@ export class Database {
     if (!characters) {
       await localForage.setItem('meta:characters', []);
     }
+  }
+
+  async login(user: firebase.User) {
+    this.user = user;
+    await localForage.setItem('user', user);
+  }
+
+  async logout() {
+    this.user = null;
+    await localForage.setItem('user', null);
+  }
+
+  async getUser(): Promise<firebase.User | null> {
+    if (this.user) return this.user;
+    return (await localForage.getItem('user')) as firebase.User;
   }
 
   /** Convience method for adding to a metadata array. */
