@@ -1,6 +1,7 @@
 // Imports with side effects.
 import './pages/app-home/app-home';
 import './pages/login-page/login-page';
+import './components/app-nav/app-nav';
 import * as firebase from 'firebase/app';
 
 // Named imports.
@@ -27,6 +28,7 @@ interface Route {
 interface theme {
   gradient: string;
   primary: string;
+  primaryLight: string;
   secondary: string;
   emphasis: string;
   emphasisBackground: string;
@@ -37,6 +39,7 @@ interface theme {
 const PEACH_THEME: theme = {
   gradient: 'linear-gradient(110deg, #f2709c, #ff9472)',
   primary: '#f2709c',
+  primaryLight: '#f2709c1a',
   secondary: '#ff9472',
   emphasis: '#6cbee6',
   emphasisBackground: '#6cbee60f',
@@ -47,6 +50,7 @@ const PEACH_THEME: theme = {
 const FRESH_THEME: theme = {
   gradient: 'linear-gradient(110deg, #67b26f, #4ca2cd)',
   primary: '#67b26f',
+  primaryLight: '#67b26fdd',
   secondary: '#4ca2cd',
   emphasis: '#6cbee6',
   emphasisBackground: '#6cbee60f',
@@ -72,6 +76,12 @@ export class AppView extends AsyncElement {
    * the routes getter function.
    */
   @property() private shownView: TemplateResult | {} = nothing;
+
+  /**
+   * If the navbar should be shown.
+   */
+  private showNavbar: boolean = false;
+
   /**
    * All routes that the app can handle, this is a array of objects
    * which define a view function that returns a html template and a
@@ -116,8 +126,8 @@ export class AppView extends AsyncElement {
       main {
         width: calc(100% - 2 * var(--page-hpad));
         padding: var(--page-vpad) var(--page-hpad);
-        min-height: calc(
-          100% - 2 * var(--page-hpad) - var(--navbar-height) - 1px
+        height: calc(
+          100vh - (2 * var(--page-vpad)) - var(--navbar-height)
         );
         padding: var(--page-vpad) var(--page-hpad);
       }
@@ -142,9 +152,9 @@ export class AppView extends AsyncElement {
       this.changeRoute('/');
     }) as EventListener);
 
-    this.addEventListener('logout', (() => {
+    this.addEventListener('logout', (async () => {
       firebase.auth().signOut();
-      getDatabase().logout();
+      await getDatabase().logout();
       this.changeRoute('/');
     }) as EventListener);
 
@@ -169,6 +179,7 @@ export class AppView extends AsyncElement {
 
   async changeRoute(location: string) {
     history.pushState({}, '', '/');
+    this.showNavbar = false;
     const user = await getDatabase().getUser();
     for (const route of AppView.routes) {
       const m = route.pattern.exec(location);
@@ -180,6 +191,7 @@ export class AppView extends AsyncElement {
         return;
       }
       this.shownView = route.view(m);
+      this.showNavbar = true;
       return;
     }
     this.shownView = AppView.unknownRouteView();
@@ -216,7 +228,11 @@ export class AppView extends AsyncElement {
           --font-stack: 'Montserrat', sans-serif;
         }
       </style>
-      <app-nav></app-nav>
+      ${this.showNavbar
+        ? html`
+            <app-nav></app-nav>
+          `
+        : nothing}
       <main>
         ${cache(this.shownView)}
       </main>

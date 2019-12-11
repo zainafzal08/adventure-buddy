@@ -30,6 +30,7 @@
     "Chrome > 50"
   ],
   "dependencies": {
+    "@mdi/js": "^4.7.95",
     "@types/localforage": "0.0.34",
     "firebase": "^7.5.0",
     "lit-element": "^2.2.1",

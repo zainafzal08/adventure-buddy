@@ -14,7 +14,7 @@ type resolver = (value?: void | PromiseLike<void> | undefined) => void;
 
 export class Database {
   /**
-   * A promise that resolves when the database is finished initilisating
+   * A promise that resolves when the database is finished initilisating.
    */
   ready!: Promise<void>;
 
@@ -32,7 +32,7 @@ export class Database {
   /**
    * Currently logged in user.
    */
-  private user: firebase.User | null = null;
+  private user: firebase.UserInfo | null = null;
 
   constructor() {
     this.ready = new Promise(resolve => {
@@ -52,8 +52,16 @@ export class Database {
   }
 
   async login(user: firebase.User) {
-    this.user = user;
-    await localForage.setItem('user', user);
+    this.user = {
+      displayName: user.displayName,
+      email: user.email,
+      phoneNumber: user.phoneNumber,
+      photoURL: user.photoURL,
+      providerId: user.providerId,
+      uid: user.uid,
+    };
+
+    await localForage.setItem('user', this.user);
   }
 
   async logout() {
@@ -61,9 +69,9 @@ export class Database {
     await localForage.setItem('user', null);
   }
 
-  async getUser(): Promise<firebase.User | null> {
+  async getUser(): Promise<firebase.UserInfo | null> {
     if (this.user) return this.user;
-    return (await localForage.getItem('user')) as firebase.User;
+    return (await localForage.getItem('user')) as firebase.UserInfo;
   }
 
   /** Convience method for adding to a metadata array. */
@@ -74,12 +82,12 @@ export class Database {
     await localForage.setItem(`meta:${key}`, [...array, value]);
   }
 
-  /** Convience Method for getting metadata */
+  /** Convience Method for getting metadata. */
   async getMetadata(key: string) {
     return (await localForage.getItem(`meta:${key}`)) as Array<string>;
   }
 
-  /** Get's number of characters */
+  /** Get's number of characters. */
   async numCharacters(): Promise<number> {
     const characters = await this.getMetadata('characters');
     return characters.length;
