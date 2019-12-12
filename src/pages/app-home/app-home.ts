@@ -1,10 +1,12 @@
 import '../../components/mdi-icon/mdi-icon';
 
 import { html, customElement, css } from 'lit-element';
-import { mdiPlusCircleOutline, mdiAccountMultiple } from '@mdi/js';
+import { mdiPlusCircleOutline } from '@mdi/js';
 
 import { AsyncElement } from '../../AsyncElement';
 import { getDatabase } from '../../data/Database';
+import { CharacterSheet } from '../../data/CharacterSheet';
+import sittingHuman from '../../assets/humaaans/sitting.svg';
 
 @customElement('app-home')
 export class AppHome extends AsyncElement {
@@ -66,6 +68,23 @@ export class AppHome extends AsyncElement {
         width: fit-content;
         margin-right: 0.5rem;
       }
+      .zero-state {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+      }
+      .zero-state img {
+        filter: grayscale(1);
+        opacity: 0.4;
+        width: 160px;
+      }
+      .zero-state p {
+        color: #bbb;
+        text-align: center;
+      }
     `;
   }
 
@@ -73,9 +92,27 @@ export class AppHome extends AsyncElement {
     this.user = await getDatabase().getUser();
   }
 
+  characterList(characters: CharacterSheet[]) {
+    return html`
+      nada
+    `;
+  }
+
+  characterZeroState() {
+    return html`
+      <div class="zero-state">
+        <img src=${sittingHuman} />
+        <p>
+          The best part is making the characters, What are you waiting
+          for?
+        </p>
+      </div>
+    `;
+  }
+
   template() {
-    // todo(zain): Need to make the first name extraction more reliable,
-    // splitting on space is going to fail a bunch i bet.
+    const characters: CharacterSheet[] = [];
+
     return html`
       <div class="heading">
         <h1>
@@ -94,25 +131,12 @@ export class AppHome extends AsyncElement {
             New
           </div>
         </div>
+        ${
+          characters.length > 0
+            ? this.characterList(characters)
+            : this.characterZeroState()
+        }
       </div>
-      <div class="list-container">
-        <div class="list-title">
-          <h2>Games</h2>
-          <div class="chip-button">
-            <mdi-icon
-              .color=${css`var(--theme-primary)`}
-              icon="${mdiPlusCircleOutline}"
-            ></mdi-icon>
-            Create
-          </div>
-          <div class="chip-button">
-            <mdi-icon
-              .color=${css`var(--theme-primary)`}
-              icon="${mdiAccountMultiple}"
-            ></mdi-icon>
-            Join
-          </div>
-        </div>
       </div>
     `;
   }
