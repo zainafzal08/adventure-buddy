@@ -150,7 +150,6 @@ export class AppView extends AsyncElement {
 
   async init() {
     this.addEventListener('navigate', ((e: CustomEvent) => {
-      history.pushState({}, '', e.detail.target);
       this.changeRoute(e.detail.target);
     }) as EventListener);
 
@@ -166,8 +165,10 @@ export class AppView extends AsyncElement {
       this.changeRoute('/');
     }) as EventListener);
 
-    window.onpopstate = () => {
-      this.changeRoute(document.location.pathname);
+    window.onpopstate = (e: PopStateEvent) => {
+      if (e.state) {
+        this.changeRoute(e.state.target, false);
+      }
     };
 
     const database = getDatabase();
@@ -176,17 +177,22 @@ export class AppView extends AsyncElement {
     }
     const fetchedUser = new Promise(resolve => {
       firebase.auth().onAuthStateChanged(user => {
+        // TODO(zain): Maybe actually wait for this and handle
+        // it failing...
         if (user) database.login(user);
         resolve();
       });
     });
     await fetchedUser;
-
-    await this.changeRoute(document.location.pathname);
+    const location = document.location.pathname;
+    await this.changeRoute(location, false);
+    history.replaceState({ target: location }, '', location);
   }
 
-  async changeRoute(location: string) {
-    history.pushState({}, '', '/');
+  async changeRoute(location: string, appendToHistory = true) {
+    console.log(location);
+    if (appendToHistory)
+      history.pushState({ target: location }, '', location);
     this.showNavbar = false;
     const user = await getDatabase().getUser();
     for (const route of AppView.routes) {
