@@ -4,6 +4,7 @@ import {
   TemplateResult,
   html,
 } from 'lit-element';
+import { getActionEvent } from './util';
 
 export class AsyncElement extends LitElement {
   @property() ready: boolean = false;
@@ -69,16 +70,28 @@ export class AsyncElement extends LitElement {
   }
 
   /**
-   * Register a promise which will block the component until resolved.
-   * Useful for pages which do server calls.
+   * Register that there is some pending action this component is
+   * waiting on.
    */
-  waitOn(p: Promise<any>) {
-    this.ready = false;
-    p.then(() => {
-      this.ready = true;
-    }).catch(e => {
-      this.fail(e);
-    });
+  actionPending(id: string) {
+    this.dispatchEvent(getActionEvent('pending', id));
+  }
+
+  /**
+   * Register that some pending action this component was
+   * waiting on has completed.
+   */
+  actionCompleted(id: string) {
+    this.dispatchEvent(getActionEvent('complete', id));
+  }
+
+  /**
+   * Register that some pending action this component was
+   * waiting on failed.
+   */
+  actionFailed(id: string) {
+    this.actionsPending--;
+    this.dispatchEvent(getActionEvent('failed', id));
   }
 
   render() {

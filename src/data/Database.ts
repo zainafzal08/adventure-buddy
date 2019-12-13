@@ -111,6 +111,9 @@ export class Database {
   /** Get's a character sheet by id. */
   async getCharacterSheet(id: string): Promise<CharacterSheet | null> {
     const data = await localForage.getItem(`character:${id}`);
+    // TODO(zain): we need a server request here to grab a character not
+    // in local storage. On failed request we can error (this is how
+    // offline will work).
     if (!data) return null;
     return new CharacterSheet(data as CharacterSheetDescriptor);
   }

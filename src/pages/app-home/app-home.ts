@@ -1,16 +1,23 @@
 import '../../components/mdi-icon/mdi-icon';
-
-import { html, customElement, css } from 'lit-element';
+import '../../components/character-gallery-item/character-gallery-item';
+import { html, customElement, css, query } from 'lit-element';
 import { mdiPlusCircleOutline } from '@mdi/js';
 
 import { AsyncElement } from '../../AsyncElement';
 import { getDatabase } from '../../data/Database';
-import { CharacterSheet } from '../../data/CharacterSheet';
+import {
+  CharacterSheet,
+  CharacterSheetDescriptor,
+} from '../../data/CharacterSheet';
 import sittingHuman from '../../assets/humaaans/sitting.svg';
+import { getNavigateEvent } from '../../util';
 
 @customElement('app-home')
 export class AppHome extends AsyncElement {
+  @query('new-character-btn') newCharacterButton!: HTMLDivElement;
+
   private user: firebase.UserInfo | null = null;
+  private characters: CharacterSheet[] = [];
 
   static get styles() {
     return css`
@@ -90,12 +97,18 @@ export class AppHome extends AsyncElement {
 
   async init() {
     this.user = await getDatabase().getUser();
+    this.characters = await getDatabase().getAllCharacters();
   }
 
-  characterList(characters: CharacterSheet[]) {
-    return html`
-      nada
-    `;
+  characterList() {
+    return this.characters.map(
+      character =>
+        html`
+          <character-gallery-item
+            .character=${character}
+          ></character-gallery-item>
+        `
+    );
   }
 
   characterZeroState() {
@@ -110,9 +123,11 @@ export class AppHome extends AsyncElement {
     `;
   }
 
-  template() {
-    const characters: CharacterSheet[] = [];
+  newCharacter() {
+    this.dispatchEvent(getNavigateEvent('/new/character'));
+  }
 
+  template() {
     return html`
       <div class="heading">
         <h1>
@@ -123,7 +138,9 @@ export class AppHome extends AsyncElement {
       <div class="list-container">
         <div class="list-title">
           <h2>Characters</h2>
-          <div class="chip-button">
+          <div id="new-character-btn" class="chip-button" @click=${
+            this.newCharacter
+          }>
             <mdi-icon
               .color=${css`var(--theme-primary)`}
               icon="${mdiPlusCircleOutline}"
@@ -132,8 +149,8 @@ export class AppHome extends AsyncElement {
           </div>
         </div>
         ${
-          characters.length > 0
-            ? this.characterList(characters)
+          this.characters.length > 0
+            ? this.characterList()
             : this.characterZeroState()
         }
       </div>

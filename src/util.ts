@@ -7,18 +7,31 @@ export function getNavigateEvent(target: string) {
     },
   });
 }
+
 export function getLogoutEvent() {
   return new CustomEvent('logout', {
     bubbles: true,
     composed: true,
   });
 }
+
 export function getLoginEvent(user: firebase.User) {
   return new CustomEvent('login', {
     bubbles: true,
     composed: true,
     detail: {
       user,
+    },
+  });
+}
+
+export function getActionEvent(type: string, id: string) {
+  return new CustomEvent('action', {
+    bubbles: true,
+    composed: true,
+    detail: {
+      type,
+      id,
     },
   });
 }

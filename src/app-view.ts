@@ -1,6 +1,7 @@
 // Imports with side effects.
 import './pages/app-home/app-home';
 import './pages/login-page/login-page';
+import './pages/new-character/new-character';
 import './components/app-nav/app-nav';
 import * as firebase from 'firebase/app';
 
@@ -95,6 +96,13 @@ export class AppView extends AsyncElement {
         view: () =>
           html`
             <app-home></app-home>
+          `,
+      },
+      {
+        pattern: /^\/new\/character/,
+        view: () =>
+          html`
+            <new-character></new-character>
           `,
       },
     ];
