@@ -1,5 +1,6 @@
 import '../../components/character-card/character-card';
 import '../../components/text-field/text-field';
+import '../../components/number-field/number-field';
 
 import {
   LitElement,
@@ -33,6 +34,14 @@ const NEW_CHARACTER_FLOW: Step[] = [
       () =>
         html`
           <text-field name="Character Name" field="name"></text-field>
+        `,
+      () =>
+        html`
+          <number-field
+            name="Level"
+            field="level"
+            .range=${[1, 20]}
+          ></number-field>
         `,
     ],
   },

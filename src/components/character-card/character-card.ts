@@ -57,30 +57,40 @@ export class CharacterCard extends LitElement {
       .basics .text-small {
         width: 40%;
         height: 1rem;
-        background: #ebebeb;
         margin: 0.5rem 0;
+        text-align: center;
+        color: #777;
+      }
+      .basics .text-small.empty {
+        background: #ebebeb;
       }
     `;
   }
 
-  getName() {
-    if (!this.character.name) {
-      return html`
-        <div class="text empty"></div>
-      `;
-    } else {
-      return html`
-        <div class="text">${this.character.name}</div>
-      `;
-    }
+  placeholder(elemClass: string, value: string) {
+    const div = document.createElement('div');
+    div.classList.add(elemClass);
+    if (!value) div.classList.add('empty');
+    div.innerText = value;
+    return div;
+  }
+
+  getDescriptor() {
+    let level = `Level ${this.character.level}`;
+    if (this.character.level === -1 || !this.character.level)
+      level = '';
+
+    return [level, this.character.race, this.character.class]
+      .filter(x => x !== '')
+      .join(' ');
   }
 
   render() {
     return html`
       <div class="basics">
         <div class="img"></div>
-        ${this.getName()}
-        <div class="text-small empty"></div>
+        ${this.placeholder('text', this.character.name)}
+        ${this.placeholder('text-small', this.getDescriptor())}
       </div>
     `;
   }
