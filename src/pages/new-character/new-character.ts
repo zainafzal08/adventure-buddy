@@ -1,6 +1,7 @@
 import '../../components/character-card/character-card';
 import '../../components/text-field/text-field';
 import '../../components/number-field/number-field';
+import '../../components/race-selection-field/race-selection-field';
 
 import {
   LitElement,
@@ -22,8 +23,71 @@ import {
  */
 interface Step {
   title: TemplateResult;
-  fields: (() => TemplateResult)[];
+  fields: TemplateResult[];
 }
+
+const CLASSES = [
+  {
+    name: 'Barbarian',
+    value: 'barbarian',
+    icon: 'boxing-glove',
+  },
+  {
+    name: 'Bard',
+    value: 'bard',
+    icon: 'music',
+  },
+  {
+    name: 'Cleric',
+    value: 'cleric',
+    icon: 'hand-heart',
+  },
+  {
+    name: 'Druid',
+    value: 'druid',
+    icon: 'leaf',
+  },
+  {
+    name: 'Fighter',
+    value: 'fighter',
+    icon: 'sword-cross',
+  },
+  {
+    name: 'Monk',
+    value: 'monk',
+    icon: 'karate',
+  },
+  {
+    name: 'Paladin',
+    value: 'paladin',
+    icon: 'shield-cross-outline',
+  },
+  {
+    name: 'Ranger',
+    value: 'ranger',
+    icon: 'bullseye-arrow',
+  },
+  {
+    name: 'Rogue',
+    value: 'rogue',
+    icon: 'knife-military',
+  },
+  {
+    name: 'Sorcerer',
+    value: 'sorcerer',
+    icon: 'fire',
+  },
+  {
+    name: 'Warlock',
+    value: 'warlock',
+    icon: 'eye-circle-outline',
+  },
+  {
+    name: 'Wizard',
+    value: 'wizard',
+    icon: 'auto-fix',
+  },
+];
 
 const NEW_CHARACTER_FLOW: Step[] = [
   {
@@ -31,18 +95,19 @@ const NEW_CHARACTER_FLOW: Step[] = [
       Lets start with the <span>Basics<span></span></span>
     `,
     fields: [
-      () =>
-        html`
-          <text-field name="Character Name" field="name"></text-field>
-        `,
-      () =>
-        html`
-          <number-field
-            name="Level"
-            field="level"
-            .range=${[1, 20]}
-          ></number-field>
-        `,
+      html`
+        <text-field name="Character Name" field="name"></text-field>
+      `,
+      html`
+        <number-field
+          name="Level"
+          field="level"
+          .range=${[1, 20]}
+        ></number-field>
+      `,
+      html`
+        <race-selection-field></race-selection-field>
+      `,
     ],
   },
 ];
@@ -139,9 +204,7 @@ export class NewCharacter extends LitElement {
   }
 
   getFields() {
-    return NEW_CHARACTER_FLOW[this.currentStep - 1].fields.map(field =>
-      field()
-    );
+    return NEW_CHARACTER_FLOW[this.currentStep - 1].fields;
   }
 
   firstUpdated() {

@@ -12,11 +12,9 @@ export class NumberField extends LitElement {
   @property({ attribute: true }) name: string = 'numberField';
   @property() field: string = 'number';
   @property() range: [number | null, number | null] = [null, null];
-
+  @property() help: string = '';
   @query('input') input!: HTMLInputElement;
   @query('.group') group!: HTMLDivElement;
-
-  private err: string = '';
 
   static get styles() {
     return css`
@@ -29,7 +27,8 @@ export class NumberField extends LitElement {
         justify-content: flex-start;
         flex-direction: column;
         width: 100%;
-        margin-top: 2rem;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
       }
       label {
         font-size: 0.8rem;
@@ -40,6 +39,7 @@ export class NumberField extends LitElement {
         color: var(--theme-primary);
         opacity: 0.7;
       }
+
       .group.invalid:focus-within label {
         color: var(--theme-emphasis-low);
         opacity: 0.7;
@@ -53,7 +53,7 @@ export class NumberField extends LitElement {
         border: none;
         outline: none;
         height: 1.6rem;
-        width: 80%;
+        width: 100%;
         background: none;
         color: #777;
         padding: 0.3rem 0;
@@ -73,10 +73,20 @@ export class NumberField extends LitElement {
       input[type='number']::-webkit-inner-spin-button {
         -webkit-appearance: none;
       }
+      small {
+        color: #ccc;
+        font-size: 0.7rem;
+        margin-top: 0.3rem;
+        height: 0.8rem;
+      }
+      .group.invalid small {
+        color: var(--theme-emphasis-low);
+        opacity: 0.7;
+      }
     `;
   }
 
-  isValid() {
+  validate() {
     const v = parseInt(this.input.value);
     let valid = true;
     if (this.range[0]) {
@@ -86,9 +96,12 @@ export class NumberField extends LitElement {
       valid = valid && v <= this.range[1];
     }
     if (!valid) {
-      this.err = `Value must be in range [${this.range[0]}, ${this.range[1]}]`;
+      this.help = `Value must be between ${this.range[0]} and ${this.range[1]}`;
+    } else {
+      this.help = '';
     }
-    return valid;
+
+    this.group.classList.toggle('invalid', !valid);
   }
 
   render() {
@@ -101,7 +114,7 @@ export class NumberField extends LitElement {
           min=${this.range[0] ? this.range[0] : ''}
           max=${this.range[1] ? this.range[1] : ''}
           @input=${() => {
-            this.group.classList.toggle('invalid', !this.isValid());
+            this.validate();
             this.dispatchEvent(
               new CustomEvent('mutation', {
                 bubbles: true,
@@ -116,6 +129,7 @@ export class NumberField extends LitElement {
             );
           }}
         />
+        <small>${this.help}</small>
       </div>
     `;
   }

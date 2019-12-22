@@ -59,6 +59,7 @@ export class AppNav extends LitElement {
             size="28"
             icon=${item.icon}
             @click=${item.handler}
+            button="true"
           ></mdi-icon>
         `
       )}

@@ -25,7 +25,8 @@ export class TextField extends LitElement {
         justify-content: flex-start;
         flex-direction: column;
         width: 100%;
-        margin-top: 2rem;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
       }
       label {
         font-size: 0.8rem;
@@ -41,7 +42,7 @@ export class TextField extends LitElement {
         border: none;
         outline: none;
         height: 1.6rem;
-        width: 80%;
+        width: 100%;
         background: none;
         color: #777;
         padding: 0.3rem 0;

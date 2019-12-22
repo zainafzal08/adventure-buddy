@@ -60,6 +60,9 @@ export class CharacterCard extends LitElement {
         margin: 0.5rem 0;
         text-align: center;
         color: #777;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
       }
       .basics .text-small.empty {
         background: #ebebeb;
