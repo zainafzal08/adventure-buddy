@@ -20,6 +20,9 @@ import { nothing } from 'lit-html';
 import { getDatabase, DatabaseState, Settings } from './data/Database';
 import { AsyncElement } from './AsyncElement';
 import { THEMES } from './themes';
+import { connect } from 'pwa-helpers';
+import { store } from './redux/store';
+import { AppState } from './redux/reducer';
 
 type RouteRenderer = (match: RegExpExecArray) => TemplateResult;
 
@@ -29,7 +32,7 @@ interface Route {
 }
 
 @customElement('app-view')
-export class AppView extends AsyncElement {
+export class AppView extends connect(store)(AsyncElement) {
   /**
    * The theme of the application, this is used to generate a
    * series of css variables which the rest of the application uses.
@@ -151,13 +154,6 @@ export class AppView extends AsyncElement {
       await database.ready;
     }
 
-    database.addSettingsListener(newSettings =>
-      this.updateSettings(newSettings)
-    );
-
-    const settings = await database.getSettings();
-    this.theme = settings.theme;
-
     const fetchedUser = new Promise(resolve => {
       firebase.auth().onAuthStateChanged(user => {
         // TODO(zain): Maybe actually wait for this and handle
@@ -170,6 +166,10 @@ export class AppView extends AsyncElement {
     const location = document.location.pathname;
     await this.changeRoute(location, false);
     history.replaceState({ target: location }, '', location);
+  }
+
+  stateChanged(state: AppState) {
+    this.theme = state.settings.theme;
   }
 
   async changeRoute(location: string, appendToHistory = true) {

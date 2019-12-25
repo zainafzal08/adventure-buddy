@@ -1,13 +1,18 @@
 import { html, customElement, css, property } from 'lit-element';
 import { AsyncElement } from '../../AsyncElement';
-import { getDatabase } from '../../data/Database';
 import { Settings } from '../../data/Database';
 import { THEMES } from '../../themes';
-import { getSettingChangedEvent } from '../../util';
+import { AppState } from '../../redux/reducer';
+import { store } from '../../redux/store';
+import { connect } from 'pwa-helpers';
 
 @customElement('settings-page')
-export class SettingsPage extends AsyncElement {
+export class SettingsPage extends connect(store)(AsyncElement) {
   @property() settings!: Settings;
+
+  stateChanged(state: AppState) {
+    this.settings = state.settings;
+  }
 
   static get styles() {
     return css`
@@ -76,18 +81,11 @@ export class SettingsPage extends AsyncElement {
     `;
   }
 
-  async init() {
-    this.settings = await getDatabase().getSettings();
-  }
-
   updateTheme(value: string) {
-    this.settings = { ...this.settings, theme: value };
-    this.dispatchEvent(getSettingChangedEvent());
-    this.syncSettings();
-  }
-
-  syncSettings() {
-    getDatabase().updateSettings(this.settings);
+    store.dispatch({
+      type: 'UPDATE_THEME',
+      value,
+    });
   }
 
   themeList() {
