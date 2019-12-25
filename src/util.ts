@@ -36,6 +36,13 @@ export function getActionEvent(type: string, id: string) {
   });
 }
 
+export function getSettingChangedEvent() {
+  return new CustomEvent('settingsChanged', {
+    bubbles: true,
+    composed: true,
+  });
+}
+
 export function exhaustiveCheck(param: never) {
   param;
 }

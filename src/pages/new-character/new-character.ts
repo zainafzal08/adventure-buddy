@@ -15,6 +15,7 @@ import {
   CharacterSheetDescriptor,
   Ability,
 } from '../../data/CharacterSheet';
+import { runInThisContext } from 'vm';
 
 /**
  * A field is simply some input field that generates mutations,
@@ -26,73 +27,10 @@ interface Step {
   fields: TemplateResult[];
 }
 
-const CLASSES = [
-  {
-    name: 'Barbarian',
-    value: 'barbarian',
-    icon: 'boxing-glove',
-  },
-  {
-    name: 'Bard',
-    value: 'bard',
-    icon: 'music',
-  },
-  {
-    name: 'Cleric',
-    value: 'cleric',
-    icon: 'hand-heart',
-  },
-  {
-    name: 'Druid',
-    value: 'druid',
-    icon: 'leaf',
-  },
-  {
-    name: 'Fighter',
-    value: 'fighter',
-    icon: 'sword-cross',
-  },
-  {
-    name: 'Monk',
-    value: 'monk',
-    icon: 'karate',
-  },
-  {
-    name: 'Paladin',
-    value: 'paladin',
-    icon: 'shield-cross-outline',
-  },
-  {
-    name: 'Ranger',
-    value: 'ranger',
-    icon: 'bullseye-arrow',
-  },
-  {
-    name: 'Rogue',
-    value: 'rogue',
-    icon: 'knife-military',
-  },
-  {
-    name: 'Sorcerer',
-    value: 'sorcerer',
-    icon: 'fire',
-  },
-  {
-    name: 'Warlock',
-    value: 'warlock',
-    icon: 'eye-circle-outline',
-  },
-  {
-    name: 'Wizard',
-    value: 'wizard',
-    icon: 'auto-fix',
-  },
-];
-
 const NEW_CHARACTER_FLOW: Step[] = [
   {
     title: html`
-      Lets start with the <span>Basics<span></span></span>
+      Lets start with the <span>Basics<span></span> </span>
     `,
     fields: [
       html`
@@ -110,6 +48,12 @@ const NEW_CHARACTER_FLOW: Step[] = [
       `,
     ],
   },
+  {
+    title: html`
+      Looking good, lets talk about <span>Class<span></span> </span>
+    `,
+    fields: [],
+  },
 ];
 
 @customElement('new-character')
@@ -118,7 +62,8 @@ export class NewCharacter extends LitElement {
     id: null,
     name: '',
     race: '',
-    class: '',
+    subrace: null,
+    characterClass: '',
     level: -1,
     baseAC: -1,
     speed: -1,
@@ -135,7 +80,7 @@ export class NewCharacter extends LitElement {
     proficiencies: [],
   };
 
-  private currentStep: number = 1;
+  @property() currentStep: number = 1;
 
   static get styles() {
     return css`
@@ -178,6 +123,7 @@ export class NewCharacter extends LitElement {
         display: flex;
         align-items: center;
         justify-content: center;
+        flex-direction: column;
       }
       .form-fields {
         height: 600px;
@@ -187,6 +133,35 @@ export class NewCharacter extends LitElement {
         align-items: flex-start;
         justify-content: flex-start;
         flex-direction: column;
+      }
+      .navigation {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        height: 100px;
+        width: 100%;
+      }
+      .chip {
+        color: var(--theme-primary);
+        border: 2px solid var(--theme-primary);
+        border-radius: 15px;
+        padding: 4px 12px;
+        font-size: 0.8rem;
+        margin: 0 4px;
+        background: none;
+        cursor: pointer;
+      }
+      .chip:hover {
+        background: var(--theme-primary-light);
+      }
+      .chip:focus {
+      }
+      .chip.primary {
+        background: var(--theme-primary);
+        color: white;
+      }
+      .chip.primary:hover {
+        opacity: 0.8;
       }
     `;
   }
@@ -225,6 +200,19 @@ export class NewCharacter extends LitElement {
     };
   }
 
+  prevStep() {
+    if (this.currentStep < 2) {
+      return;
+    }
+    this.currentStep--;
+  }
+  nextStep() {
+    if (this.currentStep > NEW_CHARACTER_FLOW.length - 1) {
+      return;
+    }
+    this.currentStep++;
+  }
+  create() {}
   render() {
     return html`
       <div class="heading">
@@ -234,7 +222,7 @@ export class NewCharacter extends LitElement {
         <div class="progress-bar">
           <div
             class="progress"
-            style=${`width: ${this.progress}%`}
+            style=${`width: ${this.progress()}%`}
           ></div>
         </div>
       </div>
@@ -242,6 +230,29 @@ export class NewCharacter extends LitElement {
         <div class="form-space">
           <div class="form-fields">
             ${this.getFields()}
+            <div class="navigation">
+              ${this.currentStep === 1
+                ? null
+                : html`
+                    <button @click=${this.prevStep} class="chip">
+                      Previous Step
+                    </button>
+                  `}
+              ${this.currentStep === NEW_CHARACTER_FLOW.length
+                ? html`
+                    <button @click=${this.create} class="chip primary">
+                      Create Character
+                    </button>
+                  `
+                : html`
+                    <button
+                      @click=${this.nextStep}
+                      class="chip primary"
+                    >
+                      Next Step
+                    </button>
+                  `}
+            </div>
           </div>
         </div>
         <div class="preview-space">

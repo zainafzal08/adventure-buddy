@@ -4,23 +4,67 @@ import {
   CharacterSheet,
   CharacterSheetDescriptor,
 } from './CharacterSheet';
+import * as RACES_STRICT from '../assets/races.json';
+import * as CLASSES_STRICT from '../assets/classes.json';
 
 export enum DatabaseState {
   LOADING,
   READY,
 }
 
+const RACES: { [x in string]: Race } = RACES_STRICT;
+delete RACES['default'];
+const CLASSES: { [x in string]: CharacterClass } = CLASSES_STRICT;
+delete RACES['default'];
+delete CLASSES['default'];
+
 type resolver = (value?: void | PromiseLike<void> | undefined) => void;
 
+interface Feature {
+  fullName: string;
+  desc: string;
+  icon: string;
+  link?: boolean;
+}
+
+interface SubRace {
+  fullName: string;
+  tagline: string;
+  features: Feature[];
+}
+
+interface Race {
+  name: string;
+  tagline: string;
+  physical: {
+    height: string;
+    size: string;
+    speed: string;
+  };
+  subraces: { [x in string]: SubRace };
+  features: Feature[];
+}
+
+interface CharacterClass {
+  name: string;
+  icon: string;
+}
+
+export interface Settings {
+  theme: string;
+}
+
+function defaultSettings(): Settings {
+  return {
+    theme: 'peach',
+  };
+}
+
 export class Database {
-  /**
-   * A promise that resolves when the database is finished initilisating.
-   */
+  /** A promise that resolves when the database is finished initilisating. */
   ready!: Promise<void>;
 
-  /**
-   * The state of the database
-   */
+  /** The state of the database */
   state: DatabaseState = DatabaseState.LOADING;
 
   /**
@@ -29,10 +73,13 @@ export class Database {
    */
   private readyPromiseResolver!: resolver;
 
-  /**
-   * Currently logged in user.
-   */
+  /** Currently logged in user. */
   private user: firebase.UserInfo | null = null;
+
+  private races = RACES;
+  private raceList = Object.keys(RACES);
+  private classes = CLASSES;
+  private settingListners: ((newSettings: Settings) => void)[] = [];
 
   constructor() {
     this.ready = new Promise(resolve => {
@@ -74,6 +121,53 @@ export class Database {
     return (await localForage.getItem('user')) as firebase.UserInfo;
   }
 
+  getRace(id: string) {
+    return this.races[id];
+  }
+
+  getSubRace(raceId: string, subraceId: string) {
+    return this.races[raceId].subraces[subraceId];
+  }
+
+  getRaceIdFromIndex(index: number) {
+    return this.raceList[index];
+  }
+
+  getSubRaceIdFromIndex(race: string, index: number) {
+    return Object.keys(this.races[race].subraces)[index];
+  }
+
+  getAllRaces() {
+    return Object.entries(this.races);
+  }
+
+  getAllSubRaces(race: string) {
+    return Object.entries(this.races[race].subraces);
+  }
+
+  getClass(characterClass: string) {
+    return this.classes[characterClass];
+  }
+
+  async getSettings(): Promise<Settings> {
+    let settings = await localForage.getItem('settings');
+    if (settings === null) {
+      settings = defaultSettings();
+      this.updateSettings(settings);
+    }
+    return settings as Settings;
+  }
+
+  async updateSettings(settings: Settings) {
+    await localForage.setItem('settings', settings);
+    this.settingListners.map(callback => {
+      callback(settings);
+    });
+  }
+
+  addSettingsListener(callback: (newSettings: Settings) => void) {
+    this.settingListners.push(callback);
+  }
   /** Convience method for adding to a metadata array. */
   async appendToMeta(key: string, value: string) {
     const array = (await localForage.getItem(`meta:${key}`)) as Array<

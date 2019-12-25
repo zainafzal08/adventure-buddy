@@ -1,6 +1,6 @@
 import { LitElement, html, customElement, css } from 'lit-element';
-import { getLogoutEvent } from '../../util';
-import { mdiLogout, mdiSettings, mdiFace } from '@mdi/js';
+import { getLogoutEvent, getNavigateEvent } from '../../util';
+import { mdiLogout, mdiSettings, mdiFace, mdiHome } from '@mdi/js';
 
 @customElement('app-nav')
 export class AppNav extends LitElement {
@@ -39,14 +39,23 @@ export class AppNav extends LitElement {
         icon: mdiFace,
         handler: this.profile,
       },
+      {
+        icon: mdiHome,
+        handler: this.home,
+      },
     ];
   }
 
+  home() {
+    this.dispatchEvent(getNavigateEvent('/'));
+  }
   logout() {
     this.dispatchEvent(getLogoutEvent());
   }
 
-  settings() {}
+  settings() {
+    this.dispatchEvent(getNavigateEvent('/settings'));
+  }
 
   profile() {}
 

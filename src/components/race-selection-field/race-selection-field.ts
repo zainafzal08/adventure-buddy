@@ -7,7 +7,6 @@ import {
   css,
   property,
 } from 'lit-element';
-import * as RACES_STRICT from '../../assets/races.json';
 import {
   mdiAccountMultiple,
   mdiImageFilterHdr,
@@ -17,54 +16,18 @@ import {
   mdiFire,
   mdiHumanHandsup,
 } from '@mdi/js';
+import { getDatabase } from '../../data/Database';
 
-interface Feature {
-  fullName: string;
-  desc: string;
-  icon: string;
-  link?: boolean;
-}
-
-interface SubRace {
-  fullName: string;
-  features: Feature[];
-}
-
-interface Race {
-  name: string;
-  tagline: string;
-  physical: {
-    height: string;
-    size: string;
-    speed: string;
-  };
-  subraces: { [x in string]: SubRace };
-  features: Feature[];
-}
-
-// Importing a json object directly imposes some strict types we don't
-// want to deal with, cast it to a more loose type since we trust our
-// own keys, typescript just can't enforce their types.
-const RACES: { [x in string]: Race } = RACES_STRICT;
-delete RACES['default'];
-const RACE_LIST = Object.keys(RACES);
 @customElement('race-selection-field')
 export class RaceSelectionField extends LitElement {
-  @property() raceIndex: number = 0;
+  @property() activeRace!: string;
+  @property() activeSubRace: string | null = null;
 
-  private height: number = 0;
-
-  firstUpdated() {
-    this.addEventListener('keydown', keyEvent =>
-      this.keydown(keyEvent)
-    );
-    this.height = this.shadowRoot!.querySelector(
-      '.list'
-    )!.getBoundingClientRect().height;
-  }
-
-  get selectedRace() {
-    return RACES[RACE_LIST[this.raceIndex]];
+  constructor() {
+    super();
+    const db = getDatabase();
+    this.activeRace = db.getRaceIdFromIndex(0);
+    this.activeSubRace = db.getSubRaceIdFromIndex(this.activeRace, 0);
   }
 
   static get styles() {
@@ -72,7 +35,7 @@ export class RaceSelectionField extends LitElement {
     return css`
       :host {
         width: 100%;
-        height: 400px;
+        height: 350px;
         display: flex;
       }
 
@@ -91,15 +54,28 @@ export class RaceSelectionField extends LitElement {
         display: flex;
         justify-content: flex-start;
         align-items: flex-start;
-        flex-wrap: wrap;
+        flex-direction: column;
         margin-top: 16px;
         background: white;
         border-radius: 15px;
         border: 1px solid #ebebeb;
       }
-
-      .card {
+      .list.inactive {
+        justify-content: center;
+        align-items: center;
+        overflow: none;
+        opacity: 0.6;
+      }
+      .list > p {
         width: 100%;
+        box-sizing: border-box;
+        color: #bbb;
+        text-align: center;
+        font-size: 12px;
+        padding: 0 16px;
+      }
+      .card {
+        width: calc(100% - 8px);
         box-sizing: border-box;
         padding: 10px 16px;
         display: flex;
@@ -151,57 +127,6 @@ export class RaceSelectionField extends LitElement {
     `;
   }
 
-  keydown(keyEvent: KeyboardEvent) {
-    switch (keyEvent.key) {
-      case 'ArrowUp':
-        this.prevRace();
-        break;
-      case 'ArrowDown':
-        this.nextRace();
-        break;
-    }
-  }
-
-  prevRace() {
-    if (this.raceIndex <= 0) return;
-    this.raceIndex--;
-    this.updateChoice(RACE_LIST[this.raceIndex]);
-  }
-
-  nextRace() {
-    if (this.raceIndex >= RACE_LIST.length - 1) return;
-    this.raceIndex++;
-    this.updateChoice(RACE_LIST[this.raceIndex]);
-  }
-
-  updateRace(raceKey: string) {
-    this.raceIndex = RACE_LIST.indexOf(raceKey);
-    this.updateChoice(raceKey);
-  }
-
-  updateChoice(raceKey: string) {
-    // TODO: replace this with a library that's more reliable.
-    const container = this.shadowRoot!.querySelector('.list')!;
-    const height = this.height - 100;
-    if (this.raceIndex * 70 - container.scrollTop > height) {
-      container.scrollTop += 70;
-    }
-    if (container.scrollTop > this.raceIndex * 70) {
-      container.scrollTop -= 70;
-    }
-
-    new CustomEvent('mutation', {
-      bubbles: true,
-      composed: true,
-      detail: [
-        {
-          field: 'race',
-          value: raceKey,
-        },
-      ],
-    });
-  }
-
   getIcon(raceKey: string) {
     switch (raceKey) {
       case 'dwarf':
@@ -227,43 +152,103 @@ export class RaceSelectionField extends LitElement {
     }
   }
 
-  isSelected(raceKey: string) {
-    return RACE_LIST[this.raceIndex] === raceKey;
+  renderCard(
+    id: string,
+    title: string,
+    subtitle: string,
+    active: boolean,
+    event: string
+  ) {
+    return html`
+      <div
+        class="card ${active ? 'active' : ''}"
+        id=${id}
+        @click=${() => this.changeSelection(event, id)}
+      >
+        <mdi-icon
+          color="var(--theme-primary)"
+          background=${active
+            ? 'rgba(255, 255, 255, 0.8)'
+            : 'var(--theme-primary-light)'}
+          size="20"
+          icon=${this.getIcon(id)}
+        ></mdi-icon>
+        <div class="text">
+          <h1>${title}</h1>
+          <p>${subtitle}</p>
+        </div>
+      </div>
+    `;
+  }
+
+  changeSelection(event: string, id: string) {
+    const db = getDatabase();
+    if (event === 'race') {
+      this.activeRace = id;
+      this.activeSubRace = db.getSubRaceIdFromIndex(this.activeRace, 0);
+    }
+    if (event === 'subrace') {
+      this.activeSubRace = id;
+    }
+    this.dispatchState();
+  }
+
+  dispatchState() {
+    this.dispatchEvent(
+      new CustomEvent('mutation', {
+        bubbles: true,
+        composed: true,
+        detail: [
+          {
+            field: 'race',
+            value: this.activeRace,
+          },
+          {
+            field: 'subrace',
+            value: this.activeSubRace,
+          },
+        ],
+      })
+    );
   }
 
   render() {
+    const allRaces = getDatabase().getAllRaces();
+    const allSubRaces = getDatabase().getAllSubRaces(this.activeRace);
+
     return html`
       <div class="group">
         <label tabindex="0">Race</label>
         <div class="list">
-          ${Object.entries(RACES).map(
-            ([key, race]) =>
-              html`
-                <div
-                  class="card ${this.isSelected(key) ? 'active' : ''}"
-                  id=${key}
-                  @click=${() => this.updateRace(key)}
-                >
-                  <mdi-icon
-                    color="var(--theme-primary)"
-                    background=${this.isSelected(key)
-                      ? 'rgba(255, 255, 255, 0.8)'
-                      : 'var(--theme-primary-light)'}
-                    size="20"
-                    icon=${this.getIcon(key)}
-                  ></mdi-icon>
-                  <div class="text">
-                    <h1>${race.name}</h1>
-                    <p>${race.tagline}</p>
-                  </div>
-                </div>
-              `
+          ${allRaces.map(([raceKey, race]) =>
+            this.renderCard(
+              raceKey,
+              race.name,
+              race.tagline,
+              this.activeRace === raceKey,
+              'race'
+            )
           )}
         </div>
       </div>
       <div class="group">
         <label tabindex="0">Subrace</label>
-        <div class="list"></div>
+        <div class="list ${this.activeSubRace ? '' : 'inactive'}">
+          ${allSubRaces.map(([subRaceKey, subrace]) =>
+            this.renderCard(
+              subRaceKey,
+              subrace.fullName,
+              subrace.tagline,
+              this.activeSubRace === subRaceKey,
+              'subrace'
+            )
+          )}
+          ${this.activeSubRace
+            ? null
+            : html`
+                <p>You don't need to pick a subrace for this one!</p>
+              `}
+        </div>
       </div>
     `;
   }

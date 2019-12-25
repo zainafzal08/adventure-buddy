@@ -5,7 +5,10 @@ import {
   css,
   property,
 } from 'lit-element';
-import { CharacterSheetDescriptor } from '../../data/CharacterSheet';
+import {
+  CharacterSheetDescriptor,
+  generateDescriptor,
+} from '../../data/CharacterSheet';
 
 @customElement('character-card')
 export class CharacterCard extends LitElement {
@@ -56,7 +59,7 @@ export class CharacterCard extends LitElement {
       }
       .basics .text-small {
         width: 40%;
-        height: 1rem;
+        height: 1.1rem;
         margin: 0.5rem 0;
         text-align: center;
         color: #777;
@@ -79,13 +82,8 @@ export class CharacterCard extends LitElement {
   }
 
   getDescriptor() {
-    let level = `Level ${this.character.level}`;
-    if (this.character.level === -1 || !this.character.level)
-      level = '';
-
-    return [level, this.character.race, this.character.class]
-      .filter(x => x !== '')
-      .join(' ');
+    const { level, race, subrace, characterClass } = this.character;
+    return generateDescriptor(level, race, subrace, characterClass);
   }
 
   render() {

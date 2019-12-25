@@ -1,21 +1,16 @@
-import '../../components/mdi-icon/mdi-icon';
+import '../../components/icon-btn/icon-btn';
 import '../../components/character-gallery-item/character-gallery-item';
-import { html, customElement, css, query } from 'lit-element';
-import { mdiPlusCircleOutline } from '@mdi/js';
+import { html, customElement, css } from 'lit-element';
+import { mdiFile } from '@mdi/js';
 
 import { AsyncElement } from '../../AsyncElement';
 import { getDatabase } from '../../data/Database';
-import {
-  CharacterSheet,
-  CharacterSheetDescriptor,
-} from '../../data/CharacterSheet';
+import { CharacterSheet } from '../../data/CharacterSheet';
 import sittingHuman from '../../assets/humaaans/sitting.svg';
 import { getNavigateEvent } from '../../util';
 
 @customElement('app-home')
 export class AppHome extends AsyncElement {
-  @query('new-character-btn') newCharacterButton!: HTMLDivElement;
-
   private user: firebase.UserInfo | null = null;
   private characters: CharacterSheet[] = [];
 
@@ -47,24 +42,6 @@ export class AppHome extends AsyncElement {
         display: flex;
         align-items: center;
         justify-content: flex-start;
-      }
-      .chip-button {
-        padding: 0.3rem 0.5rem;
-        border-radius: 15px;
-        margin: 0 0.3rem;
-        color: var(--theme-primary);
-        background: var(--theme-primary-light);
-        font-size: 0.9rem;
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-        transition: 0.32s all;
-      }
-      .chip-button:hover {
-        box-shadow: 1px 2px 4px rgba(242, 112, 156, 0.4);
-      }
-      .chip-button mdi-icon {
-        margin-right: 0.3rem;
       }
       h2 {
         margin: 0;
@@ -138,15 +115,7 @@ export class AppHome extends AsyncElement {
       <div class="list-container">
         <div class="list-title">
           <h2>Characters</h2>
-          <div id="new-character-btn" class="chip-button" @click=${
-            this.newCharacter
-          }>
-            <mdi-icon
-              .color=${css`var(--theme-primary)`}
-              icon="${mdiPlusCircleOutline}"
-            ></mdi-icon>
-            New
-          </div>
+          <icon-btn icon=${mdiFile}>Import</icon-btn>
         </div>
         ${
           this.characters.length > 0

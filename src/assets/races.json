@@ -10,6 +10,7 @@
         "subraces": {
             "hill": {
                 "fullName": "Hill Dwarf",
+                "tagline": "A wiser dwarf with more hit points",
                 "features": [
                     {
                         "fullName": "Ability Score Increase",
@@ -25,6 +26,7 @@
             },
             "mountain": {
                 "fullName": "Mountain Dwarf",
+                "tagline": "A stronger dwarf with better armor skills.",
                 "features": [
                     {
                         "fullName": "Ability Score Increase",
@@ -88,6 +90,7 @@
         "subraces": {
             "high": {
                 "fullName": "High Elf",
+                "tagline": "A smarter elf with military training",
                 "features": [
                     {
                         "fullName": "Ability Score Increase",
@@ -113,6 +116,7 @@
             },
             "wood": {
                 "fullName": "Wood Elf",
+                "tagline": "A wiser, faster elf who can sneak through nature.",
                 "features": [
                     {
                         "fullName": "Ability Score Increase",
@@ -138,6 +142,7 @@
             },
             "dark": {
                 "fullName": "Dark (drow) Elf",
+                "tagline": "A charming elf who thrives in the darkness but struggles in the light.",
                 "features": [
                     {
                         "fullName": "Ability Score Increase",
@@ -211,6 +216,7 @@
         "subraces": {
             "lightfoot": {
                 "fullName": "Lightfoot Halfing",
+                "tagline": "A charming halfing who can sneak.",
                 "features": [
                     {
                         "fullName": "Ability Score Increase",
@@ -226,6 +232,7 @@
             },
             "stout": {
                 "fullName": "Stout Halfing",
+                "tagline": "A hearty halfing who is resistant to poison",
                 "features": [
                     {
                         "fullName": "Ability Score Increase",
@@ -301,6 +308,7 @@
         "subraces": {
             "black": {
                 "fullName": "Black Dragonborn",
+                "tagline": "A black or copper dragon who can breathe acid",
                 "features": [
                     {
                         "fullName": "Breath Damage",
@@ -321,6 +329,7 @@
             },
             "blue": {
                 "fullName": "Blue Dragonborn",
+                "tagline": "A blue or bronze dragon who can breathe lighting",
                 "features": [
                     {
                         "fullName": "Breath Damage",
@@ -341,6 +350,7 @@
             },
             "brass": {
                 "fullName": "Brass Dragonborn",
+                "tagline": "A bronze dragon who can breathe fire",
                 "features": [
                     {
                         "fullName": "Breath Damage",
@@ -361,6 +371,7 @@
             },
             "gold": {
                 "fullName": "Gold Dragonborn",
+                "tagline": "A gold or red dragon who can breathe fire",
                 "features": [
                     {
                         "fullName": "Breath Damage",
@@ -381,6 +392,7 @@
             },
             "silver": {
                 "fullName": "Silver Dragonborn",
+                "tagline": "A silver or white dragon who can breathe ice",
                 "features": [
                     {
                         "fullName": "Breath Damage",
@@ -401,6 +413,7 @@
             },
             "green": {
                 "fullName": "Green Dragonborn",
+                "tagline": "A green dragon who can breathe poisen",
                 "features": [
                     {
                         "fullName": "Breath Damage",
@@ -459,6 +472,7 @@
         "subraces": {
             "forest": {
                 "fullName": "Forest Gnome",
+                "tagline": "A more dexterious gnome who can commune with nature.",
                 "features": [
                     {
                         "fullName": "Ability Score Increase",
@@ -479,6 +493,7 @@
             },
             "rock": {
                 "fullName": "Rock Gnome",
+                "tagline": "A heartier gnome who can tinker and build",
                 "features": [
                     {
                         "fullName": "Ability Score Increase",
@@ -500,6 +515,7 @@
             },
             "deep": {
                 "fullName": "Deep",
+                "tagline": "A smarter, wiser, stealthier more charming gnome who can see in the dark.",
                 "features": [
                     {
                         "fullName": "Ability Score Increase",

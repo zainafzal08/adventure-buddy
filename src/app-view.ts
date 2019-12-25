@@ -1,6 +1,7 @@
 // Imports with side effects.
 import './pages/app-home/app-home';
 import './pages/login-page/login-page';
+import './pages/settings-page/settings-page';
 import './pages/new-character/new-character';
 import './components/app-nav/app-nav';
 import * as firebase from 'firebase/app';
@@ -16,8 +17,9 @@ import {
 } from 'lit-element';
 import { cache } from 'lit-html/directives/cache';
 import { nothing } from 'lit-html';
-import { getDatabase, DatabaseState } from './data/Database';
+import { getDatabase, DatabaseState, Settings } from './data/Database';
 import { AsyncElement } from './AsyncElement';
+import { THEMES } from './themes';
 
 type RouteRenderer = (match: RegExpExecArray) => TemplateResult;
 
@@ -25,47 +27,6 @@ interface Route {
   pattern: RegExp;
   view: RouteRenderer;
 }
-
-interface theme {
-  gradient: string;
-  primary: string;
-  primaryLight: string;
-  primaryShadow: string;
-  secondary: string;
-  emphasis: string;
-  emphasisBackground: string;
-  emphasisHigh: string;
-  emphasisLow: string;
-}
-
-const PEACH_THEME: theme = {
-  gradient: 'linear-gradient(110deg, #f2709c, #ff9472)',
-  primary: '#f2709c',
-  primaryLight: '#f2709c1a',
-  primaryShadow: '#f2709c30',
-  secondary: '#ff9472',
-  emphasis: '#6cbee6',
-  emphasisBackground: '#6cbee60f',
-  emphasisHigh: '#6fcf97',
-  emphasisLow: '#ed6f6f',
-};
-
-const FRESH_THEME: theme = {
-  gradient: 'linear-gradient(110deg, #67b26f, #4ca2cd)',
-  primary: '#67b26f',
-  primaryLight: '#67b26fdd',
-  primaryShadow: '#67b26f30',
-  secondary: '#4ca2cd',
-  emphasis: '#6cbee6',
-  emphasisBackground: '#6cbee60f',
-  emphasisHigh: '#6fcf97',
-  emphasisLow: '#ed6f6f',
-};
-
-const THEMES: { [k: string]: theme } = {
-  peach: PEACH_THEME,
-  fresh: FRESH_THEME,
-};
 
 @customElement('app-view')
 export class AppView extends AsyncElement {
@@ -106,6 +67,13 @@ export class AppView extends AsyncElement {
         view: () =>
           html`
             <new-character></new-character>
+          `,
+      },
+      {
+        pattern: /^\/settings/,
+        view: () =>
+          html`
+            <settings-page></settings-page>
           `,
       },
     ];
@@ -151,6 +119,10 @@ export class AppView extends AsyncElement {
     `;
   }
 
+  updateSettings(newSettings: Settings) {
+    this.theme = newSettings.theme;
+  }
+
   async init() {
     this.addEventListener('navigate', ((e: CustomEvent) => {
       this.changeRoute(e.detail.target);
@@ -178,6 +150,14 @@ export class AppView extends AsyncElement {
     if (database.state !== DatabaseState.READY) {
       await database.ready;
     }
+
+    database.addSettingsListener(newSettings =>
+      this.updateSettings(newSettings)
+    );
+
+    const settings = await database.getSettings();
+    this.theme = settings.theme;
+
     const fetchedUser = new Promise(resolve => {
       firebase.auth().onAuthStateChanged(user => {
         // TODO(zain): Maybe actually wait for this and handle

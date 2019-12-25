@@ -1,4 +1,5 @@
 import { exhaustiveCheck } from '../util';
+import { getDatabase } from './Database';
 
 export enum Ability {
   STR = 'strength',
@@ -24,7 +25,8 @@ export interface CharacterSheetDescriptor {
   id: string | null;
   name: string;
   race: string;
-  class: string;
+  subrace: string | null;
+  characterClass: string;
   level: number;
   baseAC: number;
   speed: number;
@@ -101,12 +103,39 @@ export function getSkillAbility(skill: Skill) {
   }
 }
 
+export function generateDescriptor(
+  level: number,
+  race: string,
+  subrace: string | null,
+  characterClass: string
+) {
+  let raceStr = null;
+  let levelStr = null;
+  let classStr = null;
+
+  if (level > 0) {
+    levelStr = `Level ${level}`;
+  }
+  if (race) {
+    raceStr = getDatabase().getRace(race).name;
+  }
+  if (subrace) {
+    raceStr = getDatabase().getSubRace(race, subrace).fullName;
+  }
+  if (characterClass) {
+    classStr = getDatabase().getClass(characterClass).name;
+  }
+
+  return [levelStr, raceStr, classStr].join(' ');
+}
+
 export class CharacterSheet {
   // Character Info.
   id: string;
   name: string;
   race: string;
-  class: string;
+  subrace: string | null;
+  characterClass: string;
   level: number;
   speed: number;
   inspiration: number;
@@ -126,7 +155,8 @@ export class CharacterSheet {
     this.id = data.id;
     this.name = data.name;
     this.race = data.race;
-    this.class = data.class;
+    this.subrace = data.subrace;
+    this.characterClass = data.characterClass;
     this.level = data.level;
     this.ability = data.ability;
     this.inspiration = 0;
@@ -187,6 +217,11 @@ export class CharacterSheet {
   }
 
   getDescriptor() {
-    return `Level ${this.level} ${this.race} ${this.class}`;
+    return generateDescriptor(
+      this.level,
+      this.race,
+      this.subrace,
+      this.characterClass
+    );
   }
 }
