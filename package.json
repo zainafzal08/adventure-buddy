@@ -33,6 +33,7 @@
     "@mdi/js": "^4.7.95",
     "@types/localforage": "0.0.34",
     "@types/redux": "^3.6.0",
+    "@vaadin/router": "^1.6.0",
     "@webcomponents/webcomponentsjs": "^2.4.0",
     "firebase": "^7.5.0",
     "lit-element": "^2.2.1",

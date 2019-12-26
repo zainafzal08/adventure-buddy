@@ -1,7 +1,8 @@
 import { update, Action } from './helpers';
+import { ThemeName } from '../themes';
 
 export interface Settings {
-  theme: string;
+  theme: ThemeName;
 }
 
 export interface SettingsAction extends Action {
@@ -15,7 +16,7 @@ export const initalSettingsState: Settings = {
 export function settingsReducer(
   settings: Settings,
   action: SettingsAction
-) {
+): Settings {
   switch (action.type) {
     case 'UPDATE_THEME':
       return update(settings, 'theme', action.value);

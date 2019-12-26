@@ -1,9 +1,14 @@
+import '../mdi-icon/mdi-icon';
+
 import { LitElement, html, customElement, css } from 'lit-element';
-import { getLogoutEvent, getNavigateEvent } from '../../util';
+import { getLogoutEvent } from '../../util';
 import { mdiLogout, mdiSettings, mdiFace, mdiHome } from '@mdi/js';
+import { connect } from 'pwa-helpers';
+import { store } from '../../redux/store';
+import { navigate } from '../../router/navigate';
 
 @customElement('app-nav')
-export class AppNav extends LitElement {
+export class AppNav extends connect(store)(LitElement) {
   static get styles() {
     return css`
       :host {
@@ -47,14 +52,15 @@ export class AppNav extends LitElement {
   }
 
   home() {
-    this.dispatchEvent(getNavigateEvent('/'));
+    navigate('/');
   }
+
   logout() {
     this.dispatchEvent(getLogoutEvent());
   }
 
   settings() {
-    this.dispatchEvent(getNavigateEvent('/settings'));
+    navigate('/settings');
   }
 
   profile() {}

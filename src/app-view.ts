@@ -1,95 +1,32 @@
 // Imports with side effects.
-import './pages/app-home/app-home';
-import './pages/login-page/login-page';
-import './pages/settings-page/settings-page';
-import './pages/new-character/new-character';
 import './components/app-nav/app-nav';
-import * as firebase from 'firebase/app';
+import './router/app-router';
 
 // Named imports.
 import {
   html,
   customElement,
   css,
-  TemplateResult,
   property,
   unsafeCSS,
+  LitElement,
 } from 'lit-element';
-import { cache } from 'lit-html/directives/cache';
-import { nothing } from 'lit-html';
-import { getDatabase, DatabaseState, Settings } from './data/Database';
-import { AsyncElement } from './AsyncElement';
-import { THEMES } from './themes';
+
+import * as firebase from 'firebase/app';
+import { getDatabase, DatabaseState } from './data/Database';
+import { THEMES, ThemeName } from './themes';
 import { connect } from 'pwa-helpers';
 import { store } from './redux/store';
 import { AppState } from './redux/reducer';
-
-type RouteRenderer = (match: RegExpExecArray) => TemplateResult;
-
-interface Route {
-  pattern: RegExp;
-  view: RouteRenderer;
-}
+import { ROUTES } from './routes';
 
 @customElement('app-view')
-export class AppView extends connect(store)(AsyncElement) {
+export class AppView extends connect(store)(LitElement) {
   /**
    * The theme of the application, this is used to generate a
    * series of css variables which the rest of the application uses.
    */
-  @property() private theme = 'peach';
-
-  /**
-   * The view currently shown, all views are defined in
-   * the routes getter function.
-   */
-  @property() private shownView: TemplateResult | {} = nothing;
-
-  /**
-   * If the navbar should be shown.
-   */
-  private showNavbar: boolean = false;
-
-  /**
-   * All routes that the app can handle, this is a array of objects
-   * which define a view function that returns a html template and a
-   * route pattern which defines what url triggers the view to be
-   * visible.
-   */
-  static get routes(): Route[] {
-    return [
-      {
-        pattern: /^\/$/,
-        view: () =>
-          html`
-            <app-home></app-home>
-          `,
-      },
-      {
-        pattern: /^\/new\/character/,
-        view: () =>
-          html`
-            <new-character></new-character>
-          `,
-      },
-      {
-        pattern: /^\/settings/,
-        view: () =>
-          html`
-            <settings-page></settings-page>
-          `,
-      },
-    ];
-  }
-
-  /**
-   * The default error page which we show if the route can't be resolved
-   */
-  static unknownRouteView() {
-    return html`
-      <p>Unknown Route</p>
-    `;
-  }
+  @property() private theme: ThemeName = 'peach';
 
   static get styles() {
     return css`
@@ -106,11 +43,9 @@ export class AppView extends connect(store)(AsyncElement) {
         width: 100%;
       }
       main {
-        width: calc(100% - 2 * var(--page-hpad));
-        padding: var(--page-vpad) var(--page-hpad);
-        height: calc(
-          100vh - (2 * var(--page-vpad)) - var(--navbar-height)
-        );
+        width: 100%;
+        height: 100vh;
+        box-sizing: border-box;
         padding: var(--page-vpad) var(--page-hpad);
       }
       @media all and (max-width: 550px) {
@@ -122,32 +57,16 @@ export class AppView extends connect(store)(AsyncElement) {
     `;
   }
 
-  updateSettings(newSettings: Settings) {
-    this.theme = newSettings.theme;
-  }
-
-  async init() {
-    this.addEventListener('navigate', ((e: CustomEvent) => {
-      this.changeRoute(e.detail.target);
-    }) as EventListener);
-
+  async blah() {
     // todo(zain): Delegate all auth stuff to it's own global object?
     this.addEventListener('login', ((e: CustomEvent) => {
       getDatabase().login(e.detail.user);
-      this.changeRoute('/');
     }) as EventListener);
 
     this.addEventListener('logout', (async () => {
       firebase.auth().signOut();
       await getDatabase().logout();
-      this.changeRoute('/');
     }) as EventListener);
-
-    window.onpopstate = (e: PopStateEvent) => {
-      if (e.state) {
-        this.changeRoute(e.state.target, false);
-      }
-    };
 
     const database = getDatabase();
     if (database.state !== DatabaseState.READY) {
@@ -163,50 +82,14 @@ export class AppView extends connect(store)(AsyncElement) {
       });
     });
     await fetchedUser;
-    const location = document.location.pathname;
-    await this.changeRoute(location, false);
-    history.replaceState({ target: location }, '', location);
   }
 
   stateChanged(state: AppState) {
     this.theme = state.settings.theme;
   }
 
-  async changeRoute(location: string, appendToHistory = true) {
-    if (appendToHistory)
-      history.pushState({ target: location }, '', location);
-    this.showNavbar = false;
-    const user = await getDatabase().getUser();
-    for (const route of AppView.routes) {
-      const m = route.pattern.exec(location);
-      if (!m) continue;
-      if (!user) {
-        this.shownView = html`
-          <login-page></login-page>
-        `;
-        return;
-      }
-      this.shownView = route.view(m);
-      this.showNavbar = true;
-      return;
-    }
-    this.shownView = AppView.unknownRouteView();
-  }
-
-  loading() {
-    return html`
-      <p>Bruh i'm loading innit luv</p>
-    `;
-  }
-
-  error() {
-    return html`
-      <p>Bruh someting went wrong dinnit</p>
-    `;
-  }
-
-  template() {
-    const theme = THEMES[this.theme];
+  render() {
+    const theme = THEMES[this.theme as ThemeName];
     const rules = [];
     for (let [property, value] of Object.entries(theme)) {
       property = property.replace(/[A-Z]/, (match: string) => {
@@ -216,6 +99,7 @@ export class AppView extends connect(store)(AsyncElement) {
         css`--theme-${unsafeCSS(property)}: ${unsafeCSS(value)};`
       );
     }
+
     return html`
       <style>
         :host {
@@ -224,13 +108,13 @@ export class AppView extends connect(store)(AsyncElement) {
           --font-stack: 'Montserrat', sans-serif;
         }
       </style>
-      ${this.showNavbar
+      ${window.location.pathname !== '/login'
         ? html`
             <app-nav></app-nav>
           `
-        : nothing}
+        : null}
       <main>
-        ${cache(this.shownView)}
+        <app-router .routes=${ROUTES}></app-router>
       </main>
     `;
   }

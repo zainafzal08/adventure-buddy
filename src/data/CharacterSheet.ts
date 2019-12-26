@@ -224,4 +224,21 @@ export class CharacterSheet {
       this.characterClass
     );
   }
+
+  serialize(): CharacterSheetDescriptor {
+    return {
+      id: this.id,
+      name: this.name,
+      race: this.race,
+      subrace: this.subrace,
+      characterClass: this.characterClass,
+      level: this.level,
+      baseAC: this.baseAC,
+      speed: this.speed,
+      proficiencyBonus: this.proficiencyBonus,
+      ability: this.ability,
+      specialBonus: this.specialBonus,
+      proficiencies: Array.from(this.proficiencies),
+    };
+  }
 }

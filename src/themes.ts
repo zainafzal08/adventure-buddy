@@ -1,4 +1,4 @@
-interface theme {
+interface Theme {
   gradient: string;
   primary: string;
   primaryLight: string;
@@ -10,7 +10,7 @@ interface theme {
   emphasisLow: string;
 }
 
-const PEACH_THEME: theme = {
+const PEACH_THEME: Theme = {
   gradient: 'linear-gradient(110deg, #f2709c, #ff9472)',
   primary: '#f2709c',
   primaryLight: '#f2709c1a',
@@ -22,7 +22,7 @@ const PEACH_THEME: theme = {
   emphasisLow: '#ed6f6f',
 };
 
-const FRESH_THEME: theme = {
+const FRESH_THEME: Theme = {
   gradient: 'linear-gradient(110deg, #67b26f, #4ca2cd)',
   primary: '#67b26f',
   primaryLight: '#67b26f1a',
@@ -34,7 +34,9 @@ const FRESH_THEME: theme = {
   emphasisLow: '#ed6f6f',
 };
 
-export const THEMES: { [x in string]: theme } = {
+export type ThemeName = 'peach' | 'fresh';
+
+export const THEMES: { [x in ThemeName]: Theme } = {
   peach: PEACH_THEME,
   fresh: FRESH_THEME,
 };

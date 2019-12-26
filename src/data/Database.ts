@@ -50,16 +50,6 @@ interface CharacterClass {
   icon: string;
 }
 
-export interface Settings {
-  theme: string;
-}
-
-function defaultSettings(): Settings {
-  return {
-    theme: 'peach',
-  };
-}
-
 export class Database {
   /** A promise that resolves when the database is finished initilisating. */
   ready!: Promise<void>;
@@ -79,7 +69,6 @@ export class Database {
   private races = RACES;
   private raceList = Object.keys(RACES);
   private classes = CLASSES;
-  private settingListners: ((newSettings: Settings) => void)[] = [];
 
   constructor() {
     this.ready = new Promise(resolve => {
@@ -149,25 +138,6 @@ export class Database {
     return this.classes[characterClass];
   }
 
-  async getSettings(): Promise<Settings> {
-    let settings = await localForage.getItem('settings');
-    if (settings === null) {
-      settings = defaultSettings();
-      this.updateSettings(settings);
-    }
-    return settings as Settings;
-  }
-
-  async updateSettings(settings: Settings) {
-    await localForage.setItem('settings', settings);
-    this.settingListners.map(callback => {
-      callback(settings);
-    });
-  }
-
-  addSettingsListener(callback: (newSettings: Settings) => void) {
-    this.settingListners.push(callback);
-  }
   /** Convience method for adding to a metadata array. */
   async appendToMeta(key: string, value: string) {
     const array = (await localForage.getItem(`meta:${key}`)) as Array<

@@ -1,14 +1,16 @@
-import { createStore, StoreEnhancer } from 'redux';
+import { createStore, compose, combineReducers } from 'redux';
 import { reducer } from './reducer';
+import { lazyReducerEnhancer } from 'pwa-helpers';
 
 declare global {
   interface Window {
-    __REDUX_DEVTOOLS_EXTENSION__: () => StoreEnhancer;
+    __REDUX_DEVTOOLS_EXTENSION_COMPOSE__: typeof compose;
   }
 }
+const composeEnhancers =
+  window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 export const store = createStore(
   reducer,
-  window.__REDUX_DEVTOOLS_EXTENSION__ &&
-    window.__REDUX_DEVTOOLS_EXTENSION__()
+  composeEnhancers(lazyReducerEnhancer(combineReducers))
 );
