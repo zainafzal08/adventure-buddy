@@ -1,16 +1,58 @@
-import { createStore, compose, combineReducers } from 'redux';
-import { reducer } from './reducer';
-import { lazyReducerEnhancer } from 'pwa-helpers';
+import { createStore, StoreEnhancer } from 'redux';
+import { reducer, AppState } from './reducer';
+import { initialRouterState } from './router';
+import { User, initialUserState } from './user';
+import { Settings, initialSettingsState } from './settings';
+
+function defaultState(key: string) {
+  switch (key) {
+    case 'user':
+      return initialUserState;
+    case 'settings':
+      return initialSettingsState;
+    default:
+      console.error(
+        `Attempted to fetch unknown key '${key}' from localstorage.`
+      );
+      return null;
+  }
+}
+
+function getFromStorage(key: string) {
+  const value = localStorage.getItem(`persisted-${key}`);
+  if (value === null) {
+    return defaultState(key);
+  }
+  return JSON.parse(value);
+}
+
+function saveToLocalStorage(store: AppState, key: keyof AppState) {
+  localStorage.setItem(`persisted-${key}`, JSON.stringify(store[key]));
+}
 
 declare global {
   interface Window {
-    __REDUX_DEVTOOLS_EXTENSION_COMPOSE__: typeof compose;
+    __REDUX_DEVTOOLS_EXTENSION__: () => StoreEnhancer;
   }
 }
-const composeEnhancers =
-  window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+
+// Grab initial state from localstorage.
+const initalState = {
+  router: initialRouterState,
+  user: getFromStorage('user') as User,
+  settings: getFromStorage('settings') as Settings,
+};
 
 export const store = createStore(
   reducer,
-  composeEnhancers(lazyReducerEnhancer(combineReducers))
+  initalState,
+  window.__REDUX_DEVTOOLS_EXTENSION__ &&
+    window.__REDUX_DEVTOOLS_EXTENSION__()
 );
+
+// Persist to localstorage.
+store.subscribe(() => {
+  const state = store.getState();
+  saveToLocalStorage(state, 'user');
+  saveToLocalStorage(state, 'settings');
+});

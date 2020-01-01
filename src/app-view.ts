@@ -12,8 +12,6 @@ import {
   LitElement,
 } from 'lit-element';
 
-import * as firebase from 'firebase/app';
-import { getDatabase, DatabaseState } from './data/Database';
 import { THEMES, ThemeName } from './themes';
 import { connect } from 'pwa-helpers';
 import { store } from './redux/store';
@@ -27,6 +25,7 @@ export class AppView extends connect(store)(LitElement) {
    * series of css variables which the rest of the application uses.
    */
   @property() private theme: ThemeName = 'peach';
+  @property() private location!: string;
 
   static get styles() {
     return css`
@@ -57,58 +56,32 @@ export class AppView extends connect(store)(LitElement) {
     `;
   }
 
-  async blah() {
-    // todo(zain): Delegate all auth stuff to it's own global object?
-    this.addEventListener('login', ((e: CustomEvent) => {
-      getDatabase().login(e.detail.user);
-    }) as EventListener);
-
-    this.addEventListener('logout', (async () => {
-      firebase.auth().signOut();
-      await getDatabase().logout();
-    }) as EventListener);
-
-    const database = getDatabase();
-    if (database.state !== DatabaseState.READY) {
-      await database.ready;
-    }
-
-    const fetchedUser = new Promise(resolve => {
-      firebase.auth().onAuthStateChanged(user => {
-        // TODO(zain): Maybe actually wait for this and handle
-        // it failing...
-        if (user) database.login(user);
-        resolve();
-      });
-    });
-    await fetchedUser;
-  }
-
   stateChanged(state: AppState) {
     this.theme = state.settings.theme;
+    this.location = state.router.location;
   }
 
   render() {
     const theme = THEMES[this.theme as ThemeName];
     const rules = [];
     for (let [property, value] of Object.entries(theme)) {
-      property = property.replace(/[A-Z]/, (match: string) => {
+      property = property.replace(/[A-Z]/g, (match: string) => {
         return '-' + match.toLowerCase();
       });
       rules.push(
         css`--theme-${unsafeCSS(property)}: ${unsafeCSS(value)};`
       );
     }
-
     return html`
       <style>
         :host {
           ${rules};
           --neutral: #ccc;
           --font-stack: 'Montserrat', sans-serif;
+          --soft-box-shadow: 5px 4px 5px rgba(0, 0, 0, 0.05);
         }
       </style>
-      ${window.location.pathname !== '/login'
+      ${this.location !== '/login'
         ? html`
             <app-nav></app-nav>
           `

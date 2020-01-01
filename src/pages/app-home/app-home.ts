@@ -1,16 +1,17 @@
 import '../../components/icon-btn/icon-btn';
 import '../../components/character-gallery-item/character-gallery-item';
-import { html, customElement, css } from 'lit-element';
-import { mdiFile } from '@mdi/js';
+import { html, customElement, css, LitElement } from 'lit-element';
+import { mdiPlusCircleOutline } from '@mdi/js';
 
-import { AsyncElement } from '../../AsyncElement';
-import { getDatabase } from '../../data/Database';
 import { CharacterSheet } from '../../data/CharacterSheet';
 import sittingHuman from '../../assets/humaaans/sitting.svg';
-import { getNavigateEvent } from '../../util';
+import { store } from '../../redux/store';
+import { connect } from 'pwa-helpers';
+import { AppState } from '../../redux/reducer';
+import { navigate } from '../../router/navigate';
 
 @customElement('app-home')
-export class AppHome extends AsyncElement {
+export class AppHome extends connect(store)(LitElement) {
   private user: firebase.UserInfo | null = null;
   private characters: CharacterSheet[] = [];
 
@@ -72,9 +73,8 @@ export class AppHome extends AsyncElement {
     `;
   }
 
-  async init() {
-    this.user = await getDatabase().getUser();
-    this.characters = await getDatabase().getAllCharacters();
+  stateChanged(state: AppState) {
+    this.user = state.user;
   }
 
   characterList() {
@@ -100,11 +100,7 @@ export class AppHome extends AsyncElement {
     `;
   }
 
-  newCharacter() {
-    this.dispatchEvent(getNavigateEvent('/new/character'));
-  }
-
-  template() {
+  render() {
     return html`
       <div class="heading">
         <h1>
@@ -115,7 +111,8 @@ export class AppHome extends AsyncElement {
       <div class="list-container">
         <div class="list-title">
           <h2>Characters</h2>
-          <icon-btn icon=${mdiFile}>Import</icon-btn>
+          <icon-btn icon=${mdiPlusCircleOutline} @click=${() =>
+      navigate('/character/new')}>New</icon-btn>
         </div>
         ${
           this.characters.length > 0

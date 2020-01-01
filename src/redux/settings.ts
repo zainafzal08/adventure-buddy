@@ -9,7 +9,7 @@ export interface SettingsAction extends Action {
   value: string;
 }
 
-export const initalSettingsState: Settings = {
+export const initialSettingsState: Settings = {
   theme: 'peach',
 };
 

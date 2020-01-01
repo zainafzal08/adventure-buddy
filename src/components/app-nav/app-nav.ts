@@ -1,7 +1,7 @@
 import '../mdi-icon/mdi-icon';
 
 import { LitElement, html, customElement, css } from 'lit-element';
-import { getLogoutEvent } from '../../util';
+import * as firebase from 'firebase/app';
 import { mdiLogout, mdiSettings, mdiFace, mdiHome } from '@mdi/js';
 import { connect } from 'pwa-helpers';
 import { store } from '../../redux/store';
@@ -56,7 +56,11 @@ export class AppNav extends connect(store)(LitElement) {
   }
 
   logout() {
-    this.dispatchEvent(getLogoutEvent());
+    firebase.auth().signOut();
+    navigate('/login');
+    store.dispatch({
+      type: 'CLEAR_USER',
+    });
   }
 
   settings() {

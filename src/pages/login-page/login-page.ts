@@ -1,12 +1,13 @@
-import { html, customElement, css } from 'lit-element';
+import { html, customElement, css, LitElement } from 'lit-element';
 import * as firebase from 'firebase/app';
 
-import { AsyncElement } from '../../AsyncElement';
 import logo from '../../assets/logo.svg';
-import { getLoginEvent } from '../../util';
+import { store } from '../../redux/store';
+import { connect } from 'pwa-helpers';
+import { navigate } from '../../router/navigate';
 
 @customElement('login-page')
-export class LoginPage extends AsyncElement {
+export class LoginPage extends connect(store)(LitElement) {
   private auth = {
     google: new firebase.auth.GoogleAuthProvider(),
   };
@@ -90,14 +91,23 @@ export class LoginPage extends AsyncElement {
           // TODO(zain): Make this more descriptive.
           throw Error('failed');
         }
-        this.dispatchEvent(getLoginEvent(result.user));
+        const user = {
+          displayName: result.user.displayName,
+          email: result.user.email,
+          phoneNumber: result.user.phoneNumber,
+          photoURL: result.user.photoURL,
+          providerId: result.user.providerId,
+          uid: result.user.uid,
+        };
+        store.dispatch({ type: 'UPDATE_USER', fields: user });
+        navigate('/');
       })
       .catch(function(error) {
         alert(`could not sign you in, ${error.message}`);
       });
   }
 
-  template() {
+  render() {
     return html`
       <div class="container">
         <div class="stripe"></div>

@@ -15,7 +15,6 @@ import {
   CharacterSheetDescriptor,
   Ability,
 } from '../../data/CharacterSheet';
-import { runInThisContext } from 'vm';
 
 /**
  * A field is simply some input field that generates mutations,
