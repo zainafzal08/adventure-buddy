@@ -10,11 +10,15 @@ import {
 @customElement('number-field')
 export class NumberField extends LitElement {
   @property({ attribute: true }) name: string = 'numberField';
-  @property() field: string = 'number';
   @property() range: [number | null, number | null] = [null, null];
   @property() help: string = '';
+  @property() change: (value: number) => void = () => {};
   @query('input') input!: HTMLInputElement;
   @query('.group') group!: HTMLDivElement;
+
+  get value() {
+    return this.input.value;
+  }
 
   static get styles() {
     return css`
@@ -86,17 +90,35 @@ export class NumberField extends LitElement {
     `;
   }
 
+  onChange() {
+    this.change(parseInt(this.input!.value));
+    this.validate();
+  }
+
+  firstUpdated() {
+    this.input.addEventListener('input', () => this.onChange());
+  }
+
   validate() {
-    const v = parseInt(this.input.value);
+    const v = parseInt(this.input!.value);
     let valid = true;
+
     if (this.range[0]) {
       valid = valid && v >= this.range[0];
     }
     if (this.range[1]) {
       valid = valid && v <= this.range[1];
     }
+
+    let helpStr = 'Invalid Value';
+    if (this.range[1]) {
+      helpStr = `Value must be between ${this.range[0]} and ${this.range[1]}`;
+    } else {
+      helpStr = `Value must be at least ${this.range[0]}`;
+    }
+
     if (!valid) {
-      this.help = `Value must be between ${this.range[0]} and ${this.range[1]}`;
+      this.help = helpStr;
     } else {
       this.help = '';
     }
@@ -113,21 +135,6 @@ export class NumberField extends LitElement {
           type="number"
           min=${this.range[0] ? this.range[0] : ''}
           max=${this.range[1] ? this.range[1] : ''}
-          @input=${() => {
-            this.validate();
-            this.dispatchEvent(
-              new CustomEvent('mutation', {
-                bubbles: true,
-                composed: true,
-                detail: [
-                  {
-                    field: this.field,
-                    value: this.input.value,
-                  },
-                ],
-              })
-            );
-          }}
         />
         <small>${this.help}</small>
       </div>

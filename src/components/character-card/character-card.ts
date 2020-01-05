@@ -45,7 +45,7 @@ export class CharacterCard extends LitElement {
       }
       .basics .text {
         width: 60%;
-        height: 1.1rem;
+        height: 1.2rem;
         font-size: 1rem;
         text-align: center;
         color: #777;
@@ -59,7 +59,7 @@ export class CharacterCard extends LitElement {
       }
       .basics .text-small {
         width: 40%;
-        height: 1.1rem;
+        height: 1.2rem;
         margin: 0.5rem 0;
         text-align: center;
         color: #777;
@@ -82,8 +82,8 @@ export class CharacterCard extends LitElement {
   }
 
   getDescriptor() {
-    const { level, race, subrace, characterClass } = this.character;
-    return generateDescriptor(level, race, subrace, characterClass);
+    const { race, subrace, classes } = this.character;
+    return generateDescriptor(race, subrace, classes);
   }
 
   render() {

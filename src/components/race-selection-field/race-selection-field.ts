@@ -30,6 +30,10 @@ export class RaceSelectionField extends LitElement {
     this.activeSubRace = db.getSubRaceIdFromIndex(this.activeRace, 0);
   }
 
+  firstUpdated() {
+    this.dispatchState();
+  }
+
   static get styles() {
     // TODO(zafzal): make this less hardcoded.
     return css`
@@ -37,6 +41,7 @@ export class RaceSelectionField extends LitElement {
         width: 100%;
         height: 350px;
         display: flex;
+        margin: 16px 0;
       }
 
       .group {

@@ -1,6 +1,6 @@
 import '../../components/character-card/character-card';
 import '../../components/text-field/text-field';
-import '../../components/number-field/number-field';
+import '../../components/class-selector/class-selector';
 import '../../components/race-selection-field/race-selection-field';
 
 import {
@@ -36,11 +36,7 @@ const NEW_CHARACTER_FLOW: Step[] = [
         <text-field name="Character Name" field="name"></text-field>
       `,
       html`
-        <number-field
-          name="Level"
-          field="level"
-          .range=${[1, 20]}
-        ></number-field>
+        <class-selector></class-selector>
       `,
       html`
         <race-selection-field></race-selection-field>
@@ -49,7 +45,14 @@ const NEW_CHARACTER_FLOW: Step[] = [
   },
   {
     title: html`
-      Looking good, lets talk about <span>Class<span></span> </span>
+      Looking good, lets talk about
+      <span>Ability Scores</span> now.
+    `,
+    fields: [],
+  },
+  {
+    title: html`
+      Tell me about<span>Your History</span>.
     `,
     fields: [],
   },
@@ -62,8 +65,7 @@ export class NewCharacter extends LitElement {
     name: '',
     race: '',
     subrace: null,
-    characterClass: '',
-    level: -1,
+    classes: [],
     baseAC: -1,
     speed: -1,
     proficiencyBonus: -1,
@@ -205,13 +207,16 @@ export class NewCharacter extends LitElement {
     }
     this.currentStep--;
   }
+
   nextStep() {
     if (this.currentStep > NEW_CHARACTER_FLOW.length - 1) {
       return;
     }
     this.currentStep++;
   }
+
   create() {}
+
   render() {
     return html`
       <div class="heading">

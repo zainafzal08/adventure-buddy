@@ -21,13 +21,17 @@ export interface SpecialBonus {
   hp: number;
 }
 
+export interface CharacterClass {
+  id: string;
+  level: number;
+}
+
 export interface CharacterSheetDescriptor {
   id: string | null;
   name: string;
   race: string;
   subrace: string | null;
-  characterClass: string;
-  level: number;
+  classes: CharacterClass[];
   baseAC: number;
   speed: number;
   proficiencyBonus: number;
@@ -104,15 +108,19 @@ export function getSkillAbility(skill: Skill) {
 }
 
 export function generateDescriptor(
-  level: number,
   race: string,
   subrace: string | null,
-  characterClass: string
+  classes: CharacterClass[]
 ) {
   let raceStr = null;
   let levelStr = null;
-  let classStr = null;
-
+  let classStr = '';
+  let level = 0;
+  for (const c of classes) {
+    if (classStr === '') classStr = `${classStr} ${c.name}`;
+    else classStr = c.name;
+    level += c.level;
+  }
   if (level > 0) {
     levelStr = `Level ${level}`;
   }
@@ -121,9 +129,6 @@ export function generateDescriptor(
   }
   if (subrace) {
     raceStr = getDatabase().getSubRace(race, subrace).fullName;
-  }
-  if (characterClass) {
-    classStr = getDatabase().getClass(characterClass).name;
   }
 
   return [levelStr, raceStr, classStr].join(' ');
@@ -135,8 +140,7 @@ export class CharacterSheet {
   name: string;
   race: string;
   subrace: string | null;
-  characterClass: string;
-  level: number;
+  classes: { name: string; level: number }[];
   speed: number;
   inspiration: number;
   proficiencyBonus: number;
@@ -156,8 +160,7 @@ export class CharacterSheet {
     this.name = data.name;
     this.race = data.race;
     this.subrace = data.subrace;
-    this.characterClass = data.characterClass;
-    this.level = data.level;
+    this.classes = [...data.classes];
     this.ability = data.ability;
     this.inspiration = 0;
     this.baseAC = data.baseAC;
@@ -217,12 +220,7 @@ export class CharacterSheet {
   }
 
   getDescriptor() {
-    return generateDescriptor(
-      this.level,
-      this.race,
-      this.subrace,
-      this.characterClass
-    );
+    return generateDescriptor(this.race, this.subrace, this.classes);
   }
 
   serialize(): CharacterSheetDescriptor {
@@ -231,8 +229,7 @@ export class CharacterSheet {
       name: this.name,
       race: this.race,
       subrace: this.subrace,
-      characterClass: this.characterClass,
-      level: this.level,
+      classes: [...this.classes],
       baseAC: this.baseAC,
       speed: this.speed,
       proficiencyBonus: this.proficiencyBonus,
