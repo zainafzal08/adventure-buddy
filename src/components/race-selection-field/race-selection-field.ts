@@ -17,22 +17,16 @@ import {
   mdiHumanHandsup,
 } from '@mdi/js';
 import { getDatabase } from '../../data/Database';
+import { store } from '../../redux/store';
+import { connect } from 'pwa-helpers';
+import { AppState } from '../../redux/reducer';
 
 @customElement('race-selection-field')
-export class RaceSelectionField extends LitElement {
-  @property() activeRace!: string;
-  @property() activeSubRace: string | null = null;
+export class RaceSelectionField extends connect(store)(LitElement) {
+  @property() selectedRace!: string;
+  @property() selectedSubrace: string | null = null;
 
-  constructor() {
-    super();
-    const db = getDatabase();
-    this.activeRace = db.getRaceIdFromIndex(0);
-    this.activeSubRace = db.getSubRaceIdFromIndex(this.activeRace, 0);
-  }
-
-  firstUpdated() {
-    this.dispatchState();
-  }
+  private db = getDatabase();
 
   static get styles() {
     // TODO(zafzal): make this less hardcoded.
@@ -89,6 +83,7 @@ export class RaceSelectionField extends LitElement {
         background: white;
         margin: 4px 4px;
         border-radius: 12px;
+        cursor: pointer;
       }
       .card.active {
         background: var(--theme-primary);
@@ -186,40 +181,35 @@ export class RaceSelectionField extends LitElement {
     `;
   }
 
-  changeSelection(event: string, id: string) {
-    const db = getDatabase();
-    if (event === 'race') {
-      this.activeRace = id;
-      this.activeSubRace = db.getSubRaceIdFromIndex(this.activeRace, 0);
-    }
-    if (event === 'subrace') {
-      this.activeSubRace = id;
-    }
-    this.dispatchState();
+  stateChanged(state: AppState) {
+    this.selectedRace = state.characterDraft.race;
+    this.selectedSubrace = state.characterDraft.subrace;
   }
 
-  dispatchState() {
-    this.dispatchEvent(
-      new CustomEvent('mutation', {
-        bubbles: true,
-        composed: true,
-        detail: [
-          {
-            field: 'race',
-            value: this.activeRace,
-          },
-          {
-            field: 'subrace',
-            value: this.activeSubRace,
-          },
-        ],
-      })
-    );
+  changeSelection(event: string, id: string) {
+    let race = this.selectedRace;
+    let subrace = this.selectedSubrace;
+    if (event === 'race') {
+      race = id;
+      subrace = this.db.getSubRaceIdFromIndex(race, 0);
+      subrace = subrace === undefined ? null : subrace;
+    } else if (event === 'subrace') {
+      subrace = id;
+    }
+    // redux uses null to mean no subrace and undefined to mean
+    // not yet specified...
+    store.dispatch({
+      type: 'UPDATE_DRAFT',
+      fields: {
+        race,
+        subrace,
+      },
+    });
   }
 
   render() {
-    const allRaces = getDatabase().getAllRaces();
-    const allSubRaces = getDatabase().getAllSubRaces(this.activeRace);
+    const allRaces = this.db.getAllRaces();
+    const allSubRaces = this.db.getAllSubRaces(this.selectedRace);
 
     return html`
       <div class="group">
@@ -230,7 +220,7 @@ export class RaceSelectionField extends LitElement {
               raceKey,
               race.name,
               race.tagline,
-              this.activeRace === raceKey,
+              this.selectedRace === raceKey,
               'race'
             )
           )}
@@ -238,17 +228,17 @@ export class RaceSelectionField extends LitElement {
       </div>
       <div class="group">
         <label tabindex="0">Subrace</label>
-        <div class="list ${this.activeSubRace ? '' : 'inactive'}">
+        <div class="list ${this.selectedSubrace ? '' : 'inactive'}">
           ${allSubRaces.map(([subRaceKey, subrace]) =>
             this.renderCard(
               subRaceKey,
               subrace.fullName,
               subrace.tagline,
-              this.activeSubRace === subRaceKey,
+              this.selectedSubrace === subRaceKey,
               'subrace'
             )
           )}
-          ${this.activeSubRace
+          ${this.selectedSubrace
             ? null
             : html`
                 <p>You don't need to pick a subrace for this one!</p>

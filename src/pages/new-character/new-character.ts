@@ -2,6 +2,9 @@ import '../../components/character-card/character-card';
 import '../../components/text-field/text-field';
 import '../../components/class-selector/class-selector';
 import '../../components/race-selection-field/race-selection-field';
+import '../../components/ability-score-input-field/ability-score-input-field';
+import '../../components/basic-stats-input-field/basic-stats-input-field';
+import '../../components/additional-stats-input-field/additional-stats-input-field';
 
 import {
   LitElement,
@@ -11,10 +14,10 @@ import {
   TemplateResult,
   property,
 } from 'lit-element';
-import {
-  CharacterSheetDescriptor,
-  Ability,
-} from '../../data/CharacterSheet';
+import { connect } from 'pwa-helpers';
+import { store } from '../../redux/store';
+import { CharacterSheetDraft } from '../../redux/characterDraft';
+import { AppState } from '../../redux/reducer';
 
 /**
  * A field is simply some input field that generates mutations,
@@ -23,6 +26,7 @@ import {
  */
 interface Step {
   title: TemplateResult;
+  valid: (draft: CharacterSheetDraft) => boolean;
   fields: TemplateResult[];
 }
 
@@ -31,9 +35,18 @@ const NEW_CHARACTER_FLOW: Step[] = [
     title: html`
       Lets start with the <span>Basics<span></span> </span>
     `,
+    valid: d =>
+      d.name !== undefined &&
+      d.name.replace(/\s/g, '') !== '' &&
+      d.race !== undefined &&
+      d.subrace !== undefined &&
+      d.classes.length >= 1,
     fields: [
       html`
-        <text-field name="Character Name" field="name"></text-field>
+        <text-field
+          name="Character Name"
+          reflect="characterDraft.name"
+        ></text-field>
       `,
       html`
         <class-selector></class-selector>
@@ -45,43 +58,31 @@ const NEW_CHARACTER_FLOW: Step[] = [
   },
   {
     title: html`
-      Looking good, lets talk about
-      <span>Ability Scores</span> now.
+      Looking good, lets talk
+      <span>Numbers</span>.
     `,
-    fields: [],
+    valid: () => true,
+    fields: [
+      html`
+        <ability-score-input-field></ability-score-input-field>
+        <basic-stats-input-field></basic-stats-input-field>
+        <additional-stats-input-field></additional-stats-input-field>
+      `,
+    ],
   },
   {
     title: html`
       Tell me about<span>Your History</span>.
     `,
+    valid: () => true,
     fields: [],
   },
 ];
 
 @customElement('new-character')
-export class NewCharacter extends LitElement {
-  @property() character: CharacterSheetDescriptor = {
-    id: null,
-    name: '',
-    race: '',
-    subrace: null,
-    classes: [],
-    baseAC: -1,
-    speed: -1,
-    proficiencyBonus: -1,
-    ability: {
-      [Ability.DEX]: -1,
-      [Ability.STR]: -1,
-      [Ability.CHR]: -1,
-      [Ability.CON]: -1,
-      [Ability.INT]: -1,
-      [Ability.WIS]: -1,
-    },
-    specialBonus: {},
-    proficiencies: [],
-  };
-
-  @property() currentStep: number = 1;
+export class NewCharacter extends connect(store)(LitElement) {
+  @property() draft!: CharacterSheetDraft;
+  @property() currentStep: number = 2;
 
   static get styles() {
     return css`
@@ -111,6 +112,7 @@ export class NewCharacter extends LitElement {
       .heading .progress {
         background: var(--theme-primary);
         height: 100%;
+        transition: 0.5s all;
       }
       .construction-space {
         width: 100%;
@@ -152,10 +154,15 @@ export class NewCharacter extends LitElement {
         background: none;
         cursor: pointer;
       }
+      .chip.disabled {
+        opacity: 0.5;
+        cursor: default;
+      }
       .chip:hover {
         background: var(--theme-primary-light);
       }
-      .chip:focus {
+      .chip.disabled:hover {
+        background: none;
       }
       .chip.primary {
         background: var(--theme-primary);
@@ -164,7 +171,15 @@ export class NewCharacter extends LitElement {
       .chip.primary:hover {
         opacity: 0.8;
       }
+      .chip.primary.disabled:hover {
+        background: var(--theme-primary);
+        opacity: 0.5;
+      }
     `;
+  }
+
+  stateChanged(state: AppState) {
+    this.draft = state.characterDraft;
   }
 
   /**
@@ -183,24 +198,6 @@ export class NewCharacter extends LitElement {
     return NEW_CHARACTER_FLOW[this.currentStep - 1].fields;
   }
 
-  firstUpdated() {
-    this.addEventListener('mutation', (e: Event) => {
-      const mutations = (e as CustomEvent).detail;
-      for (const { field, value } of mutations) {
-        this.characterMutation({
-          [field]: value,
-        });
-      }
-    });
-  }
-
-  characterMutation(mutation: Partial<CharacterSheetDescriptor>) {
-    this.character = {
-      ...this.character,
-      ...mutation,
-    };
-  }
-
   prevStep() {
     if (this.currentStep < 2) {
       return;
@@ -209,13 +206,21 @@ export class NewCharacter extends LitElement {
   }
 
   nextStep() {
-    if (this.currentStep > NEW_CHARACTER_FLOW.length - 1) {
+    if (!this.nextAllowed()) {
       return;
     }
     this.currentStep++;
   }
 
   create() {}
+
+  nextAllowed() {
+    if (this.currentStep > NEW_CHARACTER_FLOW.length - 1) {
+      return false;
+    }
+
+    return NEW_CHARACTER_FLOW[this.currentStep - 1].valid(this.draft);
+  }
 
   render() {
     return html`
@@ -244,14 +249,21 @@ export class NewCharacter extends LitElement {
                   `}
               ${this.currentStep === NEW_CHARACTER_FLOW.length
                 ? html`
-                    <button @click=${this.create} class="chip primary">
+                    <button
+                      @click=${this.create}
+                      class="chip primary ${this.nextAllowed()
+                        ? ''
+                        : 'disabled'}"
+                    >
                       Create Character
                     </button>
                   `
                 : html`
                     <button
                       @click=${this.nextStep}
-                      class="chip primary"
+                      class="chip primary ${this.nextAllowed()
+                        ? ''
+                        : 'disabled'}"
                     >
                       Next Step
                     </button>
@@ -260,7 +272,7 @@ export class NewCharacter extends LitElement {
           </div>
         </div>
         <div class="preview-space">
-          <character-card .character=${this.character}></character-card>
+          <character-card></character-card>
         </div>
       </div>
     `;

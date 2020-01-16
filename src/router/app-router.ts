@@ -29,10 +29,11 @@ export class AppRouter extends connect(store)(LitElement) {
   connectedCallback() {
     super.connectedCallback();
     this.routes = this.routes.map(r => {
-      const regex = r.path.replace(/:(\w+)/g, '(?<$1>w+)');
+      const regex = r.path.replace(/:(\w+)/g, '(?<$1>[\\w\\d]+)');
       r.pattern = new RegExp(`^${regex}$`);
       return r;
     });
+
     window.onpopstate = () => {
       store.dispatch({
         type: 'UPDATE_LOCATION',

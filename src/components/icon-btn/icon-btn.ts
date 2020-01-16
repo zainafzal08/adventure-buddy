@@ -11,6 +11,7 @@ export class IconBtn extends LitElement {
   @property() icon = '';
   @property({ attribute: true }) size: 'large' | 'small' = 'large';
   @property({ attribute: true }) primary: 'true' | 'false' = 'false';
+  @property({ attribute: true }) disabled: 'true' | 'false' = 'false';
 
   static get styles() {
     return css`
@@ -28,10 +29,16 @@ export class IconBtn extends LitElement {
         width: fit-content;
         --icon-ink: var(--theme-primary);
       }
+      :host([disabled='true']) {
+        opacity: 0.5;
+      }
       :host([primary='true']) .chip-button {
         background: var(--theme-primary);
         --icon-ink: #ffffff;
         color: white;
+      }
+      :host([disabled='true']) .chip-button {
+        cursor: default;
       }
       :host([size='small']) .chip-button {
         font-size: 0.8rem;
@@ -39,6 +46,9 @@ export class IconBtn extends LitElement {
       }
       .chip-button:hover {
         box-shadow: var(--theme-primary-shadow);
+      }
+      :host([disabled='true']) .chip-button:hover {
+        box-shadow: none;
       }
       .chip-button mdi-icon {
         margin-right: 0.3rem;

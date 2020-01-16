@@ -22,22 +22,18 @@ import {
 import * as mdiAll from '@mdi/js';
 import { CharacterClass } from '../../data/CharacterSheet';
 import { AppModal } from '../../components/app-modal/app-modal';
-import * as CLASSES_STRICT from '../../assets/classes.json';
-
-interface ClassDescriptor {
-  name: string;
-  tagline: string;
-  icon: string;
-}
-
-const classes: { [k in string]: ClassDescriptor } = CLASSES_STRICT;
-delete classes['default'];
+import { connect } from 'pwa-helpers';
+import { store } from '../../redux/store';
+import { AppState } from '../../redux/reducer';
+import { getDatabase, ClassDescriptor } from '../../data/Database';
 
 @customElement('class-selector')
-export class ClassSelector extends LitElement {
+export class ClassSelector extends connect(store)(LitElement) {
   @property() selected: CharacterClass[] = [];
-  @property() draft: CharacterClass | null = null;
   @query('app-modal') modal!: AppModal;
+  @property() draft: CharacterClass | null = null;
+
+  private db = getDatabase();
 
   static get styles() {
     return css`
@@ -70,11 +66,13 @@ export class ClassSelector extends LitElement {
         align-items: flex-end;
         border-bottom: 2px solid #ebebeb;
         margin-bottom: 4px;
+        overflow-x: scroll;
       }
 
       .chip {
         border-radius: 15px;
         margin-right: 8px;
+        width: fit-content;
         height: var(--chip-height);
         background: var(--theme-primary);
         display: flex;
@@ -89,17 +87,19 @@ export class ClassSelector extends LitElement {
         font-size: 0.8rem;
         padding: 0 8px 0 12px;
         color: white;
+        white-space: nowrap;
       }
       .chip mdi-icon {
         margin-right: 8px;
+        cursor: pointer;
       }
-
       .chip.new-class {
         background: var(--theme-primary-light);
       }
       .chip.new-class mdi-icon {
         margin-left: 4px;
         margin-right: 0;
+        cursor: pointer;
       }
       .chip.new-class span {
         padding: 0 8px;
@@ -235,8 +235,22 @@ export class ClassSelector extends LitElement {
     `;
   }
 
+  stateChanged(state: AppState) {
+    this.selected = state.characterDraft.classes;
+  }
+
+  syncRedux() {
+    store.dispatch({
+      type: 'UPDATE_DRAFT',
+      fields: {
+        classes: [...this.selected],
+      },
+    });
+  }
+
   removeSelection(id: number) {
     this.selected = this.selected.filter((_, i) => id !== i);
+    this.syncRedux();
   }
 
   newClass() {
@@ -244,7 +258,7 @@ export class ClassSelector extends LitElement {
   }
 
   getName(id: string) {
-    return classes[id].name;
+    return this.db.getClass(id).name;
   }
 
   getIcon(icon: string) {
@@ -258,7 +272,7 @@ export class ClassSelector extends LitElement {
   }
 
   selectClass(key: string) {
-    this.draft = { id: key, level: 0 };
+    this.draft = { id: key, level: 1 };
     this.toggleAttribute('chosen', true);
   }
 
@@ -305,9 +319,10 @@ export class ClassSelector extends LitElement {
         <number-field
           name="Level"
           .range=${[1]}
-          .change=${(v: number) => {
-            this.draft!.level = v;
+          .changeListener=${(v: number) => {
+            this.draft = { ...this.draft!, level: v };
           }}
+          value=${1}
         ></number-field>
       </div>
     `;
@@ -318,6 +333,54 @@ export class ClassSelector extends LitElement {
     this.draft = null;
     this.modal.hide();
     this.toggleAttribute('chosen', false);
+    this.syncRedux();
+  }
+
+  renderModal() {
+    const alreadySelected = this.selected.map(x => x.id);
+    return html`
+      <app-modal>
+        <div class="card">
+          <div class="header">
+            <h1>
+              ${this.draft
+                ? `Set your ${this.getName(this.draft.id)} level`
+                : 'Pick a class'}
+            </h1>
+          </div>
+          <div class="body">
+            ${this.draft
+              ? this.renderLevelPrompt()
+              : this.db
+                  .allClasses()
+                  .filter(([k, _]) => alreadySelected.indexOf(k) === -1)
+                  .map(([k, c]) => this.renderClassSelection(k, c))}
+          </div>
+          <div class="footer">
+            <icon-btn
+              size="small"
+              icon=${mdiChevronLeft}
+              @click=${() => this.goBack()}
+              >Back</icon-btn
+            >
+            ${this.draft
+              ? html`
+                  <icon-btn
+                    size="small"
+                    @click=${this.draft.level > 0
+                      ? () => this.addClassToList()
+                      : () => {}}
+                    icon=${mdiPlus}
+                    primary="true"
+                    disabled=${!(this.draft.level > 0)}
+                    >Add</icon-btn
+                  >
+                `
+              : null}
+          </div>
+        </div>
+      </app-modal>
+    `;
   }
 
   render() {
@@ -347,43 +410,7 @@ export class ClassSelector extends LitElement {
           </div>
         </div>
       </div>
-      <app-modal>
-        <div class="card">
-          <div class="header">
-            <h1>
-              ${this.draft
-                ? `Set your ${classes[this.draft.id].name} level`
-                : 'Pick a class'}
-            </h1>
-          </div>
-          <div class="body">
-            ${this.draft
-              ? this.renderLevelPrompt()
-              : Object.entries(classes).map(([k, c]) =>
-                  this.renderClassSelection(k, c)
-                )}
-          </div>
-          <div class="footer">
-            <icon-btn
-              size="small"
-              icon=${mdiChevronLeft}
-              @click=${() => this.goBack()}
-              >Back</icon-btn
-            >
-            ${this.draft
-              ? html`
-                  <icon-btn
-                    size="small"
-                    @click=${() => this.addClassToList()}
-                    icon=${mdiPlus}
-                    primary="true"
-                    >Add</icon-btn
-                  >
-                `
-              : null}
-          </div>
-        </div>
-      </app-modal>
+      ${this.renderModal()}
     `;
   }
 }

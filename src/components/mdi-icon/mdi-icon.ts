@@ -43,7 +43,7 @@ export class MdiIcon extends LitElement {
           display: flex;
           align-items: center;
           justify-content: center;
-          cursor: ${this.button ? 'pointer' : 'default'};
+          cursor: ${this.button ? 'pointer' : ''};
           transition: all 0.1s;
           position: relative;
         }

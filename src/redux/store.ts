@@ -1,5 +1,5 @@
 import { createStore, StoreEnhancer } from 'redux';
-import { reducer, AppState } from './reducer';
+import { reducer, AppState, INITIAL_STATE } from './reducer';
 import { initialRouterState } from './router';
 import { User, initialUserState } from './user';
 import { Settings, initialSettingsState } from './settings';
@@ -38,6 +38,7 @@ declare global {
 
 // Grab initial state from localstorage.
 const initalState = {
+  ...INITIAL_STATE,
   router: initialRouterState,
   user: getFromStorage('user') as User,
   settings: getFromStorage('settings') as Settings,

@@ -6,19 +6,23 @@ import {
   property,
   query,
 } from 'lit-element';
+import { AppState } from '../../redux/reducer';
+import { store } from '../../redux/store';
+import { connect } from 'pwa-helpers';
 
 @customElement('number-field')
-export class NumberField extends LitElement {
+export class NumberField extends connect(store)(LitElement) {
+  // User facing
   @property({ attribute: true }) name: string = 'numberField';
-  @property() range: [number | null, number | null] = [null, null];
-  @property() help: string = '';
-  @property() change: (value: number) => void = () => {};
+  @property() reflect: string = '';
+  @property() range: [number?, number?] = [];
+  @property() value: string = '';
+  @property() changeListener: (v: string) => void = () => {};
+
+  @property() private help: string = '';
+
   @query('input') input!: HTMLInputElement;
   @query('.group') group!: HTMLDivElement;
-
-  get value() {
-    return this.input.value;
-  }
 
   static get styles() {
     return css`
@@ -37,6 +41,7 @@ export class NumberField extends LitElement {
       label {
         font-size: 0.8rem;
         color: #aaa;
+        text-transform: capitalize;
       }
 
       .group:focus-within label {
@@ -90,40 +95,67 @@ export class NumberField extends LitElement {
     `;
   }
 
-  onChange() {
-    this.change(parseInt(this.input!.value));
+  stateChanged(state: AppState) {
+    if (this.reflect === '') return;
+    // Sue me.
+    let val = state as any;
+    for (const field of this.reflect.split('.')) {
+      val = val[field];
+    }
+    this.value = val === undefined ? '' : val;
     this.validate();
   }
 
-  firstUpdated() {
-    this.input.addEventListener('input', () => this.onChange());
+  change() {
+    const value = this.input.value;
+    this.changeListener(this.input.value);
+
+    if (this.reflect) {
+      store.dispatch({
+        type: 'DIRECT_SET',
+        path: this.reflect,
+        value,
+      });
+    } else {
+      this.value = value;
+      this.validate();
+    }
+  }
+
+  notNum(v: string) {
+    return isNaN(parseInt(v));
+  }
+
+  notInRange(v: number) {
+    let valid = true;
+    if (this.range[0] !== undefined) {
+      valid = valid && v >= this.range[0];
+    }
+    if (this.range[1] !== undefined) {
+      valid = valid && v <= this.range[1];
+    }
+    return !valid;
   }
 
   validate() {
-    const v = parseInt(this.input!.value);
-    let valid = true;
+    // Debounce calls made before object is ready
+    if (this.group === null) return;
+    let error = '';
+    this.help = '';
 
-    if (this.range[0]) {
-      valid = valid && v >= this.range[0];
+    if (this.notNum(this.value)) {
+      error = 'Value must be a number';
+    } else if (this.notInRange(parseInt(this.value))) {
+      if (this.range[1]) {
+        error = `Value must be between ${this.range[0]} and ${this.range[1]}`;
+      } else {
+        error = `Value must be at least ${this.range[0]}`;
+      }
     }
-    if (this.range[1]) {
-      valid = valid && v <= this.range[1];
+    if (error) {
+      this.help = error;
     }
-
-    let helpStr = 'Invalid Value';
-    if (this.range[1]) {
-      helpStr = `Value must be between ${this.range[0]} and ${this.range[1]}`;
-    } else {
-      helpStr = `Value must be at least ${this.range[0]}`;
-    }
-
-    if (!valid) {
-      this.help = helpStr;
-    } else {
-      this.help = '';
-    }
-
-    this.group.classList.toggle('invalid', !valid);
+    this.group.classList.toggle('invalid', error !== '');
   }
 
   render() {
@@ -133,8 +165,10 @@ export class NumberField extends LitElement {
         <input
           id="input"
           type="number"
+          value=${this.value}
           min=${this.range[0] ? this.range[0] : ''}
           max=${this.range[1] ? this.range[1] : ''}
+          @input=${() => this.change()}
         />
         <small>${this.help}</small>
       </div>

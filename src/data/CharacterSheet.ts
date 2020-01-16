@@ -14,6 +14,13 @@ export type BaseStats = {
   [k in Ability]: number;
 };
 
+export type SavingThrows = {
+  [k in Ability]: {
+    value: number | undefined;
+    proficient: boolean;
+  };
+};
+
 export interface SpecialBonus {
   initative: number;
   speed: number;
@@ -107,30 +114,40 @@ export function getSkillAbility(skill: Skill) {
   }
 }
 
-export function generateDescriptor(
-  race: string,
-  subrace: string | null,
-  classes: CharacterClass[]
-) {
+export const abilityShorthand = {
+  [Ability.STR]: 'Str',
+  [Ability.DEX]: 'Dex',
+  [Ability.CON]: 'Con',
+  [Ability.INT]: 'Int',
+  [Ability.WIS]: 'Wis',
+  [Ability.CHR]: 'Chr',
+};
+export interface CharacterDescriptor {
+  race: string | undefined;
+  subrace: string | null | undefined;
+  classes: CharacterClass[];
+}
+
+export function toModifier(value: number) {
+  return Math.floor((value - 10) / 2);
+}
+
+export function generateDescriptor(character: CharacterDescriptor) {
   let raceStr = null;
   let levelStr = null;
   let classStr = '';
-  let level = 0;
-  for (const c of classes) {
-    if (classStr === '') classStr = `${classStr} ${c.name}`;
-    else classStr = c.name;
-    level += c.level;
-  }
+  const { classes, race, subrace } = character;
+  let level = classes.reduce((acc, x) => acc + x.level, 0);
+
   if (level > 0) {
     levelStr = `Level ${level}`;
   }
   if (race) {
     raceStr = getDatabase().getRace(race).name;
   }
-  if (subrace) {
+  if (race && subrace) {
     raceStr = getDatabase().getSubRace(race, subrace).fullName;
   }
-
   return [levelStr, raceStr, classStr].join(' ');
 }
 
@@ -140,7 +157,7 @@ export class CharacterSheet {
   name: string;
   race: string;
   subrace: string | null;
-  classes: { name: string; level: number }[];
+  classes: CharacterClass[];
   speed: number;
   inspiration: number;
   proficiencyBonus: number;
