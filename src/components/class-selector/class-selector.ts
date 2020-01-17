@@ -319,8 +319,12 @@ export class ClassSelector extends connect(store)(LitElement) {
         <number-field
           name="Level"
           .range=${[1]}
-          .changeListener=${(v: number) => {
-            this.draft = { ...this.draft!, level: v };
+          .changeListener=${(v: string) => {
+            let level = parseInt(v);
+            if (isNaN(level)) {
+              level = 0;
+            }
+            this.draft = { ...this.draft!, level };
           }}
           value=${1}
         ></number-field>

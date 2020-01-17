@@ -6,6 +6,8 @@ import './pages/new-character/new-character';
 import { Route } from './router/app-router';
 import { html } from 'lit-html';
 
+//TODO: everything is public for ease of dev, remove the public: true
+// before any launch
 export const ROUTES: Route[] = [
   {
     path: '/',
@@ -31,7 +33,6 @@ export const ROUTES: Route[] = [
   },
   {
     path: '/character/new',
-    public: true,
     component: () =>
       html`
         <new-character></new-character>

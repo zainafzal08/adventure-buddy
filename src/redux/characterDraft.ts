@@ -63,27 +63,27 @@ export const initialCharacterDraft: CharacterSheetDraft = {
   },
   savingThrows: {
     [Ability.STR]: {
-      value: undefined,
+      value: 0,
       proficient: false,
     },
     [Ability.DEX]: {
-      value: undefined,
+      value: 0,
       proficient: false,
     },
     [Ability.CON]: {
-      value: undefined,
+      value: 0,
       proficient: false,
     },
     [Ability.INT]: {
-      value: undefined,
+      value: 0,
       proficient: false,
     },
     [Ability.WIS]: {
-      value: undefined,
+      value: 0,
       proficient: false,
     },
     [Ability.CHR]: {
-      value: undefined,
+      value: 0,
       proficient: false,
     },
   },

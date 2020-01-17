@@ -41,8 +41,8 @@ export class IconBtn extends LitElement {
         cursor: default;
       }
       :host([size='small']) .chip-button {
-        font-size: 0.8rem;
-        padding: 0.3rem 1rem 0.3rem 0.7rem;
+        font-size: 0.75rem;
+        padding: 0.2rem 1rem 0.2rem 0.7rem;
       }
       .chip-button:hover {
         box-shadow: var(--theme-primary-shadow);
@@ -54,6 +54,9 @@ export class IconBtn extends LitElement {
         margin-right: 0.3rem;
         cursor: pointer;
       }
+      :host([size='small']) .chip-button mdi-icon {
+        margin-right: 0.5rem;
+      }
     `;
   }
 
@@ -62,7 +65,7 @@ export class IconBtn extends LitElement {
       <div class="chip-button">
             <mdi-icon
               .color=${css`var(--icon-ink)`}
-              size=${this.size === 'small' ? 14 : 16}
+              size=${this.size === 'small' ? 12 : 16}
               icon="${this.icon}"
             ></mdi-icon>
             <slot></slot>

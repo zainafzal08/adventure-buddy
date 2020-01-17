@@ -20,6 +20,9 @@ export class AdditionalStatsInputField extends connect(store)(
     return css`
       :host {
         width: 100%;
+      }
+      .fields {
+        width: 100%;
         display: flex;
         justify-content: flex-start;
       }
@@ -30,6 +33,16 @@ export class AdditionalStatsInputField extends connect(store)(
         flex-direction: column;
         justify-content: flex-end;
         padding: 0 8px;
+      }
+      h3 {
+        margin: 0;
+        padding: 0;
+        color: var(--theme-primary);
+        opacity: 0.9;
+        font-weight: 500;
+        padding-left: 8px;
+        margin-bottom: 8px;
+        margin-top: 8px;
       }
     `;
   }
@@ -45,33 +58,36 @@ export class AdditionalStatsInputField extends connect(store)(
 
   render() {
     return html`
-      <div class="container-med">
-        <number-field
-          name="Inspiration"
-          .range=${[0]}
-          reflect="characterDraft.inspiration"
-        ></number-field>
-      </div>
-      <div class="container-med">
-        <number-field
-          name="Proficiency Bonus"
-          .range=${[0]}
-          reflect="characterDraft.profBonus"
-        ></number-field>
-      </div>
-      <div class="container-med">
-        <number-field
-          name="Passive Wisdom"
-          .range=${[0]}
-          reflect="characterDraft.passiveWisdom"
-        ></number-field>
-      </div>
-      <div class="container-med">
-        <number-field
-          name="XP"
-          .range=${[0]}
-          reflect="characterDraft.xp"
-        ></number-field>
+      <h3>Additional Stats</h3>
+      <div class="fields">
+        <div class="container-med">
+          <number-field
+            name="Inspiration"
+            .range=${[0]}
+            reflect="characterDraft.inspiration"
+          ></number-field>
+        </div>
+        <div class="container-med">
+          <number-field
+            name="Proficiency Bonus"
+            .range=${[0]}
+            reflect="characterDraft.profBonus"
+          ></number-field>
+        </div>
+        <div class="container-med">
+          <number-field
+            name="Passive Wisdom"
+            .range=${[0]}
+            reflect="characterDraft.passiveWisdom"
+          ></number-field>
+        </div>
+        <div class="container-med">
+          <number-field
+            name="XP"
+            .range=${[0]}
+            reflect="characterDraft.xp"
+          ></number-field>
+        </div>
       </div>
     `;
   }

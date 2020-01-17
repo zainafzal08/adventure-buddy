@@ -8,8 +8,10 @@ import {
   BaseStats,
   Ability,
   toModifier,
+  abilityShorthand,
 } from '../../data/CharacterSheet';
 import { AppState } from '../../redux/reducer';
+import { mdiAutoFix } from '@mdi/js';
 
 @customElement('saving-throw-input-field')
 export class SavingThrowInputField extends connect(store)(LitElement) {
@@ -22,8 +24,8 @@ export class SavingThrowInputField extends connect(store)(LitElement) {
     Ability.CHR,
   ];
 
-  private savingThrowScores?: SavingThrows;
-  private abilityScores?: BaseStats;
+  private savingThrowScores!: SavingThrows;
+  private abilityScores!: BaseStats;
 
   stateChanged(state: AppState) {
     this.savingThrowScores = state.characterDraft.savingThrows;
@@ -33,6 +35,10 @@ export class SavingThrowInputField extends connect(store)(LitElement) {
   static get styles() {
     return css`
       :host {
+        width: 100%;
+        height: fit-content;
+      }
+      .fields {
         width: 100%;
         height: fit-content;
         display: flex;
@@ -57,16 +63,50 @@ export class SavingThrowInputField extends connect(store)(LitElement) {
         padding-bottom: 4px;
         font-family: var(--font-stack);
       }
+      .heading {
+        width: 100%;
+        height: 28px;
+        margin-bottom: 8px;
+        padding-left: 8px;
+        display: flex;
+        align-items: center;
+      }
+      h3 {
+        margin: 0;
+        padding: 0;
+        color: var(--theme-primary);
+        opacity: 0.9;
+        font-weight: 500;
+        padding-right: 8px;
+      }
+      .bar {
+        width: 2px;
+        background: #ebebeb;
+        height: 100%;
+        margin: 0 8px;
+      }
     `;
   }
 
   setSavingThrow(ability: Ability, value: number) {
-    this.savingThrowScores![ability].value = value;
+    this.savingThrowScores = {
+      ...this.savingThrowScores,
+      [ability]: {
+        proficient: this.savingThrowScores[ability].proficient,
+        value,
+      },
+    };
     this.syncInput();
   }
 
-  setProficient(ability: Ability, value: boolean) {
-    this.savingThrowScores![ability].proficient = value;
+  setProficient(ability: Ability, proficient: boolean) {
+    this.savingThrowScores = {
+      ...this.savingThrowScores,
+      [ability]: {
+        proficient,
+        value: this.savingThrowScores[ability].value,
+      },
+    };
     this.syncInput();
   }
 
@@ -85,16 +125,38 @@ export class SavingThrowInputField extends connect(store)(LitElement) {
     return v;
   }
 
+  autofill() {}
+
+  autofillImpossible() {
+    return 'false';
+  }
+
   render() {
     return html`
-      ${this.abilities.map(
-        ability => html`
-          <div class="container">
-            <label>${ability}</label>
-            ${this.getSavingThrow(ability)}
-          </div>
-        `
-      )}
+      <div class="heading">
+        <h3>Saving Throws</h3>
+        <div class="bar"></div>
+        <icon-btn
+          icon=${mdiAutoFix}
+          size="small"
+          disabled=${this.autofillImpossible()}
+          @click=${() => this.autofill()}
+          >Autofill</icon-btn
+        >
+      </div>
+      <div class="fields">
+        ${this.abilities.map(
+          ability => html`
+            <div class="container">
+              <number-field
+                name=${abilityShorthand[ability]}
+                .range=${[0]}
+                reflect=${`characterDraft.savingThrows.${ability}.value`}
+              ></number-field>
+            </div>
+          `
+        )}
+      </div>
     `;
   }
 }

@@ -21,6 +21,10 @@ export class AbilityScoreInputField extends connect(store)(LitElement) {
       :host {
         width: 100%;
         height: fit-content;
+      }
+      .fields {
+        width: 100%;
+        height: fit-content;
         display: flex;
         justify-content: space-between;
       }
@@ -31,44 +35,36 @@ export class AbilityScoreInputField extends connect(store)(LitElement) {
         box-sizing: border-box;
         padding: 0 8px;
       }
-      p {
+      h3 {
         margin: 0;
-        margin-top: 4px;
         padding: 0;
-        color: #bbb;
-        width: 100%;
-        text-align: center;
-        font-size: 0.9rem;
-        height: 1rem;
-      }
-      input {
-        width: 100%;
-        background: none;
-        outline: none;
-        border: none;
-        border-bottom: 2px solid #ebebeb;
-        text-align: center;
-        font-size: 1.2rem;
-        color: #444;
-        padding-bottom: 4px;
-        font-family: var(--font-stack);
+        color: var(--theme-primary);
+        opacity: 0.9;
+        font-weight: 500;
+        padding-left: 8px;
+        margin-bottom: 8px;
       }
     `;
   }
 
   render() {
     return html`
-      ${this.abilities.map(
-        ability => html`
-          <div class="container">
-            <number-field
-              name=${abilityShorthand[ability]}
-              .range=${[1]}
-              reflect=${`characterDraft.abilityScores.${ability}`}
-            ></number-field>
+      <h3>Ability Scores</h3>
+      <div class="fields">
+            ${this.abilities.map(
+              ability => html`
+                <div class="container">
+                  <number-field
+                    name=${abilityShorthand[ability]}
+                    .range=${[1]}
+                    reflect=${`characterDraft.abilityScores.${ability}`}
+                  ></number-field>
+                </div>
+              `
+            )}
           </div>
-        `
-      )}
+        </h3>
+      </h3>
     `;
   }
 }

@@ -5,6 +5,7 @@ import '../../components/race-selection-field/race-selection-field';
 import '../../components/ability-score-input-field/ability-score-input-field';
 import '../../components/basic-stats-input-field/basic-stats-input-field';
 import '../../components/additional-stats-input-field/additional-stats-input-field';
+import '../../components/saving-throw-input-field/saving-throw-input-field';
 
 import {
   LitElement,
@@ -67,6 +68,7 @@ const NEW_CHARACTER_FLOW: Step[] = [
         <ability-score-input-field></ability-score-input-field>
         <basic-stats-input-field></basic-stats-input-field>
         <additional-stats-input-field></additional-stats-input-field>
+        <saving-throw-input-field></asaving-throw-nput-field>
       `,
     ],
   },
