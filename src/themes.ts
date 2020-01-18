@@ -10,6 +10,8 @@ interface Theme {
   emphasisBackground: string;
   emphasisHigh: string;
   emphasisLow: string;
+  emphasisShadow: string;
+  emphasisShadowHigh: string;
 }
 
 const PEACH_THEME: Theme = {
@@ -24,6 +26,8 @@ const PEACH_THEME: Theme = {
   emphasisBackground: '#6cbee60f',
   emphasisHigh: '#6fcf97',
   emphasisLow: '#ed6f6f',
+  emphasisShadow: '1px 2px 4px #6cbee655',
+  emphasisShadowHigh: '0px 4px 3px #6cbee685',
 };
 
 const FRESH_THEME: Theme = {
@@ -35,9 +39,11 @@ const FRESH_THEME: Theme = {
   primaryShadowHigh: '3px 3px 11px #67b26f95',
   secondary: '#4ca2cd',
   emphasis: '#6cbee6',
-  emphasisBackground: '#6cbee60f',
   emphasisHigh: '#6fcf97',
   emphasisLow: '#ed6f6f',
+  emphasisBackground: '#6cbee60f',
+  emphasisShadow: '1px 2px 4px #6cbee655',
+  emphasisShadowHigh: '3px 3px 11px #6cbee695',
 };
 
 export type ThemeName = 'peach' | 'fresh';

@@ -12,20 +12,22 @@ export interface CharacterSheetDraft {
   race: string;
   subrace: string | null; // null is valid, it means no subrace.
   classes: CharacterClass[];
-  abilityScores: BaseStats;
-  speed: number;
-  ac: number;
-  maxHealth: number;
-  initiative: number;
-  inspiration: number;
-  passiveWisdom: number;
-  profBonus: number;
-  xp: number;
+  abilityScores: { [k in Ability]: string };
+  speed: string;
+  ac: string;
+  maxHealth: string;
+  initiative: string;
+  inspiration: string;
+  passiveWisdom: string;
+  profBonus: string;
+  xp: string;
   hitDice: {
-    number: number;
-    type: number;
+    number: string;
+    type: string;
   };
-  savingThrows: SavingThrows;
+  savingThrows: {
+    [k in Ability]: { value: string; proficient: boolean };
+  };
 }
 
 export interface CharacterDraftAction extends Action {
@@ -42,48 +44,48 @@ export const initialCharacterDraft: CharacterSheetDraft = {
   subrace: initSubrace,
   classes: [],
   abilityScores: {
-    [Ability.STR]: 10,
-    [Ability.DEX]: 10,
-    [Ability.CON]: 10,
-    [Ability.INT]: 10,
-    [Ability.WIS]: 10,
-    [Ability.CHR]: 10,
+    [Ability.STR]: '10',
+    [Ability.DEX]: '10',
+    [Ability.CON]: '10',
+    [Ability.INT]: '10',
+    [Ability.WIS]: '10',
+    [Ability.CHR]: '10',
   },
-  speed: 30,
-  ac: 10,
-  maxHealth: 10,
-  initiative: 0,
-  inspiration: 0,
-  passiveWisdom: 10,
-  profBonus: 2,
-  xp: 0,
+  speed: '30',
+  ac: '10',
+  maxHealth: '10',
+  initiative: '0',
+  inspiration: '0',
+  passiveWisdom: '10',
+  profBonus: '2',
+  xp: '0',
   hitDice: {
-    number: 1,
-    type: 8,
+    number: '1',
+    type: '8',
   },
   savingThrows: {
     [Ability.STR]: {
-      value: 0,
+      value: '0',
       proficient: false,
     },
     [Ability.DEX]: {
-      value: 0,
+      value: '0',
       proficient: false,
     },
     [Ability.CON]: {
-      value: 0,
+      value: '0',
       proficient: false,
     },
     [Ability.INT]: {
-      value: 0,
+      value: '0',
       proficient: false,
     },
     [Ability.WIS]: {
-      value: 0,
+      value: '0',
       proficient: false,
     },
     [Ability.CHR]: {
-      value: 0,
+      value: '0',
       proficient: false,
     },
   },

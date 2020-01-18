@@ -1,17 +1,25 @@
-import '../number-field/number-field';
+import '../number-proficient-field/number-proficient-field';
 
-import { LitElement, html, customElement, css } from 'lit-element';
+import {
+  LitElement,
+  html,
+  customElement,
+  css,
+  property,
+} from 'lit-element';
 import { connect } from 'pwa-helpers';
 import { store } from '../../redux/store';
 import {
-  SavingThrows,
-  BaseStats,
   Ability,
   toModifier,
   abilityShorthand,
 } from '../../data/CharacterSheet';
 import { AppState } from '../../redux/reducer';
 import { mdiAutoFix } from '@mdi/js';
+
+type DraftSavingThrows = {
+  [k in Ability]: { value: string; proficient: boolean };
+};
 
 @customElement('saving-throw-input-field')
 export class SavingThrowInputField extends connect(store)(LitElement) {
@@ -24,12 +32,14 @@ export class SavingThrowInputField extends connect(store)(LitElement) {
     Ability.CHR,
   ];
 
-  private savingThrowScores!: SavingThrows;
-  private abilityScores!: BaseStats;
+  @property() private savingThrowScores!: DraftSavingThrows;
+  @property() private abilityScores!: { [k in Ability]: string };
+  @property() private proficiencyBonus!: string;
 
   stateChanged(state: AppState) {
     this.savingThrowScores = state.characterDraft.savingThrows;
     this.abilityScores = state.characterDraft.abilityScores;
+    this.proficiencyBonus = state.characterDraft.profBonus;
   }
 
   static get styles() {
@@ -118,17 +128,40 @@ export class SavingThrowInputField extends connect(store)(LitElement) {
       },
     });
   }
+  generateValues() {
+    const generated: Record<
+      string,
+      { proficient: boolean; value: string }
+    > = {};
+    for (const ability of this.abilities) {
+      let val = parseInt(this.abilityScores[ability]);
+      let profBonus = parseInt(this.proficiencyBonus);
+      if (isNaN(val)) val = 0;
+      if (isNaN(profBonus)) profBonus = 0;
+      const isProf = this.savingThrowScores[ability].proficient;
+      if (!isProf) {
+        profBonus = 0;
+      }
 
-  getSavingThrow(ability: Ability) {
-    const v = this.savingThrowScores![ability].value;
-    if (v === -1) return toModifier(this.abilityScores![ability]);
-    return v;
+      generated[ability] = {
+        proficient: isProf,
+        value: (toModifier(val) + profBonus).toString()!,
+      };
+    }
+    return generated;
   }
 
-  autofill() {}
+  autofill() {
+    if (this.autofillImpossible()) return;
+    this.savingThrowScores = this.generateValues() as DraftSavingThrows;
+    this.syncInput();
+  }
 
   autofillImpossible() {
-    return 'false';
+    const generated = this.generateValues();
+    return this.abilities
+      .map(a => this.savingThrowScores[a].value === generated[a].value)
+      .reduce((acc, v) => acc && v);
   }
 
   render() {
@@ -148,11 +181,10 @@ export class SavingThrowInputField extends connect(store)(LitElement) {
         ${this.abilities.map(
           ability => html`
             <div class="container">
-              <number-field
+              <number-proficient-field
                 name=${abilityShorthand[ability]}
-                .range=${[0]}
-                reflect=${`characterDraft.savingThrows.${ability}.value`}
-              ></number-field>
+                reflect=${`characterDraft.savingThrows.${ability}`}
+              ></number-proficient-field>
             </div>
           `
         )}

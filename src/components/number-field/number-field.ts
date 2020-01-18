@@ -84,8 +84,8 @@ export class NumberField extends connect(store)(LitElement) {
       }
       small {
         color: #ccc;
-        font-size: 0.7rem;
-        margin-top: 0.3rem;
+        font-size: 0.5rem;
+        margin-top: 0.4rem;
         height: 0.8rem;
       }
       .group.invalid small {
@@ -103,6 +103,8 @@ export class NumberField extends connect(store)(LitElement) {
       val = val[field];
     }
     this.value = val === undefined ? '' : val;
+    // Acutally update the input field to match.
+    if (this.input) this.input.value = this.value;
     this.validate();
   }
 

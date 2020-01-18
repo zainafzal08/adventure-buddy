@@ -236,10 +236,6 @@ export class CharacterSheet {
     return base + bonus;
   }
 
-  getDescriptor() {
-    return generateDescriptor(this.race, this.subrace, this.classes);
-  }
-
   serialize(): CharacterSheetDescriptor {
     return {
       id: this.id,
