@@ -154,7 +154,8 @@ export class NumberFieldProficient extends connect(store)(LitElement) {
     }
     this.data = val === undefined ? '' : val;
     // Actually update the input field to match.
-    if (this.input) this.input.value = this.data.value;
+    if (this.input && this.data.value !== '')
+      this.input.value = this.data.value;
     this.validate();
   }
 

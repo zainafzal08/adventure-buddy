@@ -11,7 +11,12 @@ import { connect } from 'pwa-helpers';
 import { store } from '../../redux/store';
 import { AppState } from '../../redux/reducer';
 import { CharacterSheetDraft } from '../../redux/characterDraft';
-import { generateDescriptor } from '../../data/CharacterSheet';
+import {
+  generateDescriptor,
+  allAbilities,
+  abilityShorthand,
+  toModifier,
+} from '../../data/CharacterSheet';
 import * as mdiAll from '@mdi/js';
 import { getDatabase } from '../../data/Database';
 
@@ -67,6 +72,19 @@ export class CharacterCard extends connect(store)(LitElement) {
       .row {
         width: 100%;
         display: flex;
+        min-height: calc(24px + 0.7rem);
+      }
+      .col {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+      .placeholder-class {
+        width: 24px;
+        height: 24px;
+        margin-top: 0.7rem;
+        background: #ebebeb;
+        border-radius: 50%;
       }
       .selected-class {
         width: 24px;
@@ -82,6 +100,65 @@ export class CharacterCard extends connect(store)(LitElement) {
       .selected-class mdi-icon {
         opacity: 0.6;
       }
+      .ability-score {
+        margin-right: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        color: #777;
+      }
+      .ability-score .score {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        text-align: center;
+        font-size: 1.2rem;
+        min-height: 1.2rem;
+        opacity: 0.7;
+      }
+      .ability-score .name {
+        margin: 0;
+        padding: 0;
+        color: #999;
+        margin-top: 8px;
+        font-size: 0.8rem;
+      }
+      .abilities {
+        width: 100%;
+        display: flex;
+        justify-content: space-around;
+        margin-top: 16px;
+      }
+      .stat-container {
+        display: flex;
+        align-items: center;
+        margin: 24px 0;
+      }
+      .stat-container p {
+        margin: 0;
+        padding: 0;
+        color: #777;
+        padding-left: 8px;
+      }
+      .health-bar {
+        width: 100%;
+        height: 8px;
+        background: var(--theme-primary);
+        border-radius: 15px;
+        margin: 24px 0 8px 0;
+      }
+      .bar-label {
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        text-align: left;
+        font-size: 0.9rem;
+        color: #999;
+      }
+      .space-out {
+        justify-content: space-between;
+      }
     `;
   }
 
@@ -93,6 +170,39 @@ export class CharacterCard extends connect(store)(LitElement) {
       return match.replace('-', '').toUpperCase();
     });
     return (mdiAll as { [k in string]: string })[`mdi${iconStr}`];
+  }
+
+  getColor(score: string) {
+    const val = isNaN(parseInt(score)) ? 10 : parseInt(score);
+    const mod = toModifier(val);
+    if (mod < 0) {
+      return css`var(--theme-emphasis-low)`;
+    } else if (mod > 0) {
+      return css`var(--theme-emphasis-high)`;
+    }
+    return css`var(--neutral)`;
+  }
+
+  renderAbilities() {
+    return html`
+      <div class="abilities">
+        ${allAbilities.map(
+          a => html`
+            <div class="ability-score">
+              <p
+                class="score"
+                style=${`color: ${this.getColor(
+                  this.character.abilityScores[a]
+                )}`}
+              >
+                ${this.character.abilityScores[a]}
+              </p>
+              <p class="name">${abilityShorthand[a]}</p>
+            </div>
+          `
+        )}
+      </div>
+    `;
   }
 
   render() {
@@ -112,7 +222,15 @@ export class CharacterCard extends connect(store)(LitElement) {
             </div>
           `
         )}
+        ${this.character.classes.length === 0
+          ? html`
+              <div class="placeholder-class"></div>
+            `
+          : null}
       </div>
+      <p>
+        OTHER INFO HERE
+      </p>
     `;
   }
 }

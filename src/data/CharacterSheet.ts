@@ -10,6 +10,15 @@ export enum Ability {
   CHR = 'charisma',
 }
 
+export const allAbilities = [
+  Ability.STR,
+  Ability.DEX,
+  Ability.CON,
+  Ability.INT,
+  Ability.WIS,
+  Ability.CHR,
+];
+
 export type BaseStats = {
   [k in Ability]: number;
 };
@@ -67,6 +76,26 @@ export enum Skill {
   PERFORMANCE = 'performance',
   PERSUASION = 'persuasion',
 }
+export const allSkills = [
+  Skill.ATHLETICS,
+  Skill.ACROBATICS,
+  Skill.SLEIGHT_OF_HAND,
+  Skill.STEALTH,
+  Skill.ARCANA,
+  Skill.HISTORY,
+  Skill.INVESTIGATION,
+  Skill.NATURE,
+  Skill.RELIGION,
+  Skill.ANIMAL_HANDLING,
+  Skill.INSIGHT,
+  Skill.MEDICINE,
+  Skill.PERCEPTION,
+  Skill.SURVIVAL,
+  Skill.DECEPTION,
+  Skill.INTIMIDATION,
+  Skill.PERFORMANCE,
+  Skill.PERSUASION,
+];
 
 export function getSkillAbility(skill: Skill) {
   switch (skill) {

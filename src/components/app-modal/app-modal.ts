@@ -39,6 +39,7 @@ export class AppModal extends LitElement {
 
   show() {
     this.shown = true;
+    window.scrollTo(0, 0);
     document.body.style.overflow = 'hidden';
   }
 

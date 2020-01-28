@@ -103,8 +103,9 @@ export class NumberField extends connect(store)(LitElement) {
       val = val[field];
     }
     this.value = val === undefined ? '' : val;
-    // Acutally update the input field to match.
-    if (this.input) this.input.value = this.value;
+    // Acutally update the input field to match but ignore blank
+    // values.
+    if (this.input && this.value !== '') this.input.value = this.value;
     this.validate();
   }
 

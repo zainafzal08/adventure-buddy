@@ -91,7 +91,7 @@ export class DiceInput extends connect(store)(LitElement) {
       small {
         color: var(--theme-emphasis-low);
         opacity: 0.7;
-        font-size: 0.7rem;
+        font-size: 0.5rem;
         margin-top: 0.3rem;
         height: 0.8rem;
       }

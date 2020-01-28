@@ -77,7 +77,7 @@ export class AdditionalStatsInputField extends connect(store)(
         <div class="container-med">
           <number-field
             name="Passive Wisdom"
-            .range=${[0]}
+            .range=${[1]}
             reflect="characterDraft.passiveWisdom"
           ></number-field>
         </div>
