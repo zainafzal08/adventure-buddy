@@ -43,7 +43,7 @@ export class AppView extends connect(store)(LitElement) {
       }
       main {
         width: 100%;
-        height: 100vh;
+        height: calc(100vh - var(--navbar-height));
         box-sizing: border-box;
         padding: var(--page-vpad) var(--page-hpad);
       }

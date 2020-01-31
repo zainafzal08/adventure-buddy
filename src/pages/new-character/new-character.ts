@@ -8,6 +8,8 @@ import '../../components/additional-stats-input-field/additional-stats-input-fie
 import '../../components/saving-throw-input-field/saving-throw-input-field';
 import '../../components/skills-input-field/skills-input-field';
 
+import hex from '../../assets/hex.svg';
+
 import {
   LitElement,
   html,
@@ -21,6 +23,14 @@ import { store } from '../../redux/store';
 import { CharacterSheetDraft } from '../../redux/characterDraft';
 import { AppState } from '../../redux/reducer';
 import { allAbilities } from '../../data/CharacterSheet';
+import {
+  mdiSword,
+  mdiDice5,
+  mdiPlusOne,
+  mdiAccount,
+  mdiBookOpenPageVariant,
+  mdiAutoFix,
+} from '@mdi/js';
 
 /**
  * A field is simply some input field that generates mutations,
@@ -116,11 +126,38 @@ const NEW_CHARACTER_FLOW: Step[] = [
   },
   {
     title: html`
-      But what are your <span>Skills</span>?
+      How about your <span>Skills</span>?
     `,
     valid: () => true,
     fields: html`
       <skills-input-field></skills-input-field>
+    `,
+  },
+  {
+    title: html`
+      Show me how you deal <span>Damage</span>!
+    `,
+    valid: () => true,
+    fields: html`
+      <attacks-input-field></attacks-input-field>
+    `,
+  },
+  {
+    title: html`
+      Do you weave the <span>Arcane</span>?
+    `,
+    valid: () => true,
+    fields: html`
+      <arcane-input-field></arcane-input-field>
+    `,
+  },
+  {
+    title: html`
+      Lastly, tell me your <span>Story</span>?
+    `,
+    valid: () => true,
+    fields: html`
+      <misc-input-field></misc-input-field>
     `,
   },
 ];
@@ -128,45 +165,41 @@ const NEW_CHARACTER_FLOW: Step[] = [
 @customElement('new-character')
 export class NewCharacter extends connect(store)(LitElement) {
   @property() draft!: CharacterSheetDraft;
-  @property() currentStep: number = 3;
+  @property({ attribute: true, reflect: true }) currentStep: number = 1;
 
   static get styles() {
     return css`
       :host {
         font-family: var(--font-stack);
         width: 100%;
+        height: 100%;
         --page-width: 800px;
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-        flex-direction: column;
-      }
-      .heading {
-        margin-bottom: 32px;
-        width: 100%;
+        --section-heading-height: 64px;
+        display: grid;
+        grid-template-rows: var(--section-heading-height) auto;
+        grid-template-columns: var(--page-width) auto;
+        grid-template-areas:
+          'header header'
+          'form progress';
       }
       h1 {
         margin: 0;
         font-weight: 100;
         color: #999;
+        border-bottom: 2px solid #ebebeb;
+        width: 100%;
         padding-bottom: 1rem;
+        height: fit-content;
+        grid-area: header;
       }
       h1 span {
         color: var(--theme-primary);
       }
-      .heading .progress-bar {
-        background: #ebebeb;
-        height: 2px;
-        width: 100%;
-      }
-      .heading .progress {
-        width: 100%;
-        height: 100%;
-        transition: 0.5s all;
-      }
       .form-fields {
-        width: var(--page-width);
-        padding: 0 32px;
+        width: 100%;
+        grid-area: form;
+        box-sizing: border-box;
+        padding: 24px 32px;
         display: flex;
         align-items: flex-start;
         justify-content: flex-start;
@@ -176,8 +209,69 @@ export class NewCharacter extends connect(store)(LitElement) {
         display: flex;
         align-items: center;
         justify-content: flex-end;
-        height: 100px;
+        height: 60px;
         width: 100%;
+      }
+      .progress {
+        grid-area: progress;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .progress .bounding {
+        width: 300px;
+        height: 300px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .progress svg {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        z-index: 1;
+      }
+      .progress .step {
+        width: 32px;
+        height: 32px;
+        background: #efefef;
+        border-radius: 50%;
+        position: absolute;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2;
+      }
+      .progress .step.done {
+        background: var(--theme-primary);
+      }
+      .progress .step.active {
+        background: var(--theme-primary);
+      }
+      .step.top {
+        top: -13px;
+        left: 135px;
+      }
+      .step.bottom {
+        bottom: -13px;
+        left: 135px;
+      }
+      .step.top-right {
+        right: 6px;
+        top: 69px;
+      }
+      .step.top-left {
+        left: 6px;
+        top: 69px;
+      }
+      .step.bottom-right {
+        right: 6px;
+        bottom: 62px;
+      }
+      .step.bottom-left {
+        left: 6px;
+        bottom: 62px;
       }
       .chip {
         color: var(--theme-primary);
@@ -217,14 +311,6 @@ export class NewCharacter extends connect(store)(LitElement) {
     this.draft = state.characterDraft;
   }
 
-  /**
-   * The current progress the user is at in the new character flow
-   * as a percentage out of 100.
-   */
-  progress() {
-    return (this.currentStep / NEW_CHARACTER_FLOW.length) * 100;
-  }
-
   getTitle() {
     return NEW_CHARACTER_FLOW[this.currentStep - 1].title;
   }
@@ -257,52 +343,109 @@ export class NewCharacter extends connect(store)(LitElement) {
     return NEW_CHARACTER_FLOW[this.currentStep - 1].valid(this.draft);
   }
 
+  renderProgressPoint(icon: string, step: number, position: string) {
+    return html`
+      <div
+        class="step ${position} ${this.currentStep > step
+          ? 'done'
+          : ''} ${this.currentStep === step ? 'active' : ''}"
+      >
+        <mdi-icon
+          color=${this.currentStep >= step ? '#fff' : '#bbb'}
+          icon=${icon}
+        ></mdi-icon>
+      </div>
+    `;
+  }
+
+  getStepColor(step: number) {
+    if (step < this.currentStep) return 'var(--theme-primary)';
+    if (this.currentStep === 6 && step === 6) {
+      return 'var(--theme-primary)';
+    }
+    return '#efefef';
+  }
+
   render() {
     return html`
-      <div class="heading">
-        <h1>
-          ${this.getTitle()}
-        </h1>
-        <div class="progress-bar">
-          <div
-            class="progress"
-            style=${`width: ${this.progress()}%`}
-          ></div>
+      <h1>${this.getTitle()}</h1>
+      <div class="form-fields">
+        ${this.getFields()}
+        <div class="navigation">
+          ${this.currentStep === 1
+            ? null
+            : html`
+                <button @click=${this.prevStep} class="chip">
+                  Previous Step
+                </button>
+              `}
+          ${this.currentStep === NEW_CHARACTER_FLOW.length
+            ? html`
+                <button
+                  @click=${this.create}
+                  class="chip primary ${this.nextAllowed()
+                    ? ''
+                    : 'disabled'}"
+                >
+                  Create Character
+                </button>
+              `
+            : html`
+                <button
+                  @click=${this.nextStep}
+                  class="chip primary ${this.nextAllowed()
+                    ? ''
+                    : 'disabled'}"
+                >
+                  Next Step
+                </button>
+              `}
         </div>
       </div>
-      <div class="form-space">
-        <div class="form-fields">
-          ${this.getFields()}
-          <div class="navigation">
-            ${this.currentStep === 1
-              ? null
-              : html`
-                  <button @click=${this.prevStep} class="chip">
-                    Previous Step
-                  </button>
-                `}
-            ${this.currentStep === NEW_CHARACTER_FLOW.length
-              ? html`
-                  <button
-                    @click=${this.create}
-                    class="chip primary ${this.nextAllowed()
-                      ? ''
-                      : 'disabled'}"
-                  >
-                    Create Character
-                  </button>
-                `
-              : html`
-                  <button
-                    @click=${this.nextStep}
-                    class="chip primary ${this.nextAllowed()
-                      ? ''
-                      : 'disabled'}"
-                  >
-                    Next Step
-                  </button>
-                `}
-          </div>
+      <div class="progress">
+        <div class="bounding">
+          ${this.renderProgressPoint(mdiAccount, 1, 'top')}
+          ${this.renderProgressPoint(mdiDice5, 2, 'top-right')}
+          ${this.renderProgressPoint(mdiPlusOne, 3, 'bottom-right')}
+          ${this.renderProgressPoint(mdiSword, 4, 'bottom')}
+          ${this.renderProgressPoint(mdiAutoFix, 5, 'bottom-left')}
+          ${this.renderProgressPoint(
+            mdiBookOpenPageVariant,
+            6,
+            'top-left'
+          )}
+          <svg
+            width="80"
+            height="80"
+            viewBox="0 0 80 80"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              stroke=${this.getStepColor(1)}
+              d="M40.4012 0L74.8022 21.9469V60.177"
+            />
+            <path
+              stroke=${this.getStepColor(2)}
+              d="M74.8022 21.9469V60.177"
+            />
+            <path
+              stroke=${this.getStepColor(3)}
+              d="M74.8022 60.177L40.4012 80"
+            />
+            <path
+              stroke=${this.getStepColor(4)}
+              d="M40.4012 80L6 60.177"
+            />
+            <path
+              stroke=${this.getStepColor(5)}
+              d="M6 60.177V21.9469"
+            />
+            <path
+              stroke=${this.getStepColor(6)}
+              d="M6 21.9469L40.4012 0"
+            />
+          </svg>
         </div>
       </div>
     `;

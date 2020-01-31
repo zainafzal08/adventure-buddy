@@ -128,6 +128,7 @@ export class SavingThrowInputField extends connect(store)(LitElement) {
       },
     });
   }
+
   generateValues() {
     const generated: Record<
       string,
@@ -136,7 +137,7 @@ export class SavingThrowInputField extends connect(store)(LitElement) {
     for (const ability of this.abilities) {
       let val = parseInt(this.abilityScores[ability]);
       let profBonus = parseInt(this.proficiencyBonus);
-      if (isNaN(val)) val = 0;
+      if (isNaN(val)) val = 10;
       if (isNaN(profBonus)) profBonus = 0;
       const isProf = this.savingThrowScores[ability].proficient;
       if (!isProf) {

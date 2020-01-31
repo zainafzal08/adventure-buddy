@@ -115,7 +115,7 @@ export class NumberFieldProficient extends connect(store)(LitElement) {
       }
       .footer {
         width: 100%;
-        height: 48px;
+        height: 32px;
         margin-top: 8px;
       }
       .prof-button {

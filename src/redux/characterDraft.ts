@@ -4,8 +4,14 @@ import {
   CharacterClass,
   BaseStats,
   SavingThrows,
+  Skill,
+  allSkills,
 } from '../data/CharacterSheet';
 import { getDatabase } from '../data/Database';
+
+export type SkillsDecleration = {
+  [k in Skill]: { value: string; proficient: boolean };
+};
 
 export interface CharacterSheetDraft {
   name: string | undefined;
@@ -28,6 +34,7 @@ export interface CharacterSheetDraft {
   savingThrows: {
     [k in Ability]: { value: string; proficient: boolean };
   };
+  skills: SkillsDecleration;
 }
 
 export interface CharacterDraftAction extends Action {
@@ -37,6 +44,15 @@ export interface CharacterDraftAction extends Action {
 const db = getDatabase();
 const initRace = db.getRaceIdFromIndex(0);
 const initSubrace = db.getSubRaceIdFromIndex(initRace, 0);
+
+const allSkillObj = {} as Partial<SkillsDecleration>;
+for (const skill of allSkills) {
+  allSkillObj[skill as Skill] = {
+    value: '0',
+    proficient: false,
+  };
+}
+const initSkills = allSkillObj as SkillsDecleration;
 
 export const initialCharacterDraft: CharacterSheetDraft = {
   name: undefined,
@@ -89,6 +105,7 @@ export const initialCharacterDraft: CharacterSheetDraft = {
       proficient: false,
     },
   },
+  skills: initSkills,
 };
 
 export function characterDraftReducer(

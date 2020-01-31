@@ -97,7 +97,7 @@ export const allSkills = [
   Skill.PERSUASION,
 ];
 
-export function getSkillAbility(skill: Skill) {
+export function getSkillAbility(skill: Skill): Ability {
   switch (skill) {
     case Skill.ATHLETICS:
       return Ability.STR;
