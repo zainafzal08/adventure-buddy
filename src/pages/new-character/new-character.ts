@@ -7,8 +7,7 @@ import '../../components/basic-stats-input-field/basic-stats-input-field';
 import '../../components/additional-stats-input-field/additional-stats-input-field';
 import '../../components/saving-throw-input-field/saving-throw-input-field';
 import '../../components/skills-input-field/skills-input-field';
-
-import hex from '../../assets/hex.svg';
+import '../../components/attacks-input-field/attacks-input-field';
 
 import {
   LitElement,

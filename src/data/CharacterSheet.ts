@@ -243,7 +243,6 @@ export class CharacterSheet {
   }
 
   getArmorClass() {
-    // TODO(zain): Calculate this correctly.
     const equipmentBonus = 0;
     return (
       this.baseAC +

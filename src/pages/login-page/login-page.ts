@@ -88,7 +88,6 @@ export class LoginPage extends connect(store)(LitElement) {
       .signInWithPopup(this.auth.google)
       .then(result => {
         if (!result.user) {
-          // TODO(zain): Make this more descriptive.
           throw Error('failed');
         }
         const user = {

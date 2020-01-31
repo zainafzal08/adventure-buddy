@@ -29,7 +29,6 @@ export class RaceSelectionField extends connect(store)(LitElement) {
   private db = getDatabase();
 
   static get styles() {
-    // TODO(zafzal): make this less hardcoded.
     return css`
       :host {
         width: 100%;
