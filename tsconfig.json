@@ -18,7 +18,8 @@
         "noImplicitAny": true,
         "noImplicitThis": true,
         "skipLibCheck": true,
-        "experimentalDecorators": true
+        "experimentalDecorators": true,
+        "resolveJsonModule": true
     },
     "include": ["./src/**/*"],
     "exclude": [

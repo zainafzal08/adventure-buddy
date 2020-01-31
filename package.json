@@ -30,10 +30,18 @@
     "Chrome > 50"
   ],
   "dependencies": {
+    "@mdi/js": "^4.7.95",
     "@types/localforage": "0.0.34",
+    "@types/redux": "^3.6.0",
+    "@types/redux-localstorage": "^1.0.8",
+    "@vaadin/router": "^1.6.0",
+    "@webcomponents/webcomponentsjs": "^2.4.0",
     "firebase": "^7.5.0",
     "lit-element": "^2.2.1",
     "localforage": "^1.7.3",
+    "pwa-helpers": "^0.9.1",
+    "redux": "^4.0.5",
+    "reselect": "^4.0.0",
     "uuidv4": "^6.0.0"
   },
   "prettier": {

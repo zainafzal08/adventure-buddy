@@ -1,5 +1,5 @@
-[
-    {
+{
+    "dwarf": {
         "name": "Dwarf",
         "tagline": "Short, Stout And Can Take A Hit",
         "physical": {
@@ -7,9 +7,10 @@
             "size": "Medium",
             "speed": "25 ft"
         },
-        "subraces": [
-            {
-                "fullName": "Hill",
+        "subraces": {
+            "hill": {
+                "fullName": "Hill Dwarf",
+                "tagline": "A wiser dwarf with more hit points",
                 "features": [
                     {
                         "fullName": "Ability Score Increase",
@@ -23,8 +24,9 @@
                     }
                 ]
             },
-            {
-                "fullName": "Mountain",
+            "mountain": {
+                "fullName": "Mountain Dwarf",
+                "tagline": "A stronger dwarf with better armor skills.",
                 "features": [
                     {
                         "fullName": "Ability Score Increase",
@@ -38,7 +40,7 @@
                     }
                 ]
             }
-        ],
+        },
         "features": [
             {
                 "fullName": "Ability Score Increase",
@@ -77,17 +79,18 @@
             }
         ]
     },
-    {
+    "elf": {
         "name": "Elf",
-        "tagline": "Full of themselves but oh so magical",
+        "tagline": "Here to kick ass and do magic.",
         "physical": {
             "height": "5-6 ft",
             "size": "Medium",
             "speed": "30 ft"
         },
-        "subraces": [
-            {
-                "fullName": "High",
+        "subraces": {
+            "high": {
+                "fullName": "High Elf",
+                "tagline": "A smarter elf with military training",
                 "features": [
                     {
                         "fullName": "Ability Score Increase",
@@ -111,8 +114,9 @@
                     }
                 ]
             },
-            {
-                "fullName": "Wood",
+            "wood": {
+                "fullName": "Wood Elf",
+                "tagline": "A wiser, faster elf who can sneak through nature.",
                 "features": [
                     {
                         "fullName": "Ability Score Increase",
@@ -136,8 +140,9 @@
                     }
                 ]
             },
-            {
-                "fullName": "Dark (drow)",
+            "dark": {
+                "fullName": "Dark (drow) Elf",
+                "tagline": "A charming elf who thrives in the darkness but struggles in the light.",
                 "features": [
                     {
                         "fullName": "Ability Score Increase",
@@ -166,7 +171,7 @@
                     }
                 ]
             }
-        ],
+        },
         "features": [
             {
                 "fullName": "Ability Score Increase",
@@ -200,17 +205,18 @@
             }
         ]
     },
-    {
+    "halfling": {
         "name": "Halfling",
-        "tagline": "Pack a lot into such a small package",
+        "tagline": "Packs a lot into a small package",
         "physical": {
             "height": "~3 ft",
             "size": "Small",
             "speed": "25 ft"
         },
-        "subraces": [
-            {
-                "fullName": "Lightfoot",
+        "subraces": {
+            "lightfoot": {
+                "fullName": "Lightfoot Halfing",
+                "tagline": "A charming halfing who can sneak.",
                 "features": [
                     {
                         "fullName": "Ability Score Increase",
@@ -224,8 +230,9 @@
                     }
                 ]
             },
-            {
-                "fullName": "Stout",
+            "stout": {
+                "fullName": "Stout Halfing",
+                "tagline": "A hearty halfing who is resistant to poison",
                 "features": [
                     {
                         "fullName": "Ability Score Increase",
@@ -239,7 +246,7 @@
                     }
                 ]
             }
-        ],
+        },
         "features": [
             {
                 "fullName": "Ability Score Increase",
@@ -268,15 +275,15 @@
             }
         ]
     },
-    {
+    "human": {
         "name": "Human",
-        "tagline": "Boring honestly",
+        "tagline": "Persistant, inovative and annoying.",
         "physical": {
             "height": "5-6 ft",
             "size": "Medium",
             "speed": "30 ft"
         },
-        "subraces": [],
+        "subraces": {},
         "features": [
             {
                 "fullName": "Ability Score Increase",
@@ -290,7 +297,7 @@
             }
         ]
     },
-    {
+    "dragonborn": {
         "name": "Dragonborn",
         "tagline": "RAWR! XD",
         "physical": {
@@ -298,128 +305,134 @@
             "size": "Medium",
             "speed": "30 ft"
         },
-        "subraces": [
-          {
-              "fullName": "Black",
-              "features": [
-                  {
-                      "fullName": "Breath Damage",
-                      "desc": "Your breath attack does acid damage",
-                      "icon": "fire"
-                  },
-                  {
-                      "fullName": "Breath Range",
-                      "desc": "Your breath attack is a 5' by 30' line and requires a dex save to dodge",
-                      "icon": "math-compass"
-                  },
-                  {
-                    "fullName": "Colors",
-                    "desc": "Can be Black or Copper",
-                    "icon": "palette"
-                  }
-              ]
-          },
-          {
-              "fullName": "Blue",
-              "features": [
-                  {
-                      "fullName": "Breath Damage",
-                      "desc": "Your breath attack does lightning damage",
-                      "icon": "fire"
-                  },
-                  {
-                      "fullName": "Breath Range",
-                      "desc": "Your breath attack is a 5' by 30' line and requires a dex save to dodge",
-                      "icon": "math-compass"
-                  },
-                  {
-                    "fullName": "Colors",
-                    "desc": "Can be Blue or Bronze",
-                    "icon": "palette"
-                  }
-              ]
-          },
-          {
-              "fullName": "Brass",
-              "features": [
-                  {
-                      "fullName": "Breath Damage",
-                      "desc": "Your breath attack does fire damage",
-                      "icon": "fire"
-                  },
-                  {
-                      "fullName": "Breath Range",
-                      "desc": "Your breath attack is a 5' by 30' line and requires a dex save to dodge",
-                      "icon": "math-compass"
-                  },
-                  {
-                    "fullName": "Colors",
-                    "desc": "Only Bronze",
-                    "icon": "palette"
-                  }
-              ]
-          },
-          {
-              "fullName": "Gold",
-              "features": [
-                  {
-                      "fullName": "Breath Damage",
-                      "desc": "Your breath attack does fire damage",
-                      "icon": "fire"
-                  },
-                  {
-                      "fullName": "Breath Range",
-                      "desc": "Your breath attack is a 15' cone and requires a dex save to dodge",
-                      "icon": "math-compass"
-                  },
-                  {
-                    "fullName": "Colors",
-                    "desc": "Can be Gold or Red",
-                    "icon": "palette"
-                  }
-              ]
-          },
-          {
-              "fullName": "Silver",
-              "features": [
-                  {
-                      "fullName": "Breath Damage",
-                      "desc": "Your breath attack does Cold damage",
-                      "icon": "fire"
-                  },
-                  {
-                      "fullName": "Breath Range",
-                      "desc": "Your breath attack is a 15' cone and requires a con save to dodge",
-                      "icon": "math-compass"
-                  },
-                  {
-                    "fullName": "Colors",
-                    "desc": "Can be Silver or White",
-                    "icon": "palette"
-                  }
-              ]
-          },
-          {
-              "fullName": "Green",
-              "features": [
-                  {
-                      "fullName": "Breath Damage",
-                      "desc": "Your breath attack does Poisen damage",
-                      "icon": "fire"
-                  },
-                  {
-                      "fullName": "Breath Range",
-                      "desc": "Your breath attack is a 15' cone and requires a con save to dodge",
-                      "icon": "math-compass"
-                  },
-                  {
-                    "fullName": "Colors",
-                    "desc": "Only Green",
-                    "icon": "palette"
-                  }
-              ]
-          }
-        ],
+        "subraces": {
+            "black": {
+                "fullName": "Black Dragonborn",
+                "tagline": "A black or copper dragon who can breathe acid",
+                "features": [
+                    {
+                        "fullName": "Breath Damage",
+                        "desc": "Your breath attack does acid damage",
+                        "icon": "fire"
+                    },
+                    {
+                        "fullName": "Breath Range",
+                        "desc": "Your breath attack is a 5' by 30' line and requires a dex save to dodge",
+                        "icon": "math-compass"
+                    },
+                    {
+                        "fullName": "Colors",
+                        "desc": "Can be Black or Copper",
+                        "icon": "palette"
+                    }
+                ]
+            },
+            "blue": {
+                "fullName": "Blue Dragonborn",
+                "tagline": "A blue or bronze dragon who can breathe lighting",
+                "features": [
+                    {
+                        "fullName": "Breath Damage",
+                        "desc": "Your breath attack does lightning damage",
+                        "icon": "fire"
+                    },
+                    {
+                        "fullName": "Breath Range",
+                        "desc": "Your breath attack is a 5' by 30' line and requires a dex save to dodge",
+                        "icon": "math-compass"
+                    },
+                    {
+                        "fullName": "Colors",
+                        "desc": "Can be Blue or Bronze",
+                        "icon": "palette"
+                    }
+                ]
+            },
+            "brass": {
+                "fullName": "Brass Dragonborn",
+                "tagline": "A bronze dragon who can breathe fire",
+                "features": [
+                    {
+                        "fullName": "Breath Damage",
+                        "desc": "Your breath attack does fire damage",
+                        "icon": "fire"
+                    },
+                    {
+                        "fullName": "Breath Range",
+                        "desc": "Your breath attack is a 5' by 30' line and requires a dex save to dodge",
+                        "icon": "math-compass"
+                    },
+                    {
+                        "fullName": "Colors",
+                        "desc": "Only Bronze",
+                        "icon": "palette"
+                    }
+                ]
+            },
+            "gold": {
+                "fullName": "Gold Dragonborn",
+                "tagline": "A gold or red dragon who can breathe fire",
+                "features": [
+                    {
+                        "fullName": "Breath Damage",
+                        "desc": "Your breath attack does fire damage",
+                        "icon": "fire"
+                    },
+                    {
+                        "fullName": "Breath Range",
+                        "desc": "Your breath attack is a 15' cone and requires a dex save to dodge",
+                        "icon": "math-compass"
+                    },
+                    {
+                        "fullName": "Colors",
+                        "desc": "Can be Gold or Red",
+                        "icon": "palette"
+                    }
+                ]
+            },
+            "silver": {
+                "fullName": "Silver Dragonborn",
+                "tagline": "A silver or white dragon who can breathe ice",
+                "features": [
+                    {
+                        "fullName": "Breath Damage",
+                        "desc": "Your breath attack does Cold damage",
+                        "icon": "fire"
+                    },
+                    {
+                        "fullName": "Breath Range",
+                        "desc": "Your breath attack is a 15' cone and requires a con save to dodge",
+                        "icon": "math-compass"
+                    },
+                    {
+                        "fullName": "Colors",
+                        "desc": "Can be Silver or White",
+                        "icon": "palette"
+                    }
+                ]
+            },
+            "green": {
+                "fullName": "Green Dragonborn",
+                "tagline": "A green dragon who can breathe poisen",
+                "features": [
+                    {
+                        "fullName": "Breath Damage",
+                        "desc": "Your breath attack does Poisen damage",
+                        "icon": "fire"
+                    },
+                    {
+                        "fullName": "Breath Range",
+                        "desc": "Your breath attack is a 15' cone and requires a con save to dodge",
+                        "icon": "math-compass"
+                    },
+                    {
+                        "fullName": "Colors",
+                        "desc": "Only Green",
+                        "icon": "palette"
+                    }
+                ]
+            }
+        },
         "features": [
             {
                 "fullName": "Ability Score Increase",
@@ -432,23 +445,23 @@
                 "icon": "fire"
             },
             {
-              "fullName": "Breath Weapon",
-              "desc": "You can use your action to exhale destructive energy. It deals damage in an area according to your ancestry. When you use your breath weapon, all creatures in the area must make a saving throw, the type of which is determined by your ancestry. The DC of this saving throw is 8 + your Constitution modifier + your proficiency bonus. A creature takes 2d6 damage on a failed save, and half as much damage on a successful one. The damage increase to 3d6 at 6th level, 4d6 at 11th, and 5d6 at 16th level. After using your breath weapon, you cannot use it again until you complete a short or long rest.",
-              "icon": "voice"
+                "fullName": "Breath Weapon",
+                "desc": "You can use your action to exhale destructive energy. It deals damage in an area according to your ancestry. When you use your breath weapon, all creatures in the area must make a saving throw, the type of which is determined by your ancestry. The DC of this saving throw is 8 + your Constitution modifier + your proficiency bonus. A creature takes 2d6 damage on a failed save, and half as much damage on a successful one. The damage increase to 3d6 at 6th level, 4d6 at 11th, and 5d6 at 16th level. After using your breath weapon, you cannot use it again until you complete a short or long rest.",
+                "icon": "voice"
             },
             {
-              "fullName":"Damage Resistance",
-              "desc": "You have resistance to the damage type associated with your ancestry.",
-              "icon": "shield-plus"
+                "fullName": "Damage Resistance",
+                "desc": "You have resistance to the damage type associated with your ancestry.",
+                "icon": "shield-plus"
             },
             {
-              "fullName": "Languages",
-              "desc":"You can read, speak, and write Common and Draconic",
-              "icon": "web"
+                "fullName": "Languages",
+                "desc": "You can read, speak, and write Common and Draconic",
+                "icon": "web"
             }
         ]
     },
-    {
+    "gnome": {
         "name": "Gnome",
         "tagline": "You know, like from your garden",
         "physical": {
@@ -456,9 +469,10 @@
             "size": "Small",
             "speed": "25 ft"
         },
-        "subraces": [
-            {
-                "fullName": "Forest",
+        "subraces": {
+            "forest": {
+                "fullName": "Forest Gnome",
+                "tagline": "A more dexterious gnome who can commune with nature.",
                 "features": [
                     {
                         "fullName": "Ability Score Increase",
@@ -477,8 +491,9 @@
                     }
                 ]
             },
-            {
-                "fullName": "Rock",
+            "rock": {
+                "fullName": "Rock Gnome",
+                "tagline": "A heartier gnome who can tinker and build",
                 "features": [
                     {
                         "fullName": "Ability Score Increase",
@@ -498,8 +513,9 @@
                     }
                 ]
             },
-            {
-                "fullName": "Deep",
+            "deep": {
+                "fullName": "Deep Gnome",
+                "tagline": "A smarter, wiser, stealthier more charming gnome who can see in the dark.",
                 "features": [
                     {
                         "fullName": "Ability Score Increase",
@@ -528,7 +544,7 @@
                     }
                 ]
             }
-        ],
+        },
         "features": [
             {
                 "fullName": "Ability Score Increase",
@@ -552,7 +568,7 @@
             }
         ]
     },
-    {
+    "half-elf": {
         "name": "Half-Elf",
         "tagline": "Filthy Mudbloods if you ask me",
         "physical": {
@@ -560,7 +576,7 @@
             "size": "Medium",
             "speed": "30 ft"
         },
-        "subraces": [],
+        "subraces": {},
         "features": [
             {
                 "fullName": "Ability Score Increase",
@@ -589,7 +605,7 @@
             }
         ]
     },
-    {
+    "half-orc": {
         "name": "Half-Orc",
         "tagline": "Kinda Sexy",
         "physical": {
@@ -597,7 +613,7 @@
             "size": "Medium",
             "speed": "30 ft"
         },
-        "subraces": [],
+        "subraces": {},
         "features": [
             {
                 "fullName": "Ability Score Increase",
@@ -631,7 +647,7 @@
             }
         ]
     },
-    {
+    "tiefling": {
         "name": "Tiefling",
         "tagline": "I forgot what these even are ",
         "physical": {
@@ -639,7 +655,7 @@
             "size": "Medium",
             "speed": "30 ft"
         },
-        "subraces": [],
+        "subraces": {},
         "features": [
             {
                 "fullName": "Ability Score Increase",
@@ -668,4 +684,4 @@
             }
         ]
     }
-]
+}

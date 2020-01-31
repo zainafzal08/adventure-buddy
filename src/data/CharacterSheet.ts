@@ -1,4 +1,5 @@
 import { exhaustiveCheck } from '../util';
+import { getDatabase } from './Database';
 
 export enum Ability {
   STR = 'strength',
@@ -9,8 +10,24 @@ export enum Ability {
   CHR = 'charisma',
 }
 
+export const allAbilities = [
+  Ability.STR,
+  Ability.DEX,
+  Ability.CON,
+  Ability.INT,
+  Ability.WIS,
+  Ability.CHR,
+];
+
 export type BaseStats = {
   [k in Ability]: number;
+};
+
+export type SavingThrows = {
+  [k in Ability]: {
+    value: number | undefined;
+    proficient: boolean;
+  };
 };
 
 export interface SpecialBonus {
@@ -20,12 +37,17 @@ export interface SpecialBonus {
   hp: number;
 }
 
+export interface CharacterClass {
+  id: string;
+  level: number;
+}
+
 export interface CharacterSheetDescriptor {
   id: string | null;
   name: string;
   race: string;
-  class: string;
-  level: number;
+  subrace: string | null;
+  classes: CharacterClass[];
   baseAC: number;
   speed: number;
   proficiencyBonus: number;
@@ -54,8 +76,28 @@ export enum Skill {
   PERFORMANCE = 'performance',
   PERSUASION = 'persuasion',
 }
+export const allSkills = [
+  Skill.ATHLETICS,
+  Skill.ACROBATICS,
+  Skill.SLEIGHT_OF_HAND,
+  Skill.STEALTH,
+  Skill.ARCANA,
+  Skill.HISTORY,
+  Skill.INVESTIGATION,
+  Skill.NATURE,
+  Skill.RELIGION,
+  Skill.ANIMAL_HANDLING,
+  Skill.INSIGHT,
+  Skill.MEDICINE,
+  Skill.PERCEPTION,
+  Skill.SURVIVAL,
+  Skill.DECEPTION,
+  Skill.INTIMIDATION,
+  Skill.PERFORMANCE,
+  Skill.PERSUASION,
+];
 
-export function getSkillAbility(skill: Skill) {
+export function getSkillAbility(skill: Skill): Ability {
   switch (skill) {
     case Skill.ATHLETICS:
       return Ability.STR;
@@ -101,13 +143,50 @@ export function getSkillAbility(skill: Skill) {
   }
 }
 
+export const abilityShorthand = {
+  [Ability.STR]: 'Str',
+  [Ability.DEX]: 'Dex',
+  [Ability.CON]: 'Con',
+  [Ability.INT]: 'Int',
+  [Ability.WIS]: 'Wis',
+  [Ability.CHR]: 'Chr',
+};
+export interface CharacterDescriptor {
+  race: string | undefined;
+  subrace: string | null | undefined;
+  classes: CharacterClass[];
+}
+
+export function toModifier(value: number) {
+  return Math.floor((value - 10) / 2);
+}
+
+export function generateDescriptor(character: CharacterDescriptor) {
+  let raceStr = null;
+  let levelStr = null;
+  let classStr = '';
+  const { classes, race, subrace } = character;
+  let level = classes.reduce((acc, x) => acc + x.level, 0);
+
+  if (level > 0) {
+    levelStr = `Level ${level}`;
+  }
+  if (race) {
+    raceStr = getDatabase().getRace(race).name;
+  }
+  if (race && subrace) {
+    raceStr = getDatabase().getSubRace(race, subrace).fullName;
+  }
+  return [levelStr, raceStr, classStr].join(' ');
+}
+
 export class CharacterSheet {
   // Character Info.
   id: string;
   name: string;
   race: string;
-  class: string;
-  level: number;
+  subrace: string | null;
+  classes: CharacterClass[];
   speed: number;
   inspiration: number;
   proficiencyBonus: number;
@@ -126,8 +205,8 @@ export class CharacterSheet {
     this.id = data.id;
     this.name = data.name;
     this.race = data.race;
-    this.class = data.class;
-    this.level = data.level;
+    this.subrace = data.subrace;
+    this.classes = [...data.classes];
     this.ability = data.ability;
     this.inspiration = 0;
     this.baseAC = data.baseAC;
@@ -164,7 +243,6 @@ export class CharacterSheet {
   }
 
   getArmorClass() {
-    // TODO(zain): Calculate this correctly.
     const equipmentBonus = 0;
     return (
       this.baseAC +
@@ -186,7 +264,19 @@ export class CharacterSheet {
     return base + bonus;
   }
 
-  getDescriptor() {
-    return `Level ${this.level} ${this.race} ${this.class}`;
+  serialize(): CharacterSheetDescriptor {
+    return {
+      id: this.id,
+      name: this.name,
+      race: this.race,
+      subrace: this.subrace,
+      classes: [...this.classes],
+      baseAC: this.baseAC,
+      speed: this.speed,
+      proficiencyBonus: this.proficiencyBonus,
+      ability: this.ability,
+      specialBonus: this.specialBonus,
+      proficiencies: Array.from(this.proficiencies),
+    };
   }
 }
