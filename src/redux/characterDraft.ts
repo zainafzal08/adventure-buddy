@@ -13,6 +13,39 @@ export type SkillsDecleration = {
   [k in Skill]: { value: string; proficient: boolean };
 };
 
+export enum DamageType {
+  ACID = 'acid',
+  BLUDGEONING = 'bludgeoning',
+  COLD = 'cold',
+  FIRE = 'fire',
+  FORCE = 'force',
+  LIGHTNING = 'lightning',
+  NECROTIC = 'necrotic',
+  PIERCING = 'piercing',
+  POISON = 'poison',
+  PSYCHIC = 'psychic',
+  RADIANT = 'radiant',
+  SLASHING = 'slashing',
+  THUNDER = 'thunder',
+}
+
+export interface AttackDamage {
+  type: DamageType;
+  formula: string;
+}
+
+export interface AttackNumbers {
+  toHit: string;
+  damage: AttackDamage[];
+}
+
+export interface AttackDescriptor {
+  name: string;
+  count: number;
+  melee: AttackNumbers | undefined;
+  ranged: AttackNumbers | undefined;
+}
+
 export interface CharacterSheetDraft {
   name: string | undefined;
   race: string;
@@ -35,6 +68,7 @@ export interface CharacterSheetDraft {
     [k in Ability]: { value: string; proficient: boolean };
   };
   skills: SkillsDecleration;
+  attacks: AttackDescriptor[];
 }
 
 export interface CharacterDraftAction extends Action {
@@ -106,6 +140,7 @@ export const initialCharacterDraft: CharacterSheetDraft = {
     },
   },
   skills: initSkills,
+  attacks: [],
 };
 
 export function characterDraftReducer(

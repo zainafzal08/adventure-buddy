@@ -164,7 +164,7 @@ const NEW_CHARACTER_FLOW: Step[] = [
 @customElement('new-character')
 export class NewCharacter extends connect(store)(LitElement) {
   @property() draft!: CharacterSheetDraft;
-  @property({ attribute: true, reflect: true }) currentStep: number = 1;
+  @property({ attribute: true, reflect: true }) currentStep: number = 4;
 
   static get styles() {
     return css`
