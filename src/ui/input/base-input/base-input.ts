@@ -16,8 +16,12 @@ export class BaseInput extends connect(store)(LitElement) {
    */
   @property() reflect: string = '';
 
+  @property() initalValue: string = '';
+
   /** The raw input element we are wrapping. */
   @query('input') inputElement?: HTMLInputElement;
+
+  private pendingValue: string | null = null;
 
   /**
    * Logic to handle the value of a field changing due to user input
@@ -28,12 +32,16 @@ export class BaseInput extends connect(store)(LitElement) {
   // On any state change we sync the input with the redux state.
   stateChanged(state: AppState) {
     if (this.reflect === '') return;
-    // Sue me.
     let val = state as any;
     for (const field of this.reflect.split('.')) {
       val = val[field];
     }
-    this.inputElement!.value = val;
+
+    if (this.inputElement) {
+      this.inputElement.value = val || '';
+    } else {
+      this.pendingValue = val || '';
+    }
     this.updateValue(val === undefined ? '' : val);
   }
 
@@ -54,5 +62,9 @@ export class BaseInput extends connect(store)(LitElement) {
     this.inputElement!.addEventListener('input', _ => {
       this.changeListener();
     });
+    if (this.pendingValue !== null) {
+      this.inputElement!.value = this.pendingValue;
+      this.pendingValue = null;
+    }
   }
 }

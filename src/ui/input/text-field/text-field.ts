@@ -1,23 +1,9 @@
-import {
-  LitElement,
-  html,
-  customElement,
-  css,
-  property,
-  query,
-} from 'lit-element';
-import { connect } from 'pwa-helpers';
-import { store } from '../../../redux/store';
-import { AppState } from '../../../redux/reducer';
+import { html, customElement, css, property } from 'lit-element';
+import { BaseInput } from '../base-input/base-input';
 
 @customElement('text-field')
-export class TextField extends connect(store)(LitElement) {
+export class TextField extends BaseInput {
   @property() name: string = 'textField';
-  @property() reflect: string = '';
-  @property() value = '';
-  @property() changeListener: (v: string) => void = () => {};
-
-  @query('input') input!: HTMLInputElement;
 
   static get styles() {
     return css`
@@ -60,34 +46,11 @@ export class TextField extends connect(store)(LitElement) {
     `;
   }
 
-  stateChanged(state: AppState) {
-    if (this.reflect === '') return;
-    // Sue me.
-    let val = state as any;
-    for (const field of this.reflect.split('.')) {
-      val = val[field];
-    }
-    this.value = val || '';
-  }
-
-  change() {
-    this.changeListener(this.input.value);
-    store.dispatch({
-      type: 'DIRECT_SET',
-      path: this.reflect,
-      value: this.input.value,
-    });
-  }
-
   render() {
     return html`
       <div class="group">
         <label for="input">${this.name}</label>
-        <input
-          type="text"
-          value=${this.value}
-          @input=${() => this.change()}
-        />
+        <input type="text" />
       </div>
     `;
   }
