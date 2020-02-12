@@ -46,9 +46,7 @@ const FRESH_THEME: Theme = {
   emphasisShadowHigh: '3px 3px 11px #6cbee695',
 };
 
-export type ThemeName = 'peach' | 'fresh';
-
-export const THEMES: { [x in ThemeName]: Theme } = {
+export const THEMES = {
   peach: PEACH_THEME,
   fresh: FRESH_THEME,
 };
