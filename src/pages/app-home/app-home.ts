@@ -1,5 +1,5 @@
-import '../../components/icon-btn/icon-btn';
-import '../../components/character-gallery-item/character-gallery-item';
+import '../../ui/components/icon-btn/icon-btn';
+import '../../ui/components/character-gallery-item/character-gallery-item';
 import { html, customElement, css, LitElement } from 'lit-element';
 import { mdiPlusCircleOutline } from '@mdi/js';
 

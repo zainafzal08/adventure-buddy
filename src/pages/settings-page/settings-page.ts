@@ -1,7 +1,7 @@
 import { html, customElement, css, property } from 'lit-element';
 import { AsyncElement } from '../../AsyncElement';
 import { Settings } from '../../redux/settings';
-import { THEMES, ThemeName } from '../../themes';
+import { THEMES } from '../../themes';
 import { store } from '../../redux/store';
 import { connect } from 'pwa-helpers';
 import { AppState } from '../../redux/reducer';
@@ -99,7 +99,8 @@ export class SettingsPage extends connect(store)(AsyncElement) {
             @click=${() => this.updateTheme(theme)}
           >
             <div
-              style="background: ${THEMES[theme as ThemeName].gradient}"
+              style="background: ${THEMES[theme as keyof typeof THEMES]
+                .gradient}"
             ></div>
             <small>${theme}</small>
           </div>

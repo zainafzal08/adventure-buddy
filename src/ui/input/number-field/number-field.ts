@@ -1,28 +1,15 @@
-import {
-  LitElement,
-  html,
-  customElement,
-  css,
-  property,
-  query,
-} from 'lit-element';
-import { AppState } from '../../redux/reducer';
-import { store } from '../../redux/store';
-import { connect } from 'pwa-helpers';
+import { html, customElement, css, property, query } from 'lit-element';
+
+import { BaseInput } from '../base-input/base-input';
 
 @customElement('number-field')
-export class NumberField extends connect(store)(LitElement) {
+export class NumberInput extends BaseInput {
   // User facing
   @property({ attribute: true }) name: string = 'numberField';
-  @property() reflect: string = '';
   @property() range: [number?, number?] = [];
-  @property() value: string = '';
-  @property() changeListener: (v: string) => void = () => {};
 
   @property() private help: string = '';
-
-  @query('input') input!: HTMLInputElement;
-  @query('.group') group!: HTMLDivElement;
+  @query('.group') private group!: HTMLDivElement;
 
   static get styles() {
     return css`
@@ -95,34 +82,8 @@ export class NumberField extends connect(store)(LitElement) {
     `;
   }
 
-  stateChanged(state: AppState) {
-    if (this.reflect === '') return;
-    // Sue me.
-    let val = state as any;
-    for (const field of this.reflect.split('.')) {
-      val = val[field];
-    }
-    this.value = val === undefined ? '' : val;
-    // Acutally update the input field to match but ignore blank
-    // values.
-    if (this.input && this.value !== '') this.input.value = this.value;
-    this.validate();
-  }
-
-  change() {
-    const value = this.input.value;
-    this.changeListener(this.input.value);
-
-    if (this.reflect) {
-      store.dispatch({
-        type: 'DIRECT_SET',
-        path: this.reflect,
-        value,
-      });
-    } else {
-      this.value = value;
-      this.validate();
-    }
+  updateValue(value: string) {
+    this.validate(value);
   }
 
   notNum(v: string) {
@@ -140,15 +101,15 @@ export class NumberField extends connect(store)(LitElement) {
     return !valid;
   }
 
-  validate() {
+  validate(value: string) {
     // Debounce calls made before object is ready
     if (this.group === null) return;
     let error = '';
     this.help = '';
 
-    if (this.notNum(this.value)) {
+    if (this.notNum(value)) {
       error = 'Value must be a number';
-    } else if (this.notInRange(parseInt(this.value))) {
+    } else if (this.notInRange(parseInt(value))) {
       if (this.range[1]) {
         error = `Value must be between ${this.range[0]} and ${this.range[1]}`;
       } else {
@@ -168,10 +129,8 @@ export class NumberField extends connect(store)(LitElement) {
         <input
           id="input"
           type="number"
-          value=${this.value}
           min=${this.range[0] ? this.range[0] : ''}
           max=${this.range[1] ? this.range[1] : ''}
-          @input=${() => this.change()}
         />
         <small>${this.help}</small>
       </div>

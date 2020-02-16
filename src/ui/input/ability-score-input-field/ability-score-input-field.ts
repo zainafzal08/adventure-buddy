@@ -2,8 +2,11 @@ import '../number-field/number-field';
 
 import { LitElement, html, customElement, css } from 'lit-element';
 import { connect } from 'pwa-helpers';
-import { store } from '../../redux/store';
-import { Ability, abilityShorthand } from '../../data/CharacterSheet';
+import { store } from '../../../redux/store';
+import {
+  Ability,
+  abilityShorthand,
+} from '../../../data/CharacterSheet';
 
 @customElement('ability-score-input-field')
 export class AbilityScoreInputField extends connect(store)(LitElement) {

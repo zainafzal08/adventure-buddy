@@ -1,6 +1,6 @@
 import { html, customElement, css, LitElement } from 'lit-element';
 import '../../components/class-selector/class-selector';
-import '../../components/text-field/text-field';
+import '../../ui/input/text-field/text-field';
 
 @customElement('import-character')
 export class ImportCharacter extends LitElement {

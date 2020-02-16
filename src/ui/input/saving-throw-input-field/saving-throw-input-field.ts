@@ -8,13 +8,13 @@ import {
   property,
 } from 'lit-element';
 import { connect } from 'pwa-helpers';
-import { store } from '../../redux/store';
+import { store } from '../../../redux/store';
 import {
   Ability,
   toModifier,
   abilityShorthand,
-} from '../../data/CharacterSheet';
-import { AppState } from '../../redux/reducer';
+} from '../../../data/CharacterSheet';
+import { AppState } from '../../../redux/reducer';
 import { mdiAutoFix } from '@mdi/js';
 
 type DraftSavingThrows = {

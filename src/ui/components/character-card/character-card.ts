@@ -8,17 +8,17 @@ import {
   property,
 } from 'lit-element';
 import { connect } from 'pwa-helpers';
-import { store } from '../../redux/store';
-import { AppState } from '../../redux/reducer';
-import { CharacterSheetDraft } from '../../redux/characterDraft';
+import { store } from '../../../redux/store';
+import { AppState } from '../../../redux/reducer';
+import { CharacterSheetDraft } from '../../../redux/characterDraft';
 import {
   generateDescriptor,
   allAbilities,
   abilityShorthand,
   toModifier,
-} from '../../data/CharacterSheet';
+} from '../../../data/CharacterSheet';
 import * as mdiAll from '@mdi/js';
-import { getDatabase } from '../../data/Database';
+import { getDatabase } from '../../../data/Database';
 
 @customElement('character-card')
 export class CharacterCard extends connect(store)(LitElement) {

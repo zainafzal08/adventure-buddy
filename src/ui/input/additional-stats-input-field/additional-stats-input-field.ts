@@ -2,9 +2,9 @@ import '../number-field/number-field';
 
 import { LitElement, html, customElement, css } from 'lit-element';
 import { connect } from 'pwa-helpers';
-import { store } from '../../redux/store';
-import { AppState } from '../../redux/reducer';
-import { CharacterSheetDraft } from '../../redux/characterDraft';
+import { store } from '../../../redux/store';
+import { AppState } from '../../../redux/reducer';
+import { CharacterSheetDraft } from '../../../redux/characterDraft';
 
 @customElement('additional-stats-input-field')
 export class AdditionalStatsInputField extends connect(store)(

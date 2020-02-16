@@ -1,6 +1,6 @@
-import '../../components/app-modal/app-modal';
-import '../../components/icon-btn/icon-btn';
-import '../../components/number-field/number-field';
+import '../app-modal/app-modal';
+import '../icon-btn/icon-btn';
+import '../../input/number-field/number-field';
 
 import {
   LitElement,
@@ -20,12 +20,12 @@ import {
   mdiPlus,
 } from '@mdi/js';
 import * as mdiAll from '@mdi/js';
-import { CharacterClass } from '../../data/CharacterSheet';
+import { CharacterClass } from '../../../data/CharacterSheet';
 import { AppModal } from '../../components/app-modal/app-modal';
 import { connect } from 'pwa-helpers';
-import { store } from '../../redux/store';
-import { AppState } from '../../redux/reducer';
-import { getDatabase, ClassDescriptor } from '../../data/Database';
+import { store } from '../../../redux/store';
+import { AppState } from '../../../redux/reducer';
+import { getDatabase, ClassDescriptor } from '../../../data/Database';
 
 @customElement('class-selector')
 export class ClassSelector extends connect(store)(LitElement) {
@@ -319,7 +319,7 @@ export class ClassSelector extends connect(store)(LitElement) {
         <number-field
           name="Level"
           .range=${[1]}
-          .changeListener=${(v: string) => {
+          .updateValue=${(v: string) => {
             let level = parseInt(v);
             if (isNaN(level)) {
               level = 0;

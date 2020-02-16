@@ -2,8 +2,8 @@ import '../number-field/number-field';
 
 import { LitElement, html, customElement, css } from 'lit-element';
 import { connect } from 'pwa-helpers';
-import { store } from '../../redux/store';
-import { AppState } from '../../redux/reducer';
+import { store } from '../../../redux/store';
+import { AppState } from '../../../redux/reducer';
 
 @customElement('attacks-input-field')
 export class AttacksInputField extends connect(store)(LitElement) {

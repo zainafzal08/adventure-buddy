@@ -4,8 +4,8 @@ import { LitElement, html, customElement, css } from 'lit-element';
 import * as firebase from 'firebase/app';
 import { mdiLogout, mdiSettings, mdiFace, mdiHome } from '@mdi/js';
 import { connect } from 'pwa-helpers';
-import { store } from '../../redux/store';
-import { navigate } from '../../router/navigate';
+import { store } from '../../../redux/store';
+import { navigate } from '../../../router/navigate';
 
 @customElement('app-nav')
 export class AppNav extends connect(store)(LitElement) {

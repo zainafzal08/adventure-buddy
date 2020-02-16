@@ -1,5 +1,5 @@
 // Imports with side effects.
-import './components/app-nav/app-nav';
+import './ui/components/app-nav/app-nav';
 import './router/app-router';
 
 // Named imports.
@@ -12,7 +12,7 @@ import {
   LitElement,
 } from 'lit-element';
 
-import { THEMES, ThemeName } from './themes';
+import { THEMES } from './themes';
 import { connect } from 'pwa-helpers';
 import { store } from './redux/store';
 import { AppState } from './redux/reducer';
@@ -24,7 +24,7 @@ export class AppView extends connect(store)(LitElement) {
    * The theme of the application, this is used to generate a
    * series of css variables which the rest of the application uses.
    */
-  @property() private theme: ThemeName = 'peach';
+  @property() private theme: keyof typeof THEMES = 'peach';
   @property() private location!: string;
 
   static get styles() {
@@ -62,7 +62,7 @@ export class AppView extends connect(store)(LitElement) {
   }
 
   render() {
-    const theme = THEMES[this.theme as ThemeName];
+    const theme = THEMES[this.theme];
     const rules = [];
     for (let [property, value] of Object.entries(theme)) {
       property = property.replace(/[A-Z]/g, (match: string) => {

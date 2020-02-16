@@ -3,7 +3,7 @@ import '../dice-input/dice-input';
 
 import { LitElement, html, customElement, css } from 'lit-element';
 import { connect } from 'pwa-helpers';
-import { store } from '../../redux/store';
+import { store } from '../../../redux/store';
 
 @customElement('basic-stats-input-field')
 export class BasicStatsInputField extends connect(store)(LitElement) {

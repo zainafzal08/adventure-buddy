@@ -8,16 +8,16 @@ import {
   property,
 } from 'lit-element';
 import { connect } from 'pwa-helpers';
-import { store } from '../../redux/store';
-import { AppState } from '../../redux/reducer';
+import { store } from '../../../redux/store';
+import { AppState } from '../../../redux/reducer';
 import {
   allSkills,
   Ability,
   getSkillAbility,
   toModifier,
-} from '../../data/CharacterSheet';
+} from '../../../data/CharacterSheet';
 import { mdiAutoFix } from '@mdi/js';
-import { SkillsDecleration } from '../../redux/characterDraft';
+import { SkillsDecleration } from '../../../redux/characterDraft';
 
 @customElement('skills-input-field')
 export class SkillsInputField extends connect(store)(LitElement) {

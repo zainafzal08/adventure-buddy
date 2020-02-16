@@ -6,8 +6,8 @@ import {
   property,
   query,
 } from 'lit-element';
-import { AppState } from '../../redux/reducer';
-import { store } from '../../redux/store';
+import { AppState } from '../../../redux/reducer';
+import { store } from '../../../redux/store';
 import { connect } from 'pwa-helpers';
 
 type Field = { proficient: boolean; value: string };

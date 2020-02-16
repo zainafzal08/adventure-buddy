@@ -1,13 +1,13 @@
-import '../../components/character-card/character-card';
-import '../../components/text-field/text-field';
-import '../../components/class-selector/class-selector';
-import '../../components/race-selection-field/race-selection-field';
-import '../../components/ability-score-input-field/ability-score-input-field';
-import '../../components/basic-stats-input-field/basic-stats-input-field';
-import '../../components/additional-stats-input-field/additional-stats-input-field';
-import '../../components/saving-throw-input-field/saving-throw-input-field';
-import '../../components/skills-input-field/skills-input-field';
-import '../../components/attacks-input-field/attacks-input-field';
+import '../../ui/components/character-card/character-card';
+import '../../ui/input/text-field/text-field';
+import '../../ui/components/class-selector/class-selector';
+import '../../ui/input/race-selection-field/race-selection-field';
+import '../../ui/input/ability-score-input-field/ability-score-input-field';
+import '../../ui/input/basic-stats-input-field/basic-stats-input-field';
+import '../../ui/input/additional-stats-input-field/additional-stats-input-field';
+import '../../ui/input/saving-throw-input-field/saving-throw-input-field';
+import '../../ui/input/skills-input-field/skills-input-field';
+import '../../ui/input/attacks-input-field/attacks-input-field';
 
 import {
   LitElement,
