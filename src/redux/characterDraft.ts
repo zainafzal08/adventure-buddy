@@ -33,17 +33,38 @@ export interface AttackDamage {
   type: DamageType;
   formula: string;
 }
-
-export interface AttackNumbers {
-  toHit: string;
-  damage: AttackDamage[];
+export interface RangedFeature {
+  name: 'ranged' | 'thrown';
+  range: {
+    normal: number;
+    long: number;
+  };
 }
+export interface ModifierFeature {
+  name: 'finesse' | 'heavy' | 'light' | 'loading';
+}
+
+export interface UseFeature {
+  name: 'two-handed' | 'versatile' | 'reach';
+}
+
+export type AttackFeature =
+  | RangedFeature
+  | ModifierFeature
+  | UseFeature;
 
 export interface AttackDescriptor {
   name: string;
-  count: number;
-  melee: AttackNumbers | undefined;
-  ranged: AttackNumbers | undefined;
+  skillLevel: 'martial' | 'simple';
+  type: 'ranged' | 'melee';
+  features: AttackFeature[];
+  toHit: string;
+  ammo: number | null;
+  range: {
+    normal: number;
+    long: number;
+  };
+  damage: AttackDamage[];
 }
 
 export interface CharacterSheetDraft {
