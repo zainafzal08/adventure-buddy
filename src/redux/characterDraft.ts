@@ -2,12 +2,11 @@ import { Action } from './helpers';
 import {
   Ability,
   CharacterClass,
-  BaseStats,
-  SavingThrows,
   Skill,
   allSkills,
 } from '../data/CharacterSheet';
 import { getDatabase } from '../data/Database';
+import { isValid } from './validateCharacter';
 
 export type SkillsDecleration = {
   [k in Skill]: { value: string; proficient: boolean };
@@ -90,6 +89,7 @@ export interface CharacterSheetDraft {
   };
   skills: SkillsDecleration;
   attacks: AttackDescriptor[];
+  valid: boolean;
 }
 
 export interface CharacterDraftAction extends Action {
@@ -162,6 +162,7 @@ export const initialCharacterDraft: CharacterSheetDraft = {
   },
   skills: initSkills,
   attacks: [],
+  valid: false,
 };
 
 export function characterDraftReducer(
@@ -173,6 +174,7 @@ export function characterDraftReducer(
       return {
         ...sheet,
         ...action.fields,
+        valid: isValid({ ...sheet, ...action.fields }),
       };
     case 'CLEAR_DRAFT':
       return initialCharacterDraft;

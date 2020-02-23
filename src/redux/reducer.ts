@@ -10,6 +10,7 @@ import {
   characterDraftReducer,
   CharacterSheetDraft,
 } from './characterDraft';
+import { isValid } from './validateCharacter';
 
 export const INITIAL_STATE: AppState = {
   user: initialUserState,
@@ -30,6 +31,7 @@ export function setField(
   pathArray: string[],
   val: any
 ): Object {
+  let newState;
   const field = pathArray[0];
   pathArray.shift();
   if (field === '') {
@@ -39,16 +41,19 @@ export function setField(
   }
 
   if (pathArray.length === 0) {
-    return {
+    newState = {
       ...o,
       [field]: val,
     };
   }
 
-  return {
+  newState = {
     ...o,
     [field]: setField(o[field], pathArray, val),
   };
+
+  newState.characterDraft.valid = isValid(newState.characterDraft);
+  return newState;
 }
 
 export const reducer = (
