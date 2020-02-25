@@ -1,0 +1,770 @@
+export interface Feature {
+  fullName: string;
+  desc: string;
+  icon: string;
+  link?: boolean;
+}
+
+export interface SubRace {
+  fullName: string;
+  tagline: string;
+  features: Feature[];
+}
+
+export interface RaceDescriptor {
+  name: string;
+  tagline: string;
+  physical: {
+    height: string;
+    size: string;
+    speed: string;
+  };
+  subraces: { [x in string]: SubRace };
+  features: Feature[];
+}
+
+export const RACES: { [k in string]: RaceDescriptor } = {
+  dwarf: {
+    name: 'Dwarf',
+    tagline: 'Short, Stout And Can Take A Hit',
+    physical: {
+      height: '4-5 ft',
+      size: 'Medium',
+      speed: '25 ft',
+    },
+    subraces: {
+      hill: {
+        fullName: 'Hill Dwarf',
+        tagline: 'A wiser dwarf with more hit points',
+        features: [
+          {
+            fullName: 'Ability Score Increase',
+            desc: 'Your Wisdom score increases by 1.',
+            icon: 'plus-one',
+          },
+          {
+            fullName: 'Dwarven Toughness',
+            desc:
+              'Your hit point maximum increases by 1, and it increases by 1 every time you gain a level.',
+            icon: 'boxing-glove',
+          },
+        ],
+      },
+      mountain: {
+        fullName: 'Mountain Dwarf',
+        tagline: 'A stronger dwarf with better armor skills.',
+        features: [
+          {
+            fullName: 'Ability Score Increase',
+            desc: 'Your Strength score increases by 2.',
+            icon: 'plus-one',
+          },
+          {
+            fullName: 'Dwarven Armor Training',
+            desc: 'You have proficiency with light and medium armor.',
+            icon: 'shield-outline',
+          },
+        ],
+      },
+    },
+    features: [
+      {
+        fullName: 'Ability Score Increase',
+        desc: 'Your Constitution score increases by 2.',
+        icon: 'plus-one',
+      },
+      {
+        fullName: 'Darkvision',
+        desc:
+          "Accustomed to life underground, you have superior vision in dark and dim conditions. You can see in dim light within 60 feet of you as if it were bright light, and in darkness as if it were dim light. You can't discern color in darkness, only shades of gray.",
+        icon: 'eye-circle',
+      },
+      {
+        fullName: 'Dwarven Resilience',
+        desc:
+          'You have advantage on saving throws against poison, and you have resistance against poison damage.',
+        icon: 'heart-half-full',
+      },
+      {
+        fullName: 'Dwarven Combat Training',
+        desc:
+          'You have proficiency with the battleaxe, handaxe, throwing hammer, and warhammer.',
+        icon: 'sword-cross',
+      },
+      {
+        fullName: 'Tool Proficiency',
+        desc:
+          "You gain proficiency with the artisan's tools of your choice: smith's tools, brewer's supplies, or mason's tools.",
+        icon: 'hammer',
+      },
+      {
+        fullName: 'Stonecunning',
+        desc:
+          'Whenever you make an Intelligence (History) check related to the origin of stonework, you are considered proficient in the History skill and add double your proficiency bonus to the check, instead of your normal proficiency bonus.',
+        icon: 'diamond-stone',
+      },
+      {
+        fullName: 'Languages',
+        desc:
+          'You can speak, read, and write Common and Dwarvish. Dwarvish is full of hard consonants and guttural sounds, and those characteristics spill over into whatever other language a dwarf might speak.',
+        icon: 'web',
+      },
+    ],
+  },
+  elf: {
+    name: 'Elf',
+    tagline: 'Here to kick ass and do magic.',
+    physical: {
+      height: '5-6 ft',
+      size: 'Medium',
+      speed: '30 ft',
+    },
+    subraces: {
+      high: {
+        fullName: 'High Elf',
+        tagline: 'A smarter elf with military training',
+        features: [
+          {
+            fullName: 'Ability Score Increase',
+            desc: 'Your Intelligence score increases by 1.',
+            icon: 'plus-one',
+          },
+          {
+            fullName: 'Elf Weapon Training',
+            desc:
+              'You have proficiency with the longsword, shortsword, shortbow, and longbow.',
+            icon: 'sword-cross',
+          },
+          {
+            fullName: 'Cantrip',
+            desc:
+              'You know one cantrip of your choice from the wizard list. Intelligence is your spellcasting ability for it.',
+            icon: 'auto-fix',
+          },
+          {
+            fullName: 'Extra Language',
+            desc:
+              'You can read, speak, and write one additional language of your choice.',
+            icon: 'language',
+          },
+        ],
+      },
+      wood: {
+        fullName: 'Wood Elf',
+        tagline: 'A wiser, faster elf who can sneak through nature.',
+        features: [
+          {
+            fullName: 'Ability Score Increase',
+            desc: 'Your Wisdom score increases by 1.',
+            icon: 'plus-one',
+          },
+          {
+            fullName: 'Elf Weapon Training',
+            desc:
+              'You have proficiency with the longsword, shortsword, shortbow, and longbow.',
+            icon: 'sword-cross',
+          },
+          {
+            fullName: 'Fleet of Foot',
+            desc: 'Your base walking speed increases to 35 feet.',
+            icon: 'run-fast',
+          },
+          {
+            fullName: 'Mask of the Wild',
+            desc:
+              'You can attempt to hide even when you are only lightly obscured by foliage, heavy rain, falling snow, mist, and other natural phenomena.',
+            icon: 'eye-off-outline',
+          },
+        ],
+      },
+      dark: {
+        fullName: 'Dark (drow) Elf',
+        tagline:
+          'A charming elf who thrives in the darkness but struggles in the light.',
+        features: [
+          {
+            fullName: 'Ability Score Increase',
+            desc: 'Your Charisma score increases by 1.',
+            icon: 'plus-one',
+          },
+          {
+            fullName: 'Superior Darkvision',
+            desc:
+              'Your darkvision has a range of 120 feet, instead of 60.',
+            icon: 'eye-plus',
+          },
+          {
+            fullName: 'Sunlight Sensitivity',
+            desc:
+              'You have disadvantage on attack rolls and Wisdom (Perception) checks that rely on sight when you, the target of the attack, or whatever you are trying to perceive is in direct sunlight.',
+            icon: 'white-balance-sunny',
+          },
+          {
+            fullName: 'Drow Magic',
+            desc:
+              'You know the dancing lights cantrip. When you reach 3rd level, you can cast faerie fire once, and it recharges after a long rest. When you reach 5th level, you can cast darkness once, and it recharges after a long rest. Charisma is your spellcasting ability for these spells.',
+            icon: 'auto-fix',
+          },
+          {
+            fullName: 'Drow Weapon Training',
+            desc:
+              'You have proficiency with rapiers, shortswords, and hand crossbows.',
+            icon: 'sword-cross',
+          },
+        ],
+      },
+    },
+    features: [
+      {
+        fullName: 'Ability Score Increase',
+        desc: 'Your Dexterity score increases by 2.',
+        icon: 'plus-one',
+      },
+      {
+        fullName: 'Darkvision',
+        desc:
+          "Accustomed to twilit forests and the night sky, you have superior vision in dark and dim conditions. You can see in dim light within 60 feet of you as if it were bright light, and in darkness as if it were dim light. You can't discern color in darkness, only shades of gray.",
+        icon: 'eye-circle',
+      },
+      {
+        fullName: 'Keen Senses',
+        desc: 'You have proficiency in the Perception skill.',
+        icon: 'eye-plus',
+      },
+      {
+        fullName: 'Fey Ancestry',
+        desc:
+          "You have advantage on saving throws against being charmed, and magic can't put you to sleep.",
+        icon: 'account-alert',
+      },
+      {
+        fullName: 'Trance',
+        desc:
+          'Elves do not sleep. Instead they meditate deeply, remaining semi-conscious, for 4 hours a day. The Common word for this meditation is "trance". While meditating, you dream after a fashion; such dreams are actually mental exercises that have become reflexive after years of practice. After resting in this way, you gain the same benefit a human would from 8 hours of sleep.',
+        icon: 'sleep',
+      },
+      {
+        fullName: 'Languages',
+        desc: 'You can speak, read, and write Common and Elven.',
+        icon: 'web',
+      },
+    ],
+  },
+  halfling: {
+    name: 'Halfling',
+    tagline: 'Packs a lot into a small package',
+    physical: {
+      height: '~3 ft',
+      size: 'Small',
+      speed: '25 ft',
+    },
+    subraces: {
+      lightfoot: {
+        fullName: 'Lightfoot Halfing',
+        tagline: 'A charming halfing who can sneak.',
+        features: [
+          {
+            fullName: 'Ability Score Increase',
+            desc: 'Your Charisma score increases by 1.',
+            icon: 'plus-one',
+          },
+          {
+            fullName: 'Naturally Stealthy',
+            desc:
+              'You can attempt to hide even when you are only obscured by a creature that is at least one size larger than you.',
+            icon: 'eye-off-outline',
+          },
+        ],
+      },
+      stout: {
+        fullName: 'Stout Halfing',
+        tagline: 'A hearty halfing who is resistant to poison',
+        features: [
+          {
+            fullName: 'Ability Score Increase',
+            desc: 'Your Constitution score increases by 1.',
+            icon: 'plus-one',
+          },
+          {
+            fullName: 'Stout Resilience',
+            desc:
+              'You have advantage on saving throws against poison, and you have resistance to poison damage.',
+            icon: 'heart-half-full',
+          },
+        ],
+      },
+    },
+    features: [
+      {
+        fullName: 'Ability Score Increase',
+        desc: 'Your Dexterity score increases by 2.',
+        icon: 'plus-one',
+      },
+      {
+        fullName: 'Lucky',
+        desc:
+          'When you roll a 1 on an attack roll, ability check, or saving throw, you can reroll the die. You must use the new result, even if it is a 1.',
+        icon: 'dice-multiple',
+      },
+      {
+        fullName: 'Brave',
+        desc:
+          'You have advantage on saving throws against being frightened.',
+        icon: 'karate',
+      },
+      {
+        fullName: 'Nimble',
+        desc:
+          'You can move through the space of any creature that is of a size larger than yours.',
+        icon: 'feather',
+      },
+      {
+        fullName: 'Languages',
+        desc: 'You can speak, read, and write Common and Halfling.',
+        icon: 'web',
+      },
+    ],
+  },
+  human: {
+    name: 'Human',
+    tagline: 'Persistant, inovative and annoying.',
+    physical: {
+      height: '5-6 ft',
+      size: 'Medium',
+      speed: '30 ft',
+    },
+    subraces: {},
+    features: [
+      {
+        fullName: 'Ability Score Increase',
+        desc: 'Your ability scores each increase by 1.',
+        icon: 'plus-one',
+      },
+      {
+        fullName: 'Languages',
+        desc:
+          'You can speak, read, and write Common and one extra language of your choice. Humans typically learn the languages of other peoples they deal with, including obscure dialects. They are fond of sprinkling their speech with words borrowed from other tongues: Orc curses, Elvish musical expressions,',
+        icon: 'web',
+      },
+    ],
+  },
+  dragonborn: {
+    name: 'Dragonborn',
+    tagline: 'RAWR! XD',
+    physical: {
+      height: '6+ ft',
+      size: 'Medium',
+      speed: '30 ft',
+    },
+    subraces: {
+      black: {
+        fullName: 'Black Dragonborn',
+        tagline: 'A black or copper dragon who can breathe acid',
+        features: [
+          {
+            fullName: 'Breath Damage',
+            desc: 'Your breath attack does acid damage',
+            icon: 'fire',
+          },
+          {
+            fullName: 'Breath Range',
+            desc:
+              "Your breath attack is a 5' by 30' line and requires a dex save to dodge",
+            icon: 'math-compass',
+          },
+          {
+            fullName: 'Colors',
+            desc: 'Can be Black or Copper',
+            icon: 'palette',
+          },
+        ],
+      },
+      blue: {
+        fullName: 'Blue Dragonborn',
+        tagline: 'A blue or bronze dragon who can breathe lighting',
+        features: [
+          {
+            fullName: 'Breath Damage',
+            desc: 'Your breath attack does lightning damage',
+            icon: 'fire',
+          },
+          {
+            fullName: 'Breath Range',
+            desc:
+              "Your breath attack is a 5' by 30' line and requires a dex save to dodge",
+            icon: 'math-compass',
+          },
+          {
+            fullName: 'Colors',
+            desc: 'Can be Blue or Bronze',
+            icon: 'palette',
+          },
+        ],
+      },
+      brass: {
+        fullName: 'Brass Dragonborn',
+        tagline: 'A bronze dragon who can breathe fire',
+        features: [
+          {
+            fullName: 'Breath Damage',
+            desc: 'Your breath attack does fire damage',
+            icon: 'fire',
+          },
+          {
+            fullName: 'Breath Range',
+            desc:
+              "Your breath attack is a 5' by 30' line and requires a dex save to dodge",
+            icon: 'math-compass',
+          },
+          {
+            fullName: 'Colors',
+            desc: 'Only Bronze',
+            icon: 'palette',
+          },
+        ],
+      },
+      gold: {
+        fullName: 'Gold Dragonborn',
+        tagline: 'A gold or red dragon who can breathe fire',
+        features: [
+          {
+            fullName: 'Breath Damage',
+            desc: 'Your breath attack does fire damage',
+            icon: 'fire',
+          },
+          {
+            fullName: 'Breath Range',
+            desc:
+              "Your breath attack is a 15' cone and requires a dex save to dodge",
+            icon: 'math-compass',
+          },
+          {
+            fullName: 'Colors',
+            desc: 'Can be Gold or Red',
+            icon: 'palette',
+          },
+        ],
+      },
+      silver: {
+        fullName: 'Silver Dragonborn',
+        tagline: 'A silver or white dragon who can breathe ice',
+        features: [
+          {
+            fullName: 'Breath Damage',
+            desc: 'Your breath attack does Cold damage',
+            icon: 'fire',
+          },
+          {
+            fullName: 'Breath Range',
+            desc:
+              "Your breath attack is a 15' cone and requires a con save to dodge",
+            icon: 'math-compass',
+          },
+          {
+            fullName: 'Colors',
+            desc: 'Can be Silver or White',
+            icon: 'palette',
+          },
+        ],
+      },
+      green: {
+        fullName: 'Green Dragonborn',
+        tagline: 'A green dragon who can breathe poisen',
+        features: [
+          {
+            fullName: 'Breath Damage',
+            desc: 'Your breath attack does Poisen damage',
+            icon: 'fire',
+          },
+          {
+            fullName: 'Breath Range',
+            desc:
+              "Your breath attack is a 15' cone and requires a con save to dodge",
+            icon: 'math-compass',
+          },
+          {
+            fullName: 'Colors',
+            desc: 'Only Green',
+            icon: 'palette',
+          },
+        ],
+      },
+    },
+    features: [
+      {
+        fullName: 'Ability Score Increase',
+        desc:
+          'Your Strength score increase by 2, and your Charisma score increases by 1.',
+        icon: 'plus-one',
+      },
+      {
+        fullName: 'Draconic Ancestry',
+        desc:
+          'You are distantly related to a particular kind of dragon. Choose a type of dragon on the flip side!',
+        icon: 'fire',
+      },
+      {
+        fullName: 'Breath Weapon',
+        desc:
+          'You can use your action to exhale destructive energy. It deals damage in an area according to your ancestry. When you use your breath weapon, all creatures in the area must make a saving throw, the type of which is determined by your ancestry. The DC of this saving throw is 8 + your Constitution modifier + your proficiency bonus. A creature takes 2d6 damage on a failed save, and half as much damage on a successful one. The damage increase to 3d6 at 6th level, 4d6 at 11th, and 5d6 at 16th level. After using your breath weapon, you cannot use it again until you complete a short or long rest.',
+        icon: 'voice',
+      },
+      {
+        fullName: 'Damage Resistance',
+        desc:
+          'You have resistance to the damage type associated with your ancestry.',
+        icon: 'shield-plus',
+      },
+      {
+        fullName: 'Languages',
+        desc: 'You can read, speak, and write Common and Draconic',
+        icon: 'web',
+      },
+    ],
+  },
+  gnome: {
+    name: 'Gnome',
+    tagline: 'You know, like from your garden',
+    physical: {
+      height: '3-4 ft',
+      size: 'Small',
+      speed: '25 ft',
+    },
+    subraces: {
+      forest: {
+        fullName: 'Forest Gnome',
+        tagline: 'A more dexterious gnome who can commune with nature.',
+        features: [
+          {
+            fullName: 'Ability Score Increase',
+            desc: 'Your Dexterity score increases by 1.',
+            icon: 'plus-one',
+          },
+          {
+            fullName: 'Natural Illusionist',
+            desc:
+              'You know the minor illusion cantrip. Intelligence is your spellcasting modifier for it.',
+            icon: 'eye-settings-outline',
+          },
+          {
+            fullName: 'Speak with Small Beasts',
+            desc:
+              'Through sound and gestures, you may communicate simple ideas with Small or smaller beasts.',
+            icon: 'voice',
+          },
+        ],
+      },
+      rock: {
+        fullName: 'Rock Gnome',
+        tagline: 'A heartier gnome who can tinker and build',
+        features: [
+          {
+            fullName: 'Ability Score Increase',
+            desc: 'Your Constitution score increases by 1.',
+            icon: 'plus-one',
+          },
+          {
+            fullName: "Artificer's Lore",
+            desc:
+              'Whenever you make an Intelligence (History) check related to magical, alchemical, or technological items, you can add twice your proficiency bonus instead of any other proficiency bonus that may apply.',
+            icon: 'book-open-page-variant',
+          },
+          {
+            fullName: 'Tinker',
+            desc: 'http://gdnd.wikidot.com/race:gnome',
+            link: true,
+            icon: 'android-studio',
+          },
+        ],
+      },
+      deep: {
+        fullName: 'Deep Gnome',
+        tagline:
+          'A smarter, wiser, stealthier more charming gnome who can see in the dark.',
+        features: [
+          {
+            fullName: 'Ability Score Increase',
+            desc:
+              'Your Intelligence score increases by 2, and your Dexterity score increases by 1.',
+            icon: 'plus-one',
+          },
+          {
+            fullName: 'Superior Darkvision',
+            desc: 'Your darkvision has a radius of 120 feet.',
+            icon: 'eye-plus',
+          },
+          {
+            fullName: 'Gnome Cunning',
+            desc:
+              'You have advantage on all Intelligence, Wisdom, and Charisma saving throws against magic.',
+            icon: 'brain',
+          },
+          {
+            fullName: 'Stone Camouflage',
+            desc:
+              'You have advantage on Dexterity (stealth) checks to hide in rocky terrain.',
+            icon: 'eye-off-outline',
+          },
+          {
+            fullName: 'Languages',
+            desc:
+              'You can speak, read, and write Common, Gnomish, and Undercommon. The svirfneblin dialect is more guttural than surface Gnomish, and most svirfneblin know only a little bit of Common, but those who deal with outsiders (and that includes you as an adventurer) pick up enough Common to get by in other lands',
+            icon: 'web',
+          },
+        ],
+      },
+    },
+    features: [
+      {
+        fullName: 'Ability Score Increase',
+        desc: 'Your Intelligence score increases by 2.',
+        icon: 'plus-one',
+      },
+      {
+        fullName: 'Darkvision',
+        desc:
+          "Accustomed to life underground, you have superior vision in dark and dim conditions. You can see in dim light within 60 feet of you as if it were bright light, and in darkness as if it were dim light. You can't discern color in darkness, only shades of gray.",
+        icon: 'eye-circle',
+      },
+      {
+        fullName: 'Gnome Cunning',
+        desc:
+          'You have advantage on all Intelligence, Wisdom, and Charisma saves against magic.',
+        icon: 'brain',
+      },
+      {
+        fullName: 'Languages',
+        desc: 'You can read, speak, and write Common and Gnomish',
+        icon: 'web',
+      },
+    ],
+  },
+  'half-elf': {
+    name: 'Half-Elf',
+    tagline: 'Filthy Mudbloods if you ask me',
+    physical: {
+      height: '5-6 ft',
+      size: 'Medium',
+      speed: '30 ft',
+    },
+    subraces: {},
+    features: [
+      {
+        fullName: 'Ability Score Increase',
+        desc:
+          'Your Charisma score increase by 2, and two other ability scores of your choice each increase by 1.',
+        icon: 'plus-one',
+      },
+      {
+        fullName: 'Darkvision',
+        desc:
+          "Thanks to your elven heritage, you have superior vision in dark and dim conditions. You can see in dim light within 60 feet of you as if it were bright light, and in darkness as if it were dim light. You can't discern color in darkness, only shades of gray.",
+        icon: 'eye-circle',
+      },
+      {
+        fullName: 'Fey Ancestry',
+        desc:
+          "You have advantage on saving throws against being charmed, and magic can't put you to sleep.",
+        icon: 'account-alert',
+      },
+      {
+        fullName: 'Skill Versatility',
+        desc: 'You gain proficiency in two skills of your choice.',
+        icon: 'account-plus',
+      },
+      {
+        fullName: 'Languages',
+        desc:
+          'You can read, speak, and write Common, Elven, and one language of your choice.',
+        icon: 'web',
+      },
+    ],
+  },
+  'half-orc': {
+    name: 'Half-Orc',
+    tagline: 'Kinda Sexy',
+    physical: {
+      height: '5-6 ft',
+      size: 'Medium',
+      speed: '30 ft',
+    },
+    subraces: {},
+    features: [
+      {
+        fullName: 'Ability Score Increase',
+        desc:
+          'Your Strength score increases by 2, and your Constitution score increases by 1.',
+        icon: 'plus-one',
+      },
+      {
+        fullName: 'Darkvision',
+        desc:
+          "Thanks to your ore blood. you have superior vision in dark and dim conditions. You can see in dim tight within 60 feet of you as if it were bright tight. and in darkness as if it were dim light. You can't discern color in darkness, only shades of gray.",
+        icon: 'eye-circle',
+      },
+      {
+        fullName: 'Menacing',
+        desc: 'You gain proficiency in the Intimidation skill.',
+        icon: 'comment-alert',
+      },
+      {
+        fullName: 'Relentless Endurance',
+        desc:
+          "When you are reduced to O hit points but not killed outright. you can drop to I hit point instead. Vou can't use this feature again until you finish a long rest.",
+        icon: 'speedometer',
+      },
+      {
+        fullName: 'Savage Attacks',
+        desc:
+          "When you score a critical hit with a melee weapon attack, you can roll one of the weapon's damage dice one additional time and add it lo lhe extra damage of lhe criticaI hit.",
+        icon: 'knife-military',
+      },
+      {
+        fullName: 'Languages',
+        desc:
+          'You can speak. read, and write Common and Ore. Ore is a harsh. grating language with hard consonants. It has no script of its own but is written in the Dwarvish script.',
+        icon: 'web',
+      },
+    ],
+  },
+  tiefling: {
+    name: 'Tiefling',
+    tagline: 'I forgot what these even are ',
+    physical: {
+      height: '5-6 ft',
+      size: 'Medium',
+      speed: '30 ft',
+    },
+    subraces: {},
+    features: [
+      {
+        fullName: 'Ability Score Increase',
+        desc:
+          'Your Intelligence score increases by 1, and your choice of Charisma or Dexterity score increases by 2.',
+        icon: 'plus-one',
+      },
+      {
+        fullName: 'Darkvision',
+        desc:
+          'Thanks to your infernal heritage, you have superior vision in dark and dim conditions. You can see in dim light within 60 feet of you as if it were bright light, and in darkness as if it were dim light. You can’t discern color in darkness, only shades of gray.',
+        icon: 'eye-circle',
+      },
+      {
+        fullName: 'Hellish Resistance',
+        desc: 'You have resistance to fire damage.',
+        icon: 'shield-plus',
+      },
+      {
+        fullName: 'Infernal Legacy',
+        desc:
+          'You know the thaumaturgy cantrip. Once you reach 3rd level, you can cast the hellish rebuke spell once per day as a 2nd-level spell. Once you reach 5th level, you can also cast the darkness spell once per day. Charisma is your spellcasting ability for these spells.',
+        icon: 'auto-fix',
+      },
+      {
+        fullName: 'Languages',
+        desc: 'You can speak, read, and write Common and Infernal.',
+        icon: 'web',
+      },
+    ],
+  },
+};

@@ -8,10 +8,10 @@ import {
   customElement,
 } from 'lit-element';
 import { cache } from 'lit-html/directives/cache';
-import { AppState } from '../redux/reducer';
 import { connect } from 'pwa-helpers';
-import { store } from '../redux/store';
 import { navigate } from './navigate';
+import { store } from '../redux/store';
+import { AppState } from '../redux/appState';
 
 export interface Route {
   pattern?: RegExp;
@@ -36,7 +36,7 @@ export class AppRouter extends connect(store)(LitElement) {
 
     window.onpopstate = () => {
       store.dispatch({
-        type: 'UPDATE_LOCATION',
+        type: '@@router/UPDATE_LOCATION',
         value: window.location.pathname,
       });
     };

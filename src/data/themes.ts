@@ -50,3 +50,5 @@ export const THEMES = {
   peach: PEACH_THEME,
   fresh: FRESH_THEME,
 };
+
+export type ThemeKey = keyof typeof THEMES;

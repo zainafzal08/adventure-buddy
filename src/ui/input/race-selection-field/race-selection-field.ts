@@ -16,7 +16,6 @@ import {
   mdiFire,
   mdiHumanHandsup,
 } from '@mdi/js';
-import { getDatabase } from '../../../data/Database';
 import { store } from '../../../redux/store';
 import { connect } from 'pwa-helpers';
 import { AppState } from '../../../redux/reducer';
@@ -25,8 +24,6 @@ import { AppState } from '../../../redux/reducer';
 export class RaceSelectionField extends connect(store)(LitElement) {
   @property() selectedRace!: string;
   @property() selectedSubrace: string | null = null;
-
-  private db = getDatabase();
 
   static get styles() {
     return css`

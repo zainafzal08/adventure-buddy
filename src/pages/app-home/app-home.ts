@@ -1,14 +1,13 @@
 import '../../ui/components/icon-btn/icon-btn';
 import '../../ui/components/character-gallery-item/character-gallery-item';
+
 import { html, customElement, css, LitElement } from 'lit-element';
 import { mdiPlusCircleOutline } from '@mdi/js';
-
 import { CharacterSheet } from '../../data/CharacterSheet';
 import sittingHuman from '../../assets/humaaans/sitting.svg';
-import { store } from '../../redux/store';
 import { connect } from 'pwa-helpers';
-import { AppState } from '../../redux/reducer';
 import { navigate } from '../../router/navigate';
+import { store } from '../../redux/store';
 
 @customElement('app-home')
 export class AppHome extends connect(store)(LitElement) {

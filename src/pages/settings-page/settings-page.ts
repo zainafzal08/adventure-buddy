@@ -1,13 +1,18 @@
-import { html, customElement, css, property } from 'lit-element';
-import { AsyncElement } from '../../AsyncElement';
-import { Settings } from '../../redux/settings';
-import { THEMES } from '../../themes';
-import { store } from '../../redux/store';
+import {
+  html,
+  customElement,
+  css,
+  property,
+  LitElement,
+} from 'lit-element';
+import { THEMES } from '../../data/themes';
 import { connect } from 'pwa-helpers';
-import { AppState } from '../../redux/reducer';
+import { Settings } from '../../data/settings';
+import { AppState } from '../../redux/appState';
+import { store } from '../../redux/store';
 
 @customElement('settings-page')
-export class SettingsPage extends connect(store)(AsyncElement) {
+export class SettingsPage extends connect(store)(LitElement) {
   @property() settings!: Settings;
 
   stateChanged(state: AppState) {
@@ -83,7 +88,7 @@ export class SettingsPage extends connect(store)(AsyncElement) {
 
   updateTheme(value: string) {
     store.dispatch({
-      type: 'UPDATE_THEME',
+      type: '@@settings/UPDATE_THEME',
       value,
     });
   }

@@ -1,4 +1,3 @@
-import '../../ui/components/character-card/character-card';
 import '../../ui/input/text-field/text-field';
 import '../../ui/components/class-selector/class-selector';
 import '../../ui/input/race-selection-field/race-selection-field';
@@ -8,22 +7,10 @@ import '../../ui/input/additional-stats-input-field/additional-stats-input-field
 import '../../ui/input/saving-throw-input-field/saving-throw-input-field';
 import '../../ui/input/skills-input-field/skills-input-field';
 
-import {
-  LitElement,
-  html,
-  customElement,
-  css,
-  property,
-} from 'lit-element';
-import { connect } from 'pwa-helpers';
-import { store } from '../../redux/store';
-import { CharacterSheetDraft } from '../../redux/characterDraft';
-import { AppState } from '../../redux/reducer';
+import { LitElement, html, customElement, css } from 'lit-element';
 
 @customElement('new-character')
-export class NewCharacter extends connect(store)(LitElement) {
-  @property() draft!: CharacterSheetDraft;
-
+export class NewCharacter extends LitElement {
   static get styles() {
     return css`
       :host {
@@ -51,18 +38,11 @@ export class NewCharacter extends connect(store)(LitElement) {
     `;
   }
 
-  stateChanged(state: AppState) {
-    this.draft = state.characterDraft;
-  }
-
   render() {
     return html`
       <h1>Let's get the <span>Basics</span> Down</h1>
       <div class="form-fields">
-        <text-field
-          name="Character Name"
-          reflect="characterDraft.name"
-        ></text-field>
+        <text-field></text-field>
         <class-selector></class-selector>
         <race-selection-field></race-selection-field>
         <ability-score-input-field></ability-score-input-field>
@@ -70,7 +50,6 @@ export class NewCharacter extends connect(store)(LitElement) {
         <additional-stats-input-field></additional-stats-input-field>
         <saving-throw-input-field></saving-throw-input-field>
         <skills-input-field></skills-input-field>
-      </div>
       </div>
     `;
   }

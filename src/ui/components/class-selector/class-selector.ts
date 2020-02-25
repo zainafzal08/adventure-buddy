@@ -20,20 +20,17 @@ import {
   mdiPlus,
 } from '@mdi/js';
 import * as mdiAll from '@mdi/js';
-import { CharacterClass } from '../../../data/CharacterSheet';
 import { AppModal } from '../../components/app-modal/app-modal';
 import { connect } from 'pwa-helpers';
 import { store } from '../../../redux/store';
 import { AppState } from '../../../redux/reducer';
-import { getDatabase, ClassDescriptor } from '../../../data/Database';
+import { ClassDescriptor } from '../../../data/classes';
 
 @customElement('class-selector')
 export class ClassSelector extends connect(store)(LitElement) {
-  @property() selected: CharacterClass[] = [];
+  @property() selected: ClassDescriptor[] = [];
   @query('app-modal') modal!: AppModal;
-  @property() draft: CharacterClass | null = null;
-
-  private db = getDatabase();
+  @property() draft: ClassDescriptor | null = null;
 
   static get styles() {
     return css`

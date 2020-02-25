@@ -1,6 +1,10 @@
 // Imports with side effects.
 import './ui/components/app-nav/app-nav';
 import './router/app-router';
+import './pages/app-home/app-home';
+import './pages/login-page/login-page';
+import './pages/settings-page/settings-page';
+import './pages/new-character/new-character';
 
 // Named imports.
 import {
@@ -12,11 +16,43 @@ import {
   LitElement,
 } from 'lit-element';
 
-import { THEMES } from './themes';
+import { THEMES } from './data/themes';
 import { connect } from 'pwa-helpers';
 import { store } from './redux/store';
-import { AppState } from './redux/reducer';
-import { ROUTES } from './routes';
+import { AppState } from './redux/appState';
+import { Route } from './router/app-router';
+
+export const ROUTES: Route[] = [
+  {
+    path: '/',
+    component: () =>
+      html`
+        <app-home></app-home>
+      `,
+  },
+  {
+    path: '/settings',
+    component: () =>
+      html`
+        <settings-page></settings-page>
+      `,
+  },
+  {
+    path: '/login',
+    public: true,
+    component: () =>
+      html`
+        <login-page></login-page>
+      `,
+  },
+  {
+    path: '/character/new',
+    component: () =>
+      html`
+        <new-character></new-character>
+      `,
+  },
+];
 
 @customElement('app-view')
 export class AppView extends connect(store)(LitElement) {

@@ -2,9 +2,9 @@ import { html, customElement, css, LitElement } from 'lit-element';
 import * as firebase from 'firebase/app';
 
 import logo from '../../assets/logo.svg';
-import { store } from '../../redux/store';
 import { connect } from 'pwa-helpers';
 import { navigate } from '../../router/navigate';
+import { store } from '../../redux/store';
 
 @customElement('login-page')
 export class LoginPage extends connect(store)(LitElement) {
