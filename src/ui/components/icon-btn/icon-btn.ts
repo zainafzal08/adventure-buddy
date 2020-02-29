@@ -16,7 +16,7 @@ export class IconBtn extends LitElement {
   static get styles() {
     return css`
       .chip-button {
-        padding: 0.3rem 0.5rem;
+        padding: 0.3rem 0.7rem 0.3rem 0.5rem;
         border-radius: 15px;
         margin: 0 0.3rem;
         font-size: 0.9rem;
@@ -60,9 +60,15 @@ export class IconBtn extends LitElement {
     `;
   }
 
+  onClick(e: Event) {
+    if (this.disabled === 'true') {
+      e.stopPropagation();
+    }
+  }
+
   render() {
     return html`
-      <div class="chip-button">
+      <div class="chip-button" @click=${this.onClick}>
             <mdi-icon
               .color=${css`var(--icon-ink)`}
               size=${this.size === 'small' ? 12 : 16}

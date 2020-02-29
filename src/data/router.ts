@@ -4,6 +4,6 @@ export interface Router {
 
 export function defaultRouter() {
   return {
-    location: '/',
+    location: window.location.pathname,
   };
 }

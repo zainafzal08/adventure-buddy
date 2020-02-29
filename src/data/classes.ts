@@ -4,6 +4,11 @@ export interface ClassDescriptor {
   icon: string;
 }
 
+export interface ClassSelection {
+  id: string; // corrosponds to a key in CLASSES.
+  level: number;
+}
+
 export const CLASSES: { [k in string]: ClassDescriptor } = {
   barbarian: {
     name: 'Barbarian',

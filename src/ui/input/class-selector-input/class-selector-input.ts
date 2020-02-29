@@ -1,6 +1,6 @@
-import '../app-modal/app-modal';
-import '../icon-btn/icon-btn';
-import '../../input/number-field/number-field';
+import '../../components/app-modal/app-modal';
+import '../../components/icon-btn/icon-btn';
+import '../number-field/number-field';
 
 import {
   LitElement,
@@ -11,7 +11,6 @@ import {
   query,
 } from 'lit-element';
 
-import '../icon-btn/icon-btn';
 import {
   mdiCloseCircle,
   mdiPlusCircle,
@@ -21,16 +20,19 @@ import {
 } from '@mdi/js';
 import * as mdiAll from '@mdi/js';
 import { AppModal } from '../../components/app-modal/app-modal';
-import { connect } from 'pwa-helpers';
-import { store } from '../../../redux/store';
-import { AppState } from '../../../redux/reducer';
-import { ClassDescriptor } from '../../../data/classes';
+import {
+  ClassSelection,
+  CLASSES,
+  ClassDescriptor,
+} from '../../../data/classes';
+import { NumberField } from '../number-field/number-field';
 
-@customElement('class-selector')
-export class ClassSelector extends connect(store)(LitElement) {
-  @property() selected: ClassDescriptor[] = [];
+@customElement('class-selector-input')
+export class ClassSelectorInput extends LitElement {
+  @property() selected: ClassSelection[] = [];
+  @property() id: string = '';
   @query('app-modal') modal!: AppModal;
-  @property() draft: ClassDescriptor | null = null;
+  @property() private draft: ClassSelection | null = null;
 
   static get styles() {
     return css`
@@ -232,22 +234,31 @@ export class ClassSelector extends connect(store)(LitElement) {
     `;
   }
 
-  stateChanged(state: AppState) {
-    this.selected = state.characterDraft.classes;
+  get value(): ClassSelection[] {
+    return [...this.selected];
   }
 
-  syncRedux() {
-    store.dispatch({
-      type: 'UPDATE_DRAFT',
-      fields: {
-        classes: [...this.selected],
-      },
-    });
+  set value(selected: ClassSelection[]) {
+    this.selected = [...selected];
+  }
+
+  firstUpdated() {
+    const saved = localStorage.getItem(`saved-input-value(${this.id})`);
+    if (!saved) return;
+    this.selected = JSON.parse(saved);
+  }
+
+  backup() {
+    if (this.id === '') return;
+    localStorage.setItem(
+      `saved-input-value(${this.id})`,
+      JSON.stringify(this.selected)
+    );
   }
 
   removeSelection(id: number) {
     this.selected = this.selected.filter((_, i) => id !== i);
-    this.syncRedux();
+    this.backup();
   }
 
   newClass() {
@@ -255,7 +266,7 @@ export class ClassSelector extends connect(store)(LitElement) {
   }
 
   getName(id: string) {
-    return this.db.getClass(id).name;
+    return CLASSES[id].name;
   }
 
   getIcon(icon: string) {
@@ -310,20 +321,26 @@ export class ClassSelector extends connect(store)(LitElement) {
     `;
   }
 
+  clear() {
+    this.value = [];
+    localStorage.removeItem(`saved-input-value(${this.id})`);
+  }
+
+  updateDraft(event: CustomEvent) {
+    this.draft = {
+      ...this.draft!,
+      level: event.detail.value,
+    };
+  }
+
   renderLevelPrompt() {
     return html`
       <div class="wrapper">
         <number-field
+          id="new-character-new-class-level"
           name="Level"
-          .range=${[1]}
-          .updateValue=${(v: string) => {
-            let level = parseInt(v);
-            if (isNaN(level)) {
-              level = 0;
-            }
-            this.draft = { ...this.draft!, level };
-          }}
-          value=${1}
+          start=${1}
+          @value-updated=${this.updateDraft}
         ></number-field>
       </div>
     `;
@@ -334,7 +351,14 @@ export class ClassSelector extends connect(store)(LitElement) {
     this.draft = null;
     this.modal.hide();
     this.toggleAttribute('chosen', false);
-    this.syncRedux();
+    this.backup();
+  }
+
+  isLevelValid() {
+    const id = 'new-character-new-class-level';
+    const field = this.shadowRoot?.getElementById(id) as NumberField;
+    if (!field) return false;
+    return field.isValid();
   }
 
   renderModal() {
@@ -352,8 +376,7 @@ export class ClassSelector extends connect(store)(LitElement) {
           <div class="body">
             ${this.draft
               ? this.renderLevelPrompt()
-              : this.db
-                  .allClasses()
+              : Object.entries(CLASSES)
                   .filter(([k, _]) => alreadySelected.indexOf(k) === -1)
                   .map(([k, c]) => this.renderClassSelection(k, c))}
           </div>
@@ -368,12 +391,10 @@ export class ClassSelector extends connect(store)(LitElement) {
               ? html`
                   <icon-btn
                     size="small"
-                    @click=${this.draft.level > 0
-                      ? () => this.addClassToList()
-                      : () => {}}
+                    @click=${() => this.addClassToList()}
                     icon=${mdiPlus}
                     primary="true"
-                    disabled=${!(this.draft.level > 0)}
+                    disabled=${!this.isLevelValid()}
                     >Add</icon-btn
                   >
                 `

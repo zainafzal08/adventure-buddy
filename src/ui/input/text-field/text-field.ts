@@ -1,9 +1,24 @@
-import { html, customElement, css, property } from 'lit-element';
-import { BaseInput } from '../base-input/base-input';
+import {
+  html,
+  customElement,
+  css,
+  property,
+  query,
+  LitElement,
+} from 'lit-element';
 
 @customElement('text-field')
-export class TextField extends BaseInput {
+export class TextField extends LitElement {
   @property() name: string = 'textField';
+  @property() placeholder: string = 'Enter Text Here';
+  @property() id: string = '';
+  @query('input') input!: HTMLInputElement;
+
+  firstUpdated() {
+    const saved = localStorage.getItem(`saved-input-value(${this.id})`);
+    if (!saved) return;
+    this.value = saved;
+  }
 
   static get styles() {
     return css`
@@ -43,14 +58,53 @@ export class TextField extends BaseInput {
       .group:focus-within input[type='text'] {
         border-bottom: 2px solid var(--theme-primary);
       }
+      input[type='text']::placeholder {
+        color: #cecece;
+      }
     `;
+  }
+
+  get value() {
+    return this.input.value;
+  }
+
+  set value(value: string) {
+    this.input.value = value;
+  }
+
+  isValid() {
+    return this.value !== '';
+  }
+
+  clear() {
+    this.value = '';
+    localStorage.removeItem(`saved-input-value(${this.id})`);
+  }
+
+  updateValue() {
+    this.backup();
+    this.dispatchEvent(
+      new CustomEvent('value-updated', {
+        detail: {
+          id: this.id,
+          value: this.value,
+        },
+        composed: true,
+        bubbles: true,
+      })
+    );
+  }
+
+  backup() {
+    if (this.id === '') return;
+    localStorage.setItem(`saved-input-value(${this.id})`, this.value);
   }
 
   render() {
     return html`
-      <div class="group">
+      <div class="group" @input=${this.updateValue}>
         <label for="input">${this.name}</label>
-        <input type="text" />
+        <input type="text" placeholder=${this.placeholder} />
       </div>
     `;
   }

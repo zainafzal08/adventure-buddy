@@ -2,11 +2,20 @@ import '../number-field/number-field';
 import '../dice-input/dice-input';
 
 import { LitElement, html, customElement, css } from 'lit-element';
-import { connect } from 'pwa-helpers';
-import { store } from '../../../redux/store';
+import { DiceDescriptor } from '../../../data/CharacterSheet';
+import { NumberField } from '../number-field/number-field';
+import { DiceInput } from '../dice-input/dice-input';
+
+interface BasicStats {
+  maxHealth: number;
+  hitDice: DiceDescriptor;
+  ac: number;
+  initative: number;
+  speed: number;
+}
 
 @customElement('basic-stats-input-field')
-export class BasicStatsInputField extends connect(store)(LitElement) {
+export class BasicStatsInputField extends LitElement {
   static get styles() {
     return css`
       :host {
@@ -15,65 +24,111 @@ export class BasicStatsInputField extends connect(store)(LitElement) {
       .fields {
         width: 100%;
         display: flex;
-        justify-content: flex-start;
+        justify-content: space-between;
       }
       .container-med {
-        width: 20%;
+        width: calc(20% - 12px);
         box-sizing: border-box;
         display: flex;
         flex-direction: column;
         justify-content: flex-end;
-        padding: 0 8px;
-      }
-      h3 {
-        margin: 0;
-        padding: 0;
-        color: var(--theme-primary);
-        opacity: 0.9;
-        font-weight: 500;
-        padding-left: 8px;
-        margin-bottom: 8px;
-        margin-top: 8px;
       }
     `;
   }
 
+  getVal(id: string): number {
+    const input = this.shadowRoot?.getElementById(
+      `new-character-${id}`
+    ) as NumberField;
+    return input.value;
+  }
+
+  setVal(id: string, val: number) {
+    const input = this.shadowRoot?.getElementById(
+      `new-character-${id}`
+    ) as NumberField;
+    input.value = val;
+  }
+
+  clearVal(id: string) {
+    const input = this.shadowRoot?.getElementById(
+      `new-character-${id}`
+    ) as NumberField;
+    input.clear();
+  }
+
+  get value(): BasicStats {
+    const diceInput = this.shadowRoot?.getElementById(
+      `new-character-hit-dice`
+    ) as DiceInput;
+    return {
+      maxHealth: this.getVal('max-health'),
+      hitDice: diceInput.value,
+      ac: this.getVal('ac'),
+      initative: this.getVal('initative'),
+      speed: this.getVal('speed'),
+    };
+  }
+
+  set value(stats: BasicStats) {
+    const diceInput = this.shadowRoot?.getElementById(
+      `new-character-hit-dice`
+    ) as DiceInput;
+    diceInput.value = stats.hitDice;
+
+    this.setVal('max-health', stats.maxHealth);
+    this.setVal('ac', stats.ac);
+    this.setVal('initative', stats.initative);
+    this.setVal('speed', stats.speed);
+  }
+
+  clear() {
+    const diceInput = this.shadowRoot?.getElementById(
+      `new-character-hit-dice`
+    ) as DiceInput;
+    diceInput.clear();
+    this.clearVal('max-health');
+    this.clearVal('ac');
+    this.clearVal('initative');
+    this.clearVal('speed');
+  }
+
   render() {
     return html`
-      <h3>Basic Stats</h3>
       <div class="fields">
         <div class="container-med">
           <number-field
             name="Max Health"
-            .range=${[1]}
-            reflect="characterDraft.maxHealth"
+            id="new-character-max-health"
+            .start=${1}
           ></number-field>
         </div>
         <div class="container-med">
           <dice-input
             name="Hit Dice"
-            reflect="characterDraft.hitDice"
+            id="new-character-hit-dice"
           ></dice-input>
         </div>
         <div class="container-med">
           <number-field
             name="AC"
-            .range=${[1]}
-            reflect="characterDraft.ac"
+            id="new-character-ac"
+            .start=${1}
           ></number-field>
         </div>
         <div class="container-med">
           <number-field
             name="Initiative"
-            .range=${[0]}
-            reflect="characterDraft.initiative"
+            id="new-character-initative"
+            .start=${0}
           ></number-field>
         </div>
         <div class="container-med">
           <number-field
             name="Speed"
-            .range=${[1]}
-            reflect="characterDraft.speed"
+            id="new-character-speed"
+            .initial=${30}
+            .start=${1}
           ></number-field>
         </div>
       </div>

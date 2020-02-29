@@ -115,7 +115,7 @@ export class SettingsPage extends connect(store)(LitElement) {
     return result;
   }
 
-  template() {
+  render() {
     return html`
       <h1><span>Customise</span> your Adventure Buddy here</h1>
       <div class="setting">

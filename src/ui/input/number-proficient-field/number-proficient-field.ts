@@ -6,22 +6,12 @@ import {
   property,
   query,
 } from 'lit-element';
-import { AppState } from '../../../redux/reducer';
-import { store } from '../../../redux/store';
-import { connect } from 'pwa-helpers';
-
-type Field = { proficient: boolean; value: string };
+import { ModifiableValue } from '../../../data/CharacterSheet';
 
 @customElement('number-proficient-field')
-export class NumberFieldProficient extends connect(store)(LitElement) {
-  // User facing
+export class NumberProficientField extends LitElement {
   @property({ attribute: true }) name: string = 'numberProficientField';
-  @property() reflect: string = '';
-  @property() data: Field = {
-    proficient: false,
-    value: '0',
-  };
-  @property() changeListener: (v: Field) => void = () => {};
+  @property() id: string = '';
 
   @query('input') input!: HTMLInputElement;
   @query('.group') group!: HTMLDivElement;
@@ -145,64 +135,77 @@ export class NumberFieldProficient extends connect(store)(LitElement) {
     `;
   }
 
-  stateChanged(state: AppState) {
-    if (this.reflect === '') return;
-    // Sue me.
-    let val = state as any;
-    for (const field of this.reflect.split('.')) {
-      val = val[field];
-    }
-    this.data = val === undefined ? '' : val;
-    // Actually update the input field to match.
-    if (this.input && this.data.value !== '')
-      this.input.value = this.data.value;
-    this.validate();
-  }
-
-  change() {
-    const data = {
-      proficient: this.hasAttribute('proficient'),
-      value: this.input.value,
-    };
-    this.changeListener(data);
-
-    if (this.reflect) {
-      store.dispatch({
-        type: 'DIRECT_SET',
-        path: this.reflect,
-        value: data,
-      });
-    } else {
-      this.data = data;
-      this.validate();
-    }
-  }
-
   notNum(v: string) {
     return isNaN(parseInt(v));
   }
 
   validate() {
-    // Debounce calls made before object is ready
-    if (this.group === null) return;
     this.group.classList.toggle(
       'invalid',
-      this.notNum(this.data.value)
+      this.notNum(this.input.value)
     );
   }
 
-  profToggle() {
-    return html`
-      <div
-        class="prof-button"
-        @click=${() => {
-          this.toggleAttribute('proficient');
-          this.change();
-        }}
-      >
-        Proficient
-      </div>
-    `;
+  get value() {
+    let v;
+    if (!this.input) {
+      v = 0;
+    } else {
+      v = parseInt(this.input.value);
+      if (isNaN(v)) v = 0;
+    }
+    return {
+      value: v,
+      proficient: this.hasAttribute('proficient'),
+    };
+  }
+
+  set value(score: ModifiableValue) {
+    this.input.value = score.value.toString();
+    this.toggleAttribute('proficient', score.proficient);
+    this.updateValue();
+  }
+
+  clear() {
+    this.value = {
+      value: 0,
+      proficient: false,
+    };
+    localStorage.removeItem(`saved-input-value(${this.id})`);
+  }
+
+  updateValue() {
+    this.validate();
+    this.backup();
+    this.dispatchEvent(
+      new CustomEvent('value-updated', {
+        detail: {
+          id: this.id,
+          value: this.value,
+        },
+        composed: true,
+        bubbles: true,
+      })
+    );
+  }
+
+  firstUpdated() {
+    const saved = localStorage.getItem(`saved-input-value(${this.id})`);
+    if (!saved) {
+      this.value = {
+        value: 0,
+        proficient: false,
+      };
+      return;
+    }
+    this.value = JSON.parse(saved);
+  }
+
+  backup() {
+    localStorage.setItem(
+      `saved-input-value(${this.id})`,
+      JSON.stringify(this.value)
+    );
   }
 
   render() {
@@ -212,11 +215,18 @@ export class NumberFieldProficient extends connect(store)(LitElement) {
         <input
           id="input"
           type="number"
-          value=${this.data.value}
-          @input=${() => this.change()}
+          @input=${() => this.updateValue()}
         />
         <div class="footer">
-          ${this.profToggle()}
+          <div
+            class="prof-button"
+            @click=${() => {
+              this.toggleAttribute('proficient');
+              this.updateValue();
+            }}
+          >
+            Proficient
+          </div>
         </div>
       </div>
     `;

@@ -1,15 +1,23 @@
-import { html, customElement, css, property, query } from 'lit-element';
-
-import { BaseInput } from '../base-input/base-input';
+import {
+  html,
+  customElement,
+  css,
+  property,
+  query,
+  LitElement,
+} from 'lit-element';
 
 @customElement('number-field')
-export class NumberInput extends BaseInput {
+export class NumberField extends LitElement {
   // User facing
-  @property({ attribute: true }) name: string = 'numberField';
-  @property() range: [number?, number?] = [];
+  @property() name: string = 'numberField';
+  @property() inital: number | null = null;
+  @property() start: number | null = null;
+  @property() stop: number | null = null;
 
   @property() private help: string = '';
   @query('.group') private group!: HTMLDivElement;
+  @query('input') private input!: HTMLInputElement;
 
   static get styles() {
     return css`
@@ -22,8 +30,6 @@ export class NumberInput extends BaseInput {
         justify-content: flex-start;
         flex-direction: column;
         width: 100%;
-        margin-top: 1rem;
-        margin-bottom: 1rem;
       }
       label {
         font-size: 0.8rem;
@@ -82,26 +88,47 @@ export class NumberInput extends BaseInput {
     `;
   }
 
-  updateValue(value: string) {
-    this.validate(value);
+  getInitialValue() {
+    let initialValue = this.inital;
+    if (initialValue === null) {
+      initialValue = this.start === null ? 0 : this.start;
+    }
+    return initialValue;
+  }
+  firstUpdated() {
+    const saved = localStorage.getItem(`saved-input-value(${this.id})`);
+    if (!saved) {
+      this.value = this.getInitialValue();
+      return;
+    }
+    this.value = parseInt(saved);
+    this.updateValue();
+  }
+
+  backup() {
+    localStorage.setItem(
+      `saved-input-value(${this.id})`,
+      this.value.toString()
+    );
   }
 
   notNum(v: string) {
     return isNaN(parseInt(v));
   }
 
-  notInRange(v: number) {
+  inRange(v: number) {
     let valid = true;
-    if (this.range[0] !== undefined) {
-      valid = valid && v >= this.range[0];
+    if (this.stop !== null) {
+      valid = valid && v <= this.stop;
     }
-    if (this.range[1] !== undefined) {
-      valid = valid && v <= this.range[1];
+    if (this.start !== null) {
+      valid = valid && v >= this.start;
     }
-    return !valid;
+    return valid;
   }
 
-  validate(value: string) {
+  validate() {
+    const value = this.input.value;
     // Debounce calls made before object is ready
     if (this.group === null) return;
     let error = '';
@@ -109,11 +136,13 @@ export class NumberInput extends BaseInput {
 
     if (this.notNum(value)) {
       error = 'Value must be a number';
-    } else if (this.notInRange(parseInt(value))) {
-      if (this.range[1]) {
-        error = `Value must be between ${this.range[0]} and ${this.range[1]}`;
+    } else if (!this.inRange(parseInt(value))) {
+      if (this.start !== null && this.stop !== null) {
+        error = `Value must be between ${this.start} and ${this.stop}`;
+      } else if (this.stop !== null) {
+        error = `Value must not exceed ${this.stop}`;
       } else {
-        error = `Value must be at least ${this.range[0]}`;
+        error = `Value must be at least ${this.start}`;
       }
     }
     if (error) {
@@ -122,15 +151,50 @@ export class NumberInput extends BaseInput {
     this.group.classList.toggle('invalid', error !== '');
   }
 
+  get value() {
+    if (!this.input) return this.getInitialValue();
+    const v = parseInt(this.input.value);
+    if (isNaN(v)) return this.start === null ? 0 : this.start;
+    return v;
+  }
+
+  set value(v: number) {
+    this.input.value = v.toString();
+    this.validate();
+  }
+
+  clear() {
+    this.value = this.getInitialValue();
+    localStorage.removeItem(`saved-input-value(${this.id})`);
+  }
+
+  isValid() {
+    return this.help == '';
+  }
+
+  updateValue() {
+    this.validate();
+    this.dispatchEvent(
+      new CustomEvent('value-updated', {
+        detail: {
+          id: this.id,
+          value: this.value,
+        },
+        composed: true,
+        bubbles: true,
+      })
+    );
+    this.backup();
+  }
+
   render() {
     return html`
-      <div class="group">
+      <div class="group" @input=${this.updateValue}>
         <label for="input">${this.name}</label>
         <input
-          id="input"
           type="number"
-          min=${this.range[0] ? this.range[0] : ''}
-          max=${this.range[1] ? this.range[1] : ''}
+          min=${this.start === null ? '' : this.start}
+          max=${this.stop === null ? '' : this.stop}
         />
         <small>${this.help}</small>
       </div>

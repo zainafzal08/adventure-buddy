@@ -1,29 +1,22 @@
 import '../number-field/number-field';
 
 import { LitElement, html, customElement, css } from 'lit-element';
-import { connect } from 'pwa-helpers';
-import { store } from '../../../redux/store';
 import {
-  Ability,
   abilityShorthand,
-} from '../../../data/CharacterSheet';
+  allAbilities,
+  Ability,
+} from '../../../data/ability';
+import { AbilityScoresDecleration } from '../../../data/CharacterSheet';
+import { NumberField } from '../number-field/number-field';
 
 @customElement('ability-score-input-field')
-export class AbilityScoreInputField extends connect(store)(LitElement) {
-  private abilities = [
-    Ability.STR,
-    Ability.DEX,
-    Ability.CON,
-    Ability.INT,
-    Ability.WIS,
-    Ability.CHR,
-  ];
-
+export class AbilityScoreInputField extends LitElement {
   static get styles() {
     return css`
       :host {
         width: 100%;
         height: fit-content;
+        --num-scores: 6;
       }
       .fields {
         width: 100%;
@@ -36,31 +29,60 @@ export class AbilityScoreInputField extends connect(store)(LitElement) {
         flex-direction: column;
         justify-content: flex-end;
         box-sizing: border-box;
-        padding: 0 8px;
-      }
-      h3 {
-        margin: 0;
-        padding: 0;
-        color: var(--theme-primary);
-        opacity: 0.9;
-        font-weight: 500;
-        padding-left: 8px;
-        margin-bottom: 8px;
+        width: calc(100% / var(--num-scores) - 12px);
       }
     `;
   }
 
+  getValueForAbility(a: Ability): number {
+    const input = this.shadowRoot?.getElementById(
+      `new-character-ability-${a}`
+    ) as NumberField;
+    if (!input) return 10;
+    return input.value;
+  }
+
+  setValueForAbility(a: Ability, v: number) {
+    const input = this.shadowRoot?.getElementById(
+      `new-character-ability-${a}`
+    ) as NumberField;
+    input.value = v;
+  }
+
+  get value(): AbilityScoresDecleration {
+    const scores: Partial<AbilityScoresDecleration> = {};
+    for (const a of allAbilities) {
+      scores[a] = this.getValueForAbility(a);
+    }
+    return scores as AbilityScoresDecleration;
+  }
+
+  set value(scores: AbilityScoresDecleration) {
+    for (const a of allAbilities) {
+      this.setValueForAbility(a, scores[a]);
+    }
+  }
+
+  clear() {
+    for (const a of allAbilities) {
+      const input = this.shadowRoot?.getElementById(
+        `new-character-ability-${a}`
+      ) as NumberField;
+      input.clear();
+    }
+  }
+
   render() {
     return html`
-      <h3>Ability Scores</h3>
       <div class="fields">
-            ${this.abilities.map(
+            ${allAbilities.map(
               ability => html`
                 <div class="container">
                   <number-field
                     name=${abilityShorthand[ability]}
-                    .range=${[1]}
-                    reflect=${`characterDraft.abilityScores.${ability}`}
+                    id=${`new-character-ability-${ability}`}
+                    .inital=${10}
+                    .start=${1}
                   ></number-field>
                 </div>
               `

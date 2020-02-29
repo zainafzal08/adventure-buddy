@@ -4,9 +4,25 @@ import { Ability } from './ability';
 import { AttackDescriptor } from './attack';
 import { first } from '../util';
 
-type SkillsDecleration = {
-  [k in Skill]: { value: string; proficient: boolean };
+export interface ModifiableValue {
+  value: number;
+  proficient: boolean;
+}
+
+export type SkillsDecleration = {
+  [k in Skill]: ModifiableValue;
 };
+
+export type SavingThrowsDecleration = {
+  [k in Ability]: ModifiableValue;
+};
+
+export type AbilityScoresDecleration = { [k in Ability]: number };
+
+export interface DiceDescriptor {
+  count: number;
+  type: number;
+}
 
 export interface CharacterSheet {
   name: string | undefined;
@@ -15,7 +31,7 @@ export interface CharacterSheet {
   /** Key which reresents this characters race, null means no subrace. */
   subrace: string | null;
   classes: ClassDescriptor[];
-  abilityScores: { [k in Ability]: number };
+  abilityScores: AbilityScoresDecleration;
   speed: number;
   ac: number;
   maxHealth: number;
@@ -28,9 +44,7 @@ export interface CharacterSheet {
     number: number;
     type: number;
   };
-  savingThrows: {
-    [k in Ability]: { value: number; proficient: boolean };
-  };
+  savingThrows: SavingThrowsDecleration;
   skills: SkillsDecleration;
   attacks: AttackDescriptor[];
 }

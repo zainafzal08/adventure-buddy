@@ -16,12 +16,15 @@ import {
   mdiFire,
   mdiHumanHandsup,
 } from '@mdi/js';
-import { store } from '../../../redux/store';
-import { connect } from 'pwa-helpers';
-import { AppState } from '../../../redux/reducer';
+import { RACES } from '../../../data/races';
+
+function firstKey(o: Object) {
+  const keys = Object.keys(o);
+  return keys.length > 0 ? keys[0] : null;
+}
 
 @customElement('race-selection-field')
-export class RaceSelectionField extends connect(store)(LitElement) {
+export class RaceSelectionField extends LitElement {
   @property() selectedRace!: string;
   @property() selectedSubrace: string | null = null;
 
@@ -32,11 +35,12 @@ export class RaceSelectionField extends connect(store)(LitElement) {
         height: 350px;
         display: flex;
         margin: 16px 0;
+        justify-content: space-between;
       }
 
       .group {
-        width: calc(50% - 16px);
-        margin: 0 8px;
+        width: 48%;
+        margin: 0;
         height: 100%;
         display: flex;
         flex-direction: column;
@@ -177,35 +181,55 @@ export class RaceSelectionField extends connect(store)(LitElement) {
     `;
   }
 
-  stateChanged(state: AppState) {
-    this.selectedRace = state.characterDraft.race;
-    this.selectedSubrace = state.characterDraft.subrace;
+  constructor() {
+    super();
+    // Default
+    this.selectedRace = firstKey(RACES) as string;
+    this.selectedSubrace = firstKey(RACES[this.selectedRace].subraces);
+  }
+
+  firstUpdated() {
+    const saved = localStorage.getItem(`saved-input-value(${this.id})`);
+    if (!saved) {
+      return;
+    }
+    const selected = JSON.parse(saved);
+    this.selectedRace = selected.race;
+    this.selectedSubrace = selected.subrace;
+  }
+
+  clear() {
+    // Default
+    this.selectedRace = firstKey(RACES) as string;
+    this.selectedSubrace = firstKey(RACES[this.selectedRace].subraces);
   }
 
   changeSelection(event: string, id: string) {
-    let race = this.selectedRace;
-    let subrace = this.selectedSubrace;
     if (event === 'race') {
-      race = id;
-      subrace = this.db.getSubRaceIdFromIndex(race, 0);
-      subrace = subrace === undefined ? null : subrace;
+      this.selectedRace = id;
+      this.selectedSubrace = firstKey(RACES[id].subraces);
     } else if (event === 'subrace') {
-      subrace = id;
+      this.selectedSubrace = id;
     }
-    // redux uses null to mean no subrace and undefined to mean
-    // not yet specified...
-    store.dispatch({
-      type: 'UPDATE_DRAFT',
-      fields: {
-        race,
-        subrace,
-      },
-    });
+    this.backup();
+  }
+
+  backup() {
+    if (this.id === '') return;
+    localStorage.setItem(
+      `saved-input-value(${this.id})`,
+      JSON.stringify({
+        race: this.selectedRace,
+        subrace: this.selectedSubrace,
+      })
+    );
   }
 
   render() {
-    const allRaces = this.db.getAllRaces();
-    const allSubRaces = this.db.getAllSubRaces(this.selectedRace);
+    const allRaces = Object.entries(RACES);
+    const allSubRaces = Object.entries(
+      RACES[this.selectedRace].subraces
+    );
 
     return html`
       <div class="group">

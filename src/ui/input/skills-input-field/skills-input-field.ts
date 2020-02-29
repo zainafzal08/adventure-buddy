@@ -1,36 +1,21 @@
 import '../number-field/number-field';
 
+import { LitElement, html, customElement, css } from 'lit-element';
 import {
-  LitElement,
-  html,
-  customElement,
-  css,
-  property,
-} from 'lit-element';
-import { connect } from 'pwa-helpers';
-import { store } from '../../../redux/store';
-import { AppState } from '../../../redux/reducer';
+  SkillsDecleration,
+  AbilityScoresDecleration,
+  ModifiableValue,
+} from '../../../data/CharacterSheet';
 import {
   allSkills,
-  Ability,
   getSkillAbility,
-  toModifier,
-} from '../../../data/CharacterSheet';
-import { mdiAutoFix } from '@mdi/js';
-import { SkillsDecleration } from '../../../redux/characterDraft';
+  Skill,
+} from '../../../data/skills';
+import { NumberProficientField } from '../number-proficient-field/number-proficient-field';
+import { getModifier } from '../../../data/ability';
 
 @customElement('skills-input-field')
-export class SkillsInputField extends connect(store)(LitElement) {
-  @property() private skills!: SkillsDecleration;
-  @property() private abilities!: { [k in Ability]: string };
-  @property() private profBonus!: string;
-
-  stateChanged(state: AppState) {
-    this.skills = state.characterDraft.skills;
-    this.profBonus = state.characterDraft.profBonus;
-    this.abilities = state.characterDraft.abilityScores;
-  }
-
+export class SkillsInputField extends LitElement {
   static get styles() {
     return css`
       :host {
@@ -41,97 +26,91 @@ export class SkillsInputField extends connect(store)(LitElement) {
         display: grid;
         grid-template-columns: auto auto auto auto auto;
       }
-      .heading {
-        width: 100%;
-        height: 28px;
-        margin-bottom: 8px;
-        padding-left: 8px;
-        display: flex;
-        align-items: center;
-      }
-      h3 {
-        margin: 0;
-        padding: 0;
-        color: var(--theme-primary);
-        opacity: 0.9;
-        font-weight: 500;
-        padding-right: 8px;
-      }
-      .bar {
-        width: 2px;
-        background: #ebebeb;
-        height: 100%;
-        margin: 0 8px;
-      }
       number-proficient-field {
-        margin: 0 8px;
         width: calc(100% - 16px);
       }
     `;
   }
 
-  syncInput() {
-    store.dispatch({
-      type: 'UPDATE_DRAFT',
-      fields: {
-        skills: this.skills,
-      },
-    });
-  }
-
-  generateValues() {
+  generateValues(scores: AbilityScoresDecleration, profBonus: number) {
     const result: Partial<SkillsDecleration> = {};
     for (const s of allSkills) {
-      const profBonus =
-        this.skills[s].proficient && !isNaN(parseInt(this.profBonus))
-          ? parseInt(this.profBonus)
-          : 0;
-      const ability = !isNaN(
-        parseInt(this.abilities[getSkillAbility(s)])
-      )
-        ? parseInt(this.abilities[getSkillAbility(s)])
-        : 0;
+      const proficient = this.values[s].proficient;
+      const a = getSkillAbility(s);
+      const rawModifier = getModifier(scores[a]);
       result[s] = {
-        value: (toModifier(ability) + profBonus).toString(),
-        proficient: this.skills[s].proficient,
+        value: proficient ? rawModifier + profBonus : rawModifier,
+        proficient,
       };
     }
     return result as SkillsDecleration;
   }
 
-  autofill() {
-    if (this.autofillImpossible()) return;
-    this.skills = this.generateValues();
-    this.syncInput();
+  autofill(scores: AbilityScoresDecleration, profBonus: number) {
+    this.values = this.generateValues(scores, profBonus);
   }
 
-  autofillImpossible() {
-    const generated = this.generateValues();
+  autofillImpossible(
+    scores: AbilityScoresDecleration,
+    profBonus: number
+  ) {
+    const generated = this.generateValues(scores, profBonus);
     return allSkills
-      .map(s => this.skills[s].value === generated[s].value)
+      .map(s => this.values[s].value === generated[s].value)
       .reduce((acc, v) => acc && v);
+  }
+
+  private getValueForSkill(skill: Skill): ModifiableValue {
+    const field = this.shadowRoot?.getElementById(
+      `new-character-skill-${skill}`
+    )! as NumberProficientField;
+    if (!field)
+      return {
+        value: 0,
+        proficient: false,
+      };
+    return field.value;
+  }
+
+  private setValueForSkill(skill: Skill, value: ModifiableValue) {
+    const field = this.shadowRoot?.getElementById(
+      `new-character-skill-${skill}`
+    )! as NumberProficientField;
+    field.value = { ...value };
+  }
+
+  get values(): SkillsDecleration {
+    const skills: Partial<SkillsDecleration> = {};
+    for (const skill of allSkills) {
+      skills[skill] = this.getValueForSkill(skill);
+    }
+    return skills as SkillsDecleration;
+  }
+
+  set values(skills: SkillsDecleration) {
+    for (const skill of allSkills) {
+      this.setValueForSkill(skill, skills[skill]);
+    }
+  }
+
+  clear() {
+    for (const s of allSkills) {
+      const input = this.shadowRoot?.getElementById(
+        `new-character-skill-${s}`
+      ) as NumberProficientField;
+      input.clear();
+    }
   }
 
   render() {
     return html`
-      <div class="heading">
-        <h3>Skills</h3>
-        <div class="bar"></div>
-        <icon-btn
-          icon=${mdiAutoFix}
-          size="small"
-          disabled=${this.autofillImpossible()}
-          @click=${() => this.autofill()}
-          >Autofill</icon-btn
-        >
-      </div>
       <div class="fields">
         ${allSkills.map(
           skill =>
             html`
               <number-proficient-field
+                id=${`new-character-skill-${skill}`}
                 name=${skill}
-                reflect=${`characterDraft.skills.${skill}`}
               ></number-proficient-field>
             `
         )}
