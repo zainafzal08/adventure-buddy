@@ -2,8 +2,8 @@ import '../number-field/number-field';
 
 import { LitElement, html, customElement, css } from 'lit-element';
 import {
-  SkillsDecleration,
-  AbilityScoresDecleration,
+  SkillsDeclaration,
+  AbilityScoresDeclaration,
   ModifiableValue,
 } from '../../../data/CharacterSheet';
 import {
@@ -13,6 +13,7 @@ import {
 } from '../../../data/skills';
 import { NumberProficientField } from '../number-proficient-field/number-proficient-field';
 import { getModifier } from '../../../data/ability';
+import { all } from '../../../util';
 
 @customElement('skills-input-field')
 export class SkillsInputField extends LitElement {
@@ -32,8 +33,8 @@ export class SkillsInputField extends LitElement {
     `;
   }
 
-  generateValues(scores: AbilityScoresDecleration, profBonus: number) {
-    const result: Partial<SkillsDecleration> = {};
+  generateValues(scores: AbilityScoresDeclaration, profBonus: number) {
+    const result: Partial<SkillsDeclaration> = {};
     for (const s of allSkills) {
       const proficient = this.values[s].proficient;
       const a = getSkillAbility(s);
@@ -43,15 +44,15 @@ export class SkillsInputField extends LitElement {
         proficient,
       };
     }
-    return result as SkillsDecleration;
+    return result as SkillsDeclaration;
   }
 
-  autofill(scores: AbilityScoresDecleration, profBonus: number) {
+  autofill(scores: AbilityScoresDeclaration, profBonus: number) {
     this.values = this.generateValues(scores, profBonus);
   }
 
   autofillImpossible(
-    scores: AbilityScoresDecleration,
+    scores: AbilityScoresDeclaration,
     profBonus: number
   ) {
     const generated = this.generateValues(scores, profBonus);
@@ -79,15 +80,22 @@ export class SkillsInputField extends LitElement {
     field.value = { ...value };
   }
 
-  get values(): SkillsDecleration {
-    const skills: Partial<SkillsDecleration> = {};
+  isSkillValid(s: Skill) {
+    const field = this.shadowRoot?.getElementById(
+      `new-character-skill-${s}`
+    )! as NumberProficientField;
+    return field.isValid();
+  }
+
+  get values(): SkillsDeclaration {
+    const skills: Partial<SkillsDeclaration> = {};
     for (const skill of allSkills) {
       skills[skill] = this.getValueForSkill(skill);
     }
-    return skills as SkillsDecleration;
+    return skills as SkillsDeclaration;
   }
 
-  set values(skills: SkillsDecleration) {
+  set values(skills: SkillsDeclaration) {
     for (const skill of allSkills) {
       this.setValueForSkill(skill, skills[skill]);
     }
@@ -100,6 +108,10 @@ export class SkillsInputField extends LitElement {
       ) as NumberProficientField;
       input.clear();
     }
+  }
+
+  isValid() {
+    return all(allSkills.map(s => this.isSkillValid(s)));
   }
 
   render() {

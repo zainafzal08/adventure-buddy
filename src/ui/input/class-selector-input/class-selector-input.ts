@@ -33,6 +33,7 @@ export class ClassSelectorInput extends LitElement {
   @property() id: string = '';
   @query('app-modal') modal!: AppModal;
   @property() private draft: ClassSelection | null = null;
+  @property() private help: string = '';
 
   static get styles() {
     return css`
@@ -231,6 +232,12 @@ export class ClassSelectorInput extends LitElement {
         justify-content: center;
         padding: 0 16px;
       }
+      small {
+        margin-top: 8px;
+        color: var(--theme-emphasis-low);
+        height: 1rem;
+        font-size: 0.65rem;
+      }
     `;
   }
 
@@ -244,8 +251,28 @@ export class ClassSelectorInput extends LitElement {
 
   firstUpdated() {
     const saved = localStorage.getItem(`saved-input-value(${this.id})`);
-    if (!saved) return;
-    this.selected = JSON.parse(saved);
+    if (saved) {
+      this.selected = JSON.parse(saved);
+    }
+    this.updateValue();
+  }
+
+  updateValue() {
+    this.help = '';
+    if (this.selected.length < 1) {
+      this.help = 'You must select at least 1 class';
+    }
+    this.dispatchEvent(
+      new CustomEvent('value-updated', {
+        detail: {
+          id: this.id,
+          value: this.value,
+        },
+        composed: true,
+        bubbles: true,
+      })
+    );
+    this.backup();
   }
 
   backup() {
@@ -258,7 +285,7 @@ export class ClassSelectorInput extends LitElement {
 
   removeSelection(id: number) {
     this.selected = this.selected.filter((_, i) => id !== i);
-    this.backup();
+    this.updateValue();
   }
 
   newClass() {
@@ -324,6 +351,7 @@ export class ClassSelectorInput extends LitElement {
   clear() {
     this.value = [];
     localStorage.removeItem(`saved-input-value(${this.id})`);
+    this.updateValue();
   }
 
   updateDraft(event: CustomEvent) {
@@ -351,7 +379,7 @@ export class ClassSelectorInput extends LitElement {
     this.draft = null;
     this.modal.hide();
     this.toggleAttribute('chosen', false);
-    this.backup();
+    this.updateValue();
   }
 
   isLevelValid() {
@@ -359,6 +387,10 @@ export class ClassSelectorInput extends LitElement {
     const field = this.shadowRoot?.getElementById(id) as NumberField;
     if (!field) return false;
     return field.isValid();
+  }
+
+  isValid() {
+    return this.selected.length > 0;
   }
 
   renderModal() {
@@ -394,7 +426,7 @@ export class ClassSelectorInput extends LitElement {
                     @click=${() => this.addClassToList()}
                     icon=${mdiPlus}
                     primary="true"
-                    disabled=${!this.isLevelValid()}
+                    ?disabled=${!this.isLevelValid()}
                     >Add</icon-btn
                   >
                 `
@@ -432,6 +464,7 @@ export class ClassSelectorInput extends LitElement {
           </div>
         </div>
       </div>
+      <small>${this.help}</small>
       ${this.renderModal()}
     `;
   }

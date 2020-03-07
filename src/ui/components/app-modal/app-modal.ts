@@ -10,11 +10,16 @@ import {
 export class AppModal extends LitElement {
   @property({ type: Boolean, attribute: true, reflect: true })
   shown: boolean = false;
+  /** If escape should not trigger a close. */
+  @property({ type: Boolean }) ignoreEscape: boolean = false;
+
+  private keyDownListener: (e: KeyboardEvent) => void = e =>
+    this.keyDown(e);
 
   static get styles() {
     return css`
       :host {
-        position: absolute;
+        position: fixed;
         width: 100%;
         height: 100vh;
         top: 0;
@@ -35,11 +40,22 @@ export class AppModal extends LitElement {
     this.addEventListener('modal-close', () => {
       this.shown = false;
     });
+
+    window.addEventListener('keydown', this.keyDownListener);
+  }
+
+  keyDown(e: KeyboardEvent) {
+    if (this.ignoreEscape) return;
+    if (e.key === 'Escape') this.hide();
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    window.removeEventListener('keydown', this.keyDownListener);
   }
 
   show() {
     this.shown = true;
-    window.scrollTo(0, 0);
     document.body.style.overflow = 'hidden';
   }
 

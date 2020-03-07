@@ -174,6 +174,11 @@ export class NumberProficientField extends LitElement {
     localStorage.removeItem(`saved-input-value(${this.id})`);
   }
 
+  isValid() {
+    if (!this.group) return false;
+    return !this.group.classList.contains('invalid');
+  }
+
   updateValue() {
     this.validate();
     this.backup();

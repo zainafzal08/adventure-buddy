@@ -53,6 +53,13 @@ export class AdditionalStatsInputField extends LitElement {
     input.clear();
   }
 
+  isValValid(id: string) {
+    const input = this.shadowRoot?.getElementById(
+      `new-character-${id}`
+    ) as NumberField;
+    return input.isValid();
+  }
+
   get value(): AdditionalStats {
     return {
       inspiration: this.getVal('inspiration'),
@@ -74,6 +81,15 @@ export class AdditionalStatsInputField extends LitElement {
     this.clearVal('prof-bonus');
     this.clearVal('xp');
     this.clearVal('passive-wisdom');
+  }
+
+  isValid() {
+    return (
+      this.isValValid('inspiration') &&
+      this.isValValid('prof-bonus') &&
+      this.isValValid('xp') &&
+      this.isValValid('passive-wisdom')
+    );
   }
 
   render() {

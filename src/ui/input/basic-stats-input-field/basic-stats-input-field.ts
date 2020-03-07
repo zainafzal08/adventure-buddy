@@ -57,6 +57,13 @@ export class BasicStatsInputField extends LitElement {
     input.clear();
   }
 
+  isValValid(id: string) {
+    const input = this.shadowRoot?.getElementById(
+      `new-character-${id}`
+    ) as NumberField;
+    return input.isValid();
+  }
+
   get value(): BasicStats {
     const diceInput = this.shadowRoot?.getElementById(
       `new-character-hit-dice`
@@ -91,6 +98,19 @@ export class BasicStatsInputField extends LitElement {
     this.clearVal('ac');
     this.clearVal('initative');
     this.clearVal('speed');
+  }
+
+  isValid() {
+    const diceInput = this.shadowRoot?.getElementById(
+      `new-character-hit-dice`
+    ) as DiceInput;
+    return (
+      diceInput.isValid() &&
+      this.isValValid('max-health') &&
+      this.isValValid('ac') &&
+      this.isValValid('initative') &&
+      this.isValValid('speed')
+    );
   }
 
   render() {

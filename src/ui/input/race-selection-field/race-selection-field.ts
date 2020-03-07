@@ -188,6 +188,18 @@ export class RaceSelectionField extends LitElement {
     this.selectedSubrace = firstKey(RACES[this.selectedRace].subraces);
   }
 
+  get value(): { race: string; subrace: string | null } {
+    return {
+      race: this.selectedRace,
+      subrace: this.selectedSubrace,
+    };
+  }
+
+  set value(v: { race: string; subrace: string | null }) {
+    this.selectedRace = v.race;
+    this.selectedSubrace = v.subrace;
+  }
+
   firstUpdated() {
     const saved = localStorage.getItem(`saved-input-value(${this.id})`);
     if (!saved) {
@@ -211,6 +223,16 @@ export class RaceSelectionField extends LitElement {
     } else if (event === 'subrace') {
       this.selectedSubrace = id;
     }
+    this.dispatchEvent(
+      new CustomEvent('value-updated', {
+        detail: {
+          id: this.id,
+          value: this.value,
+        },
+        composed: true,
+        bubbles: true,
+      })
+    );
     this.backup();
   }
 
@@ -218,11 +240,14 @@ export class RaceSelectionField extends LitElement {
     if (this.id === '') return;
     localStorage.setItem(
       `saved-input-value(${this.id})`,
-      JSON.stringify({
-        race: this.selectedRace,
-        subrace: this.selectedSubrace,
-      })
+      JSON.stringify(this.value)
     );
+  }
+
+  isValid() {
+    // Since there is always _something_ selected this field is always
+    // in a valid state.
+    return true;
   }
 
   render() {

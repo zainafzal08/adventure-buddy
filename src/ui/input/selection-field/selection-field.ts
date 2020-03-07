@@ -3,29 +3,27 @@ import {
   customElement,
   css,
   property,
-  query,
   LitElement,
+  query,
 } from 'lit-element';
 
-@customElement('text-field')
-export class TextField extends LitElement {
-  @property() name: string = 'textField';
-  @property() placeholder: string = 'Enter Text Here';
-  @property() initial: string = '';
+@customElement('selection-field')
+export class SelectionField extends LitElement {
+  @property() name: string = 'selectionField';
+  @property() options: string[] = [];
   @property() id: string = '';
-  @property({ type: Boolean }) canBeEmpty: boolean = false;
-  @property() private help: string = '';
 
-  @query('input') input!: HTMLInputElement;
+  @query('select') select!: HTMLSelectElement;
 
   firstUpdated() {
     const saved = localStorage.getItem(`saved-input-value(${this.id})`);
+
     if (!saved) {
-      this.value = this.initial;
+      this.value = this.options[0];
       return;
     }
+
     this.value = saved;
-    this.validate();
   }
 
   static get styles() {
@@ -39,8 +37,6 @@ export class TextField extends LitElement {
         justify-content: flex-start;
         flex-direction: column;
         width: 100%;
-        margin-top: 1rem;
-        margin-bottom: 1rem;
       }
       label {
         font-size: 0.8rem;
@@ -51,60 +47,54 @@ export class TextField extends LitElement {
         color: var(--theme-primary);
         opacity: 0.7;
       }
+      .group:focus-within .underline {
+        background: var(--theme-primary);
+      }
 
-      .group input[type='text'] {
+      select {
         border: none;
-        outline: none;
-        height: 1.6rem;
+        margin-top: 0.3rem;
         width: 100%;
-        background: none;
+        margin-top: 0.6rem;
+        margin-bottom: 0.4rem;
         color: #777;
-        padding: 0.3rem 0;
-        font-size: 1.1rem;
-        border-bottom: 2px solid #ebebeb;
+        font-size: 0.9rem;
+        background: none;
+        /* So it's left aligned... */
+        margin-left: -0.5rem;
       }
-      .group:focus-within input[type='text'] {
-        border-bottom: 2px solid var(--theme-primary);
+      select:focus {
+        outline: none;
       }
-      input[type='text']::placeholder {
-        color: #cecece;
-      }
-      small {
-        margin-top: 8px;
-        color: var(--theme-emphasis-low);
-        height: 1rem;
-        font-size: 0.65rem;
+
+      .underline {
+        width: 100%;
+        height: 2px;
+        background: #ebebeb;
+        margin-bottom: 1.2rem;
       }
     `;
   }
 
-  get value() {
-    return this.input.value;
+  get value(): string {
+    return this.select.value;
   }
 
   set value(value: string) {
-    this.input.value = value;
-  }
-
-  validate() {
-    this.help = '';
-    if (!this.canBeEmpty && this.value === '') {
-      this.help = "This field can't be empty";
-    }
+    this.select.value = value;
   }
 
   isValid() {
-    return this.help === '';
+    return true;
   }
 
   clear() {
-    this.value = this.initial;
+    this.value = this.options[0];
     localStorage.removeItem(`saved-input-value(${this.id})`);
   }
 
   updateValue() {
     this.backup();
-    this.validate();
     this.dispatchEvent(
       new CustomEvent('value-updated', {
         detail: {
@@ -126,8 +116,15 @@ export class TextField extends LitElement {
     return html`
       <div class="group" @input=${this.updateValue}>
         <label for="input">${this.name}</label>
-        <input type="text" placeholder=${this.placeholder} />
-        <small> ${this.help} </small>
+        <select>
+          ${this.options.map(
+            option =>
+              html`
+                <option>${option}</option>
+              `
+          )}
+        </select>
+        <div class="underline"></div>
       </div>
     `;
   }

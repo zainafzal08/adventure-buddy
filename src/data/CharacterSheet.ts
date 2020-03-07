@@ -9,19 +9,66 @@ export interface ModifiableValue {
   proficient: boolean;
 }
 
-export type SkillsDecleration = {
+export type SkillsDeclaration = {
   [k in Skill]: ModifiableValue;
 };
 
-export type SavingThrowsDecleration = {
+export type SavingThrowsDeclaration = {
   [k in Ability]: ModifiableValue;
 };
 
-export type AbilityScoresDecleration = { [k in Ability]: number };
+export type AbilityScoresDeclaration = { [k in Ability]: number };
 
 export interface DiceDescriptor {
   count: number;
   type: number;
+}
+
+export interface HealthDeclaration {
+  max: number;
+  current: number;
+  // Temporary health is represented as a effect.
+}
+
+export interface InfoDeclaration {
+  background: string;
+  alignment: string;
+  personality: string;
+  languages: string[];
+  proficiencies: string[];
+  features: string[];
+  traits: string[];
+}
+
+export interface HitDiceDeclaration {
+  type: number;
+  count: number;
+  max: number;
+}
+
+export interface Equipment {
+  gold: number;
+}
+
+export interface SpellSlotDeclaration {
+  count: number;
+  max: number;
+}
+
+export interface SpellCastingDeclaration {
+  /** spellSlots[5] gives us the number of 5th level spell slots */
+  slots: Record<number, SpellSlotDeclaration>;
+  maxPrepared: number;
+  prepared: number[];
+  /** Spells that the character knows and doesn't have to prepare. */
+  known: number[];
+  ability: Ability;
+}
+
+export interface Effect {
+  name: string;
+  field: string;
+  change: number;
 }
 
 export interface CharacterSheet {
@@ -31,26 +78,29 @@ export interface CharacterSheet {
   /** Key which reresents this characters race, null means no subrace. */
   subrace: string | null;
   classes: ClassDescriptor[];
-  abilityScores: AbilityScoresDecleration;
+  abilityScores: AbilityScoresDeclaration;
   speed: number;
   ac: number;
-  maxHealth: number;
+  health: HealthDeclaration;
+  info: InfoDeclaration;
   initiative: number;
   inspiration: number;
   passiveWisdom: number;
   profBonus: number;
   xp: number;
-  hitDice: {
-    number: number;
-    type: number;
-  };
-  savingThrows: SavingThrowsDecleration;
-  skills: SkillsDecleration;
+  hitDice: HitDiceDeclaration;
+  savingThrows: SavingThrowsDeclaration;
+  skills: SkillsDeclaration;
   attacks: AttackDescriptor[];
+  // null for peeps with no spells.
+  spellCasting: SpellCastingDeclaration | null;
+  equipment: Equipment;
+  /** Stuff like 'shield-of-faith' has +2 to AC. */
+  effects: Effect[];
 }
 
 const DEFAULT_CHARACTER_SHEET: CharacterSheet = {
-  name: 'Ethor Stonebeard',
+  name: 'John Smith',
   race: 'human',
   subrace: null,
   classes: [first(CLASSES)],
@@ -62,16 +112,34 @@ const DEFAULT_CHARACTER_SHEET: CharacterSheet = {
     [Ability.WIS]: 10,
     [Ability.CHR]: 10,
   },
+  spellCasting: null,
+  equipment: {
+    gold: 50,
+  },
+  info: {
+    background: '',
+    alignment: '',
+    personality: '',
+    languages: [],
+    proficiencies: [],
+    features: [],
+    traits: [],
+  },
   speed: 30,
   ac: 10,
-  maxHealth: 10,
+  health: {
+    max: 10,
+    current: 10,
+  },
+  effects: [],
   initiative: 0,
   inspiration: 0,
   passiveWisdom: 10,
   profBonus: 2,
   xp: 0,
   hitDice: {
-    number: 1,
+    count: 1,
+    max: 1,
     type: 8,
   },
   savingThrows: {
@@ -103,7 +171,7 @@ const DEFAULT_CHARACTER_SHEET: CharacterSheet = {
   skills: allSkills.reduce(
     (acc, v) => ({ ...acc, [v]: { value: 0, proficient: false } }),
     {}
-  ) as SkillsDecleration,
+  ) as SkillsDeclaration,
   attacks: [],
 };
 

@@ -4,6 +4,7 @@ import './router/app-router';
 import './pages/app-home/app-home';
 import './pages/login-page/login-page';
 import './pages/settings-page/settings-page';
+import './pages/help-page/help-page';
 import './pages/new-character/new-character';
 
 // Named imports.
@@ -21,6 +22,7 @@ import { connect } from 'pwa-helpers';
 import { store } from './redux/store';
 import { AppState } from './redux/appState';
 import { Route } from './router/app-router';
+import { initArtificer } from './data/artificer';
 
 export const ROUTES: Route[] = [
   {
@@ -50,6 +52,13 @@ export const ROUTES: Route[] = [
     component: () =>
       html`
         <new-character></new-character>
+      `,
+  },
+  {
+    path: '/help',
+    component: () =>
+      html`
+        <help-page></help-page>
       `,
   },
 ];
@@ -90,6 +99,14 @@ export class AppView extends connect(store)(LitElement) {
         }
       }
     `;
+  }
+
+  firstUpdated() {
+    /**
+     * @todo Put a inital loading screen.
+     * @body We need to block UI while the artificer sets up with lunr.
+     */
+    initArtificer();
   }
 
   stateChanged(state: AppState) {

@@ -8,11 +8,12 @@ import {
   getModifier,
 } from '../../../data/ability';
 import {
-  SavingThrowsDecleration,
-  AbilityScoresDecleration,
+  SavingThrowsDeclaration,
+  AbilityScoresDeclaration,
   ModifiableValue,
 } from '../../../data/CharacterSheet';
 import { NumberProficientField } from '../number-proficient-field/number-proficient-field';
+import { all } from '../../../util';
 
 @customElement('saving-throw-input-field')
 export class SavingThrowInputField extends LitElement {
@@ -50,15 +51,15 @@ export class SavingThrowInputField extends LitElement {
     `;
   }
 
-  get values(): SavingThrowsDecleration {
-    const savingThrows: Partial<SavingThrowsDecleration> = {};
+  get values(): SavingThrowsDeclaration {
+    const savingThrows: Partial<SavingThrowsDeclaration> = {};
     for (const ability of allAbilities) {
       savingThrows[ability] = this.getValueForAbility(ability);
     }
-    return savingThrows as SavingThrowsDecleration;
+    return savingThrows as SavingThrowsDeclaration;
   }
 
-  set values(savingThrows: SavingThrowsDecleration) {
+  set values(savingThrows: SavingThrowsDeclaration) {
     for (const ability of allAbilities) {
       this.setValueForAbility(ability, savingThrows[ability]);
     }
@@ -73,15 +74,26 @@ export class SavingThrowInputField extends LitElement {
     }
   }
 
+  isValueValid(a: Ability) {
+    const input = this.shadowRoot?.getElementById(
+      `new-character-saving-throw-${a}`
+    ) as NumberProficientField;
+    return input.isValid();
+  }
+
+  isValid() {
+    return all(allAbilities.map(a => this.isValueValid(a)));
+  }
+
   autofill(
-    abilityScores: AbilityScoresDecleration,
+    abilityScores: AbilityScoresDeclaration,
     proficiencyBonus: number
   ) {
     this.values = this.generateValues(abilityScores, proficiencyBonus);
   }
 
   autofillImpossible(
-    abilityScores: AbilityScoresDecleration,
+    abilityScores: AbilityScoresDeclaration,
     proficiencyBonus: number
   ) {
     const generated = this.generateValues(
@@ -113,10 +125,10 @@ export class SavingThrowInputField extends LitElement {
   }
 
   private generateValues(
-    abilityScores: AbilityScoresDecleration,
+    abilityScores: AbilityScoresDeclaration,
     proficiencyBonus: number
-  ): SavingThrowsDecleration {
-    const generated: Partial<SavingThrowsDecleration> = {};
+  ): SavingThrowsDeclaration {
+    const generated: Partial<SavingThrowsDeclaration> = {};
     for (const ability of allAbilities) {
       const isProf = this.getValueForAbility(ability).proficient;
       let profBonus = proficiencyBonus;
@@ -130,7 +142,7 @@ export class SavingThrowInputField extends LitElement {
       };
     }
 
-    return generated as SavingThrowsDecleration;
+    return generated as SavingThrowsDeclaration;
   }
 
   render() {

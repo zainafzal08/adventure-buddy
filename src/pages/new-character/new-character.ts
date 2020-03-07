@@ -6,6 +6,7 @@ import '../../ui/input/basic-stats-input-field/basic-stats-input-field';
 import '../../ui/input/additional-stats-input-field/additional-stats-input-field';
 import '../../ui/input/saving-throw-input-field/saving-throw-input-field';
 import '../../ui/input/skills-input-field/skills-input-field';
+import '../../ui/input/spellcasting-input-field/spellcasting-input-field';
 
 import {
   LitElement,
@@ -15,7 +16,13 @@ import {
   query,
   property,
 } from 'lit-element';
-import { mdiAutoFix, mdiChevronRight, mdiDelete } from '@mdi/js';
+import {
+  mdiAutoFix,
+  mdiChevronRight,
+  mdiDelete,
+  mdiCheck,
+  mdiCancel,
+} from '@mdi/js';
 import { SavingThrowInputField } from '../../ui/input/saving-throw-input-field/saving-throw-input-field';
 import { TextField } from '../../ui/input/text-field/text-field';
 import { ClassSelectorInput } from '../../ui/input/class-selector-input/class-selector-input';
@@ -24,6 +31,8 @@ import { AbilityScoreInputField } from '../../ui/input/ability-score-input-field
 import { BasicStatsInputField } from '../../ui/input/basic-stats-input-field/basic-stats-input-field';
 import { AdditionalStatsInputField } from '../../ui/input/additional-stats-input-field/additional-stats-input-field';
 import { SkillsInputField } from '../../ui/input/skills-input-field/skills-input-field';
+import { SpellcastingInputField } from '../../ui/input/spellcasting-input-field/spellcasting-input-field';
+import climbingHuman from '../../assets/humaaans/climbing.svg';
 
 @customElement('new-character')
 export class NewCharacter extends LitElement {
@@ -46,9 +55,16 @@ export class NewCharacter extends LitElement {
   characterAdditionalStatsInput!: AdditionalStatsInputField;
   @query('skills-input-field')
   characterSkillsInput!: SkillsInputField;
+  @query('spellcasting-input-field')
+  characterSpellcastingInput!: SpellcastingInputField;
 
   @property() savingThrowAutofillDisabled: boolean = true;
   @property() skillsAutofillDisabled: boolean = true;
+  @property() spellcastingAutofillDisabled: boolean = false;
+  @property() characterValid: boolean = false;
+  @property() spellcastingDisabled: boolean = false;
+
+  private id: string = 'new-character';
 
   static get styles() {
     return css`
@@ -125,7 +141,52 @@ export class NewCharacter extends LitElement {
         right: 48px;
         bottom: 32px;
       }
+      .backdrop {
+        width: 100%;
+        height: 350px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+      }
+      .backdrop img {
+        height: 200px;
+        opacity: 0.7;
+      }
+      .backdrop p {
+        margin: 0;
+        margin-top: 32px;
+        padding: 0;
+        width: 400px;
+        color: #bbb;
+        text-align: center;
+        font-size: 0.8rem;
+      }
     `;
+  }
+
+  toggleSpellcasting() {
+    this.spellcastingDisabled = !this.spellcastingDisabled;
+    this.backup();
+  }
+
+  firstUpdated() {
+    const saved = localStorage.getItem(`saved-input-value(${this.id})`);
+    if (saved) {
+      this.spellcastingDisabled = JSON.parse(
+        saved
+      ).spellcastingDisabled;
+    }
+    this.valueUpdated();
+  }
+
+  backup() {
+    localStorage.setItem(
+      `saved-input-value(${this.id})`,
+      JSON.stringify({
+        spellcastingDisabled: this.spellcastingDisabled,
+      })
+    );
   }
 
   clear() {
@@ -139,6 +200,7 @@ export class NewCharacter extends LitElement {
     this.characterBasicStatsInput.clear();
     this.characterAdditionalStatsInput.clear();
     this.characterSkillsInput.clear();
+    this.characterSpellcastingInput.clear();
   }
 
   savingThrowAutofill() {
@@ -155,9 +217,7 @@ export class NewCharacter extends LitElement {
     this.characterSkillsInput.autofill(abilityScores, profBonus);
   }
 
-  firstUpdated() {
-    this.valueUpdated();
-  }
+  spellcastingAutofill() {}
 
   valueUpdated() {
     // Update autofill status.
@@ -174,9 +234,42 @@ export class NewCharacter extends LitElement {
       abilityScores,
       profBonus
     );
+
+    this.spellcastingAutofillDisabled = this.characterSpellcastingInput.autofillImpossible();
+
+    // Update validity status
+    this.characterValid =
+      this.characterNameInput.isValid() &&
+      this.characterAlignmentInput.isValid() &&
+      this.characterBackgroundInput.isValid() &&
+      this.characterClassInput.isValid() &&
+      this.characterRaceInput.isValid() &&
+      this.abilityScoreInput.isValid() &&
+      this.characterSavingThrowInput.isValid() &&
+      this.characterBasicStatsInput.isValid() &&
+      this.characterAdditionalStatsInput.isValid() &&
+      this.characterSkillsInput.isValid() &&
+      this.characterSpellcastingInput.isValid();
   }
 
   createCharacter() {}
+
+  renderSpellcastingInput() {
+    if (this.spellcastingDisabled) {
+      return html`
+        <div class="backdrop">
+          <img src=${climbingHuman} />
+          <p>
+            Click on the “i am a spellcaster” button above if your
+            character can do magic or else enjoy having one less step
+          </p>
+        </div>
+      `;
+    }
+    return html`
+      <spellcasting-input-field></spellcasting-input-field>
+    `;
+  }
 
   render() {
     return html`
@@ -187,17 +280,20 @@ export class NewCharacter extends LitElement {
           id="new-character-name"
           name="Character Name"
           placeholder="Enter Name Here!"
+          initial="John Smith"
         ></text-field>
         <div class="split">
           <text-field
             id="new-character-background"
             name="Background"
             placeholder="Acolyte"
+            ?canBeEmpty=${true}
           ></text-field>
           <text-field
             id="new-character-alignment"
             name="Alignment"
             placeholder="Chaotic Good"
+            ?canBeEmpty=${true}
           ></text-field>
         </div>
         <class-selector-input
@@ -214,7 +310,7 @@ export class NewCharacter extends LitElement {
           <icon-btn
             icon=${mdiAutoFix}
             size="small"
-            disabled=${this.savingThrowAutofillDisabled}
+            ?disabled=${this.savingThrowAutofillDisabled}
             @click=${() => {
               this.savingThrowAutofill();
             }}
@@ -231,7 +327,7 @@ export class NewCharacter extends LitElement {
           <icon-btn
             icon=${mdiAutoFix}
             size="small"
-            disabled=${this.skillsAutofillDisabled}
+            ?disabled=${this.skillsAutofillDisabled}
             @click=${() => {
               this.skillsAutofill();
             }}
@@ -239,6 +335,32 @@ export class NewCharacter extends LitElement {
           >
         </div>
         <skills-input-field></skills-input-field>
+        <div class="heading">
+          <h2>Spellcasting</h2>
+          <div class="v-bar"></div>
+          <icon-btn
+            icon=${this.spellcastingDisabled ? mdiCheck : mdiCancel}
+            size="small"
+            @click=${() => {
+              this.toggleSpellcasting();
+            }}
+            >${
+              this.spellcastingDisabled
+                ? 'I am a spellcaster'
+                : 'I am not a spellcaster'
+            }</icon-btn>
+          <icon-btn
+            icon=${mdiAutoFix}
+            size="small"
+            ?disabled=${this.spellcastingAutofillDisabled ||
+              this.spellcastingDisabled}
+            @click=${() => {
+              this.spellcastingAutofill();
+            }}
+            >Autofill</icon-btn>
+        </div>
+        ${this.renderSpellcastingInput()}
+      </div>
       </div>
       <div class="footer">
         <icon-btn
@@ -253,6 +375,7 @@ export class NewCharacter extends LitElement {
           icon=${mdiChevronRight}
           size="large"
           primary="true"
+          ?disabled=${!this.characterValid}
           @click=${() => {
             this.createCharacter();
           }}

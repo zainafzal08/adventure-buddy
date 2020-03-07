@@ -169,7 +169,7 @@ export class NumberField extends LitElement {
   }
 
   isValid() {
-    return this.help == '';
+    return this.help === '';
   }
 
   updateValue() {

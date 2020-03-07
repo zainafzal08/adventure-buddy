@@ -6,8 +6,9 @@ import {
   allAbilities,
   Ability,
 } from '../../../data/ability';
-import { AbilityScoresDecleration } from '../../../data/CharacterSheet';
+import { AbilityScoresDeclaration } from '../../../data/CharacterSheet';
 import { NumberField } from '../number-field/number-field';
+import { all } from '../../../util';
 
 @customElement('ability-score-input-field')
 export class AbilityScoreInputField extends LitElement {
@@ -49,15 +50,15 @@ export class AbilityScoreInputField extends LitElement {
     input.value = v;
   }
 
-  get value(): AbilityScoresDecleration {
-    const scores: Partial<AbilityScoresDecleration> = {};
+  get value(): AbilityScoresDeclaration {
+    const scores: Partial<AbilityScoresDeclaration> = {};
     for (const a of allAbilities) {
       scores[a] = this.getValueForAbility(a);
     }
-    return scores as AbilityScoresDecleration;
+    return scores as AbilityScoresDeclaration;
   }
 
-  set value(scores: AbilityScoresDecleration) {
+  set value(scores: AbilityScoresDeclaration) {
     for (const a of allAbilities) {
       this.setValueForAbility(a, scores[a]);
     }
@@ -70,6 +71,17 @@ export class AbilityScoreInputField extends LitElement {
       ) as NumberField;
       input.clear();
     }
+  }
+
+  isValueValid(a: Ability) {
+    const input = this.shadowRoot?.getElementById(
+      `new-character-ability-${a}`
+    ) as NumberField;
+    return input.isValid();
+  }
+
+  isValid() {
+    return all(allAbilities.map(a => this.isValueValid(a)));
   }
 
   render() {
