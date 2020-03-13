@@ -1,6 +1,6 @@
 import '../number-field/number-field';
 
-import { LitElement, html, customElement, css } from 'lit-element';
+import { html, customElement, css } from 'lit-element';
 import {
   SkillsDeclaration,
   AbilityScoresDeclaration,
@@ -14,29 +14,44 @@ import {
 import { NumberProficientField } from '../number-proficient-field/number-proficient-field';
 import { getModifier } from '../../../data/ability';
 import { all } from '../../../util';
+import { BaseInput } from '../base-input';
 
 @customElement('skills-input-field')
-export class SkillsInputField extends LitElement {
-  static get styles() {
-    return css`
-      :host {
-        width: 100%;
-      }
-      .fields {
-        width: 100%;
-        display: grid;
-        grid-template-columns: auto auto auto auto auto;
-      }
-      number-proficient-field {
-        width: calc(100% - 16px);
-      }
-    `;
+export class SkillsInputField extends BaseInput<SkillsDeclaration> {
+  // BaseInput Implementation:
+  getValue() {
+    const skills: Partial<SkillsDeclaration> = {};
+    for (const skill of allSkills) {
+      skills[skill] = this.getValueForSkill(skill);
+    }
+    return skills as SkillsDeclaration;
   }
+
+  setValue(skills: SkillsDeclaration) {
+    for (const skill of allSkills) {
+      this.setValueForSkill(skill, skills[skill]);
+    }
+  }
+
+  clearValue() {
+    for (const s of allSkills) {
+      const input = this.shadowRoot?.getElementById(
+        `new-character-skill-${s}`
+      ) as NumberProficientField;
+      input.clear();
+    }
+  }
+
+  valueValid() {
+    return all(allSkills.map(s => this.isSkillValid(s)));
+  }
+
+  // SkillsInputField Implementation:
 
   generateValues(scores: AbilityScoresDeclaration, profBonus: number) {
     const result: Partial<SkillsDeclaration> = {};
     for (const s of allSkills) {
-      const proficient = this.values[s].proficient;
+      const proficient = this.value[s].proficient;
       const a = getSkillAbility(s);
       const rawModifier = getModifier(scores[a]);
       result[s] = {
@@ -48,7 +63,7 @@ export class SkillsInputField extends LitElement {
   }
 
   autofill(scores: AbilityScoresDeclaration, profBonus: number) {
-    this.values = this.generateValues(scores, profBonus);
+    this.value = this.generateValues(scores, profBonus);
   }
 
   autofillImpossible(
@@ -57,7 +72,7 @@ export class SkillsInputField extends LitElement {
   ) {
     const generated = this.generateValues(scores, profBonus);
     return allSkills
-      .map(s => this.values[s].value === generated[s].value)
+      .map(s => this.value[s].value === generated[s].value)
       .reduce((acc, v) => acc && v);
   }
 
@@ -87,31 +102,21 @@ export class SkillsInputField extends LitElement {
     return field.isValid();
   }
 
-  get values(): SkillsDeclaration {
-    const skills: Partial<SkillsDeclaration> = {};
-    for (const skill of allSkills) {
-      skills[skill] = this.getValueForSkill(skill);
-    }
-    return skills as SkillsDeclaration;
-  }
-
-  set values(skills: SkillsDeclaration) {
-    for (const skill of allSkills) {
-      this.setValueForSkill(skill, skills[skill]);
-    }
-  }
-
-  clear() {
-    for (const s of allSkills) {
-      const input = this.shadowRoot?.getElementById(
-        `new-character-skill-${s}`
-      ) as NumberProficientField;
-      input.clear();
-    }
-  }
-
-  isValid() {
-    return all(allSkills.map(s => this.isSkillValid(s)));
+  // LitElement Implementation:
+  static get styles() {
+    return css`
+      :host {
+        width: 100%;
+      }
+      .fields {
+        width: 100%;
+        display: grid;
+        grid-template-columns: auto auto auto auto auto;
+      }
+      number-proficient-field {
+        width: calc(100% - 16px);
+      }
+    `;
   }
 
   render() {

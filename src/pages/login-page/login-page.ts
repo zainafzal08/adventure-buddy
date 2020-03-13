@@ -98,7 +98,7 @@ export class LoginPage extends connect(store)(LitElement) {
           providerId: result.user.providerId,
           uid: result.user.uid,
         };
-        store.dispatch({ type: 'UPDATE_USER', fields: user });
+        store.dispatch({ type: '@@user/UPDATE_USER', value: user });
         navigate('/');
       })
       .catch(function(error) {

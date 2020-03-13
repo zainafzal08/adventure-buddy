@@ -74,3 +74,7 @@ export const CLASSES: { [k in string]: ClassDescriptor } = {
     tagline: 'Weavers of the arcane who draw their magic from study.',
   },
 };
+
+export function getClassName(id: string) {
+  return CLASSES[id].name;
+}

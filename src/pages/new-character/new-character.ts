@@ -304,6 +304,9 @@ export class NewCharacter extends LitElement {
         ></race-selection-field>
         <h2>Ability Scores</h2>
         <ability-score-input-field></ability-score-input-field>
+        <h2>Core Details</h2>
+        <basic-stats-input-field></basic-stats-input-field>
+        <additional-stats-input-field></additional-stats-input-field>
         <div class="heading">
           <h2>Saving Throws</h2>
           <div class="v-bar"></div>
@@ -318,9 +321,6 @@ export class NewCharacter extends LitElement {
           >
         </div>
         <saving-throw-input-field></saving-throw-input-field>
-        <h2>Core Details</h2>
-        <basic-stats-input-field></basic-stats-input-field>
-        <additional-stats-input-field></additional-stats-input-field>
         <div class="heading">
           <h2>Skills</h2>
           <div class="v-bar"></div>

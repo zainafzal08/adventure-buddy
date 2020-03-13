@@ -7,9 +7,10 @@ import {
   query,
 } from 'lit-element';
 import { DiceDescriptor } from '../../../data/CharacterSheet';
+import { BaseInput } from '../base-input';
 
 @customElement('dice-input')
-export class DiceInput extends LitElement {
+export class DiceInput extends BaseInput<DiceDescriptor> {
   @property() name: string = 'diceField';
   @property() id: string = '';
   @property() help: string = '';
@@ -17,27 +18,47 @@ export class DiceInput extends LitElement {
   @query('#dice-count') diceCountElem!: HTMLInputElement;
   @query('#dice-type') diceTypeElem!: HTMLInputElement;
 
-  get value(): DiceDescriptor {
-    let count = parseInt(this.diceCountElem.value);
+  // BaseInput Implementation
+  getValue(): DiceDescriptor {
+    let count = parseInt(this.diceCountElem?.value);
     if (isNaN(count)) count = 1;
-    let type = parseInt(this.diceTypeElem.value);
+    let type = parseInt(this.diceTypeElem?.value);
     if (isNaN(type)) type = 8;
     return { count, type };
   }
 
-  set value(v: DiceDescriptor) {
+  setValue(v: DiceDescriptor) {
     this.diceCountElem.value = v.count.toString();
     this.diceTypeElem.value = v.type.toString();
-    this.validate();
   }
 
-  clear() {
+  clearValue() {
     this.value = {
       count: 1,
       type: 8,
     };
-    localStorage.removeItem(`saved-input-value(${this.id})`);
   }
+
+  valueValid() {
+    return this.help === '';
+  }
+
+  validate() {
+    const { count, type } = this.value;
+    this.help = '';
+    this.toggleAttribute('invalid', false);
+    if (isNaN(count) || isNaN(type)) {
+      this.help = 'Values must be numbers';
+    } else if (count <= 0 || type <= 0) {
+      this.help = 'Values must be > 0';
+    } else if (count > 99 || type > 99) {
+      this.help = 'Values must be < 99';
+    }
+
+    this.toggleAttribute('invalid', this.help !== '');
+  }
+
+  // LitElement Implementation
 
   static get styles() {
     return css`
@@ -117,68 +138,14 @@ export class DiceInput extends LitElement {
     `;
   }
 
-  isValid() {
-    return this.help === '';
-  }
-
-  validate() {
-    const { count, type } = this.value;
-    this.help = '';
-    this.toggleAttribute('invalid', false);
-    if (isNaN(count) || isNaN(type)) {
-      this.help = 'Values must be numbers';
-    } else if (count <= 0 || type <= 0) {
-      this.help = 'Values must be > 0';
-    } else if (count > 99 || type > 99) {
-      this.help = 'Values must be < 99';
-    }
-
-    this.toggleAttribute('invalid', this.help !== '');
-  }
-
-  firstUpdated() {
-    const saved = localStorage.getItem(`saved-input-value(${this.id})`);
-    if (!saved) {
-      this.value = {
-        count: 1,
-        type: 8,
-      };
-      return;
-    }
-    this.value = JSON.parse(saved);
-  }
-
-  backup() {
-    if (this.id === '') return;
-    localStorage.setItem(
-      `saved-input-value(${this.id})`,
-      JSON.stringify(this.value)
-    );
-  }
-
-  updateValue() {
-    this.validate();
-    this.backup();
-  }
-
   render() {
     return html`
       <div class="group">
         <label>${this.name}</label>
         <div class="input-container">
-          <input
-            id="dice-count"
-            class="left"
-            @input=${() => this.updateValue()}
-            type="number"
-          />
+          <input id="dice-count" class="left" value="1" type="number" />
           <span>x d</span>
-          <input
-            id="dice-type"
-            class="right"
-            @input=${() => this.updateValue()}
-            type="number"
-          />
+          <input id="dice-type" class="right" value="8" type="number" />
         </div>
         <small>${this.help}</small>
       </div>

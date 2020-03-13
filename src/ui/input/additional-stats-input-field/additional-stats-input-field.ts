@@ -1,6 +1,7 @@
 import '../number-field/number-field';
-import { LitElement, html, customElement, css } from 'lit-element';
+import { html, customElement, css } from 'lit-element';
 import { NumberField } from '../number-field/number-field';
+import { BaseInput } from '../base-input';
 
 interface AdditionalStats {
   inspiration: number;
@@ -10,26 +11,43 @@ interface AdditionalStats {
 }
 
 @customElement('additional-stats-input-field')
-export class AdditionalStatsInputField extends LitElement {
-  static get styles() {
-    return css`
-      :host {
-        width: 100%;
-      }
-      .fields {
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-      }
-      .container-med {
-        width: calc(25% - 8px);
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-      }
-    `;
+export class AdditionalStatsInputField extends BaseInput<
+  AdditionalStats
+> {
+  // BaseInput Implementation
+  getValue(): AdditionalStats {
+    return {
+      inspiration: this.getVal('inspiration'),
+      proficiencyBonus: this.getVal('prof-bonus'),
+      xp: this.getVal('xp'),
+      passiveWisdom: this.getVal('passive-wisdom'),
+    };
   }
+
+  setValue(stats: AdditionalStats) {
+    this.setVal('inspiration', stats.inspiration);
+    this.setVal('prof-bonus', stats.proficiencyBonus);
+    this.setVal('xp', stats.xp);
+    this.setVal('passive-wisdom', stats.passiveWisdom);
+  }
+
+  clearValue() {
+    this.clearVal('inspiration');
+    this.clearVal('prof-bonus');
+    this.clearVal('xp');
+    this.clearVal('passive-wisdom');
+  }
+
+  valueValid() {
+    return (
+      this.isValValid('inspiration') &&
+      this.isValValid('prof-bonus') &&
+      this.isValValid('xp') &&
+      this.isValValid('passive-wisdom')
+    );
+  }
+
+  // AdditionalStatsInputField Implementation:
 
   getVal(id: string): number {
     const input = this.shadowRoot?.getElementById(
@@ -60,36 +78,26 @@ export class AdditionalStatsInputField extends LitElement {
     return input.isValid();
   }
 
-  get value(): AdditionalStats {
-    return {
-      inspiration: this.getVal('inspiration'),
-      proficiencyBonus: this.getVal('prof-bonus'),
-      xp: this.getVal('xp'),
-      passiveWisdom: this.getVal('passive-wisdom'),
-    };
-  }
+  // LitElement Implementation:
 
-  set value(stats: AdditionalStats) {
-    this.setVal('inspiration', stats.inspiration);
-    this.setVal('prof-bonus', stats.proficiencyBonus);
-    this.setVal('xp', stats.xp);
-    this.setVal('passive-wisdom', stats.passiveWisdom);
-  }
-
-  clear() {
-    this.clearVal('inspiration');
-    this.clearVal('prof-bonus');
-    this.clearVal('xp');
-    this.clearVal('passive-wisdom');
-  }
-
-  isValid() {
-    return (
-      this.isValValid('inspiration') &&
-      this.isValValid('prof-bonus') &&
-      this.isValValid('xp') &&
-      this.isValValid('passive-wisdom')
-    );
+  static get styles() {
+    return css`
+      :host {
+        width: 100%;
+      }
+      .fields {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+      }
+      .container-med {
+        width: calc(25% - 8px);
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+      }
+    `;
   }
 
   render() {

@@ -1,12 +1,6 @@
 import '../../components/mdi-icon/mdi-icon';
 
-import {
-  LitElement,
-  html,
-  customElement,
-  css,
-  property,
-} from 'lit-element';
+import { html, customElement, css, property } from 'lit-element';
 import {
   mdiAccountMultiple,
   mdiImageFilterHdr,
@@ -17,6 +11,12 @@ import {
   mdiHumanHandsup,
 } from '@mdi/js';
 import { RACES } from '../../../data/races';
+import { BaseInput } from '../base-input';
+
+export interface RaceSelection {
+  race: string;
+  subrace: string | null;
+}
 
 function firstKey(o: Object) {
   const keys = Object.keys(o);
@@ -24,9 +24,100 @@ function firstKey(o: Object) {
 }
 
 @customElement('race-selection-field')
-export class RaceSelectionField extends LitElement {
+export class RaceSelectionField extends BaseInput<RaceSelection> {
   @property() selectedRace!: string;
   @property() selectedSubrace: string | null = null;
+
+  // BaseInput Implementation:
+
+  getValue(): RaceSelection {
+    const race = this.selectedRace || (firstKey(RACES) as string);
+    const subrace =
+      this.selectedSubrace || firstKey(RACES[race].subraces);
+    return {
+      race,
+      subrace,
+    };
+  }
+
+  setValue(v: RaceSelection) {
+    this.selectedRace = v.race;
+    this.selectedSubrace = v.subrace;
+  }
+
+  clearValue() {
+    this.selectedRace = firstKey(RACES) as string;
+    this.selectedSubrace = firstKey(RACES[this.selectedRace].subraces);
+  }
+
+  // RaceSelectionField Implementation:
+
+  getIcon(raceKey: string) {
+    switch (raceKey) {
+      case 'dwarf':
+        return mdiImageFilterHdr;
+      case 'elf':
+        return mdiLeaf;
+      case 'halfling':
+        return mdiHumanChild;
+      case 'human':
+        return mdiHumanMale;
+      case 'dragonborn':
+        return mdiFire;
+      case 'gnome':
+        return mdiHumanHandsup;
+      case 'half-elf':
+        return mdiLeaf;
+      case 'half-orc':
+        return mdiFire;
+      case 'tiefling':
+        return mdiFire;
+      default:
+        return mdiAccountMultiple;
+    }
+  }
+
+  renderCard(
+    id: string,
+    title: string,
+    subtitle: string,
+    active: boolean,
+    event: string
+  ) {
+    return html`
+      <div
+        class="card ${active ? 'active' : ''}"
+        id=${id}
+        @click=${() => this.changeSelection(event, id)}
+      >
+        <mdi-icon
+          color="var(--theme-primary)"
+          background=${active
+            ? 'rgba(255, 255, 255, 0.8)'
+            : 'var(--theme-primary-light)'}
+          size="20"
+          icon=${this.getIcon(id)}
+        ></mdi-icon>
+        <div class="text">
+          <h1>${title}</h1>
+          <p>${subtitle}</p>
+        </div>
+      </div>
+    `;
+  }
+
+  changeSelection(event: string, id: string) {
+    const value = this.value;
+    if (event === 'race') {
+      value.race = id;
+      value.subrace = firstKey(RACES[id].subraces);
+    } else if (event === 'subrace') {
+      value.subrace = id;
+    }
+    this.value = value;
+  }
+
+  // LitElement Implementation:
 
   static get styles() {
     return css`
@@ -127,134 +218,9 @@ export class RaceSelectionField extends LitElement {
     `;
   }
 
-  getIcon(raceKey: string) {
-    switch (raceKey) {
-      case 'dwarf':
-        return mdiImageFilterHdr;
-      case 'elf':
-        return mdiLeaf;
-      case 'halfling':
-        return mdiHumanChild;
-      case 'human':
-        return mdiHumanMale;
-      case 'dragonborn':
-        return mdiFire;
-      case 'gnome':
-        return mdiHumanHandsup;
-      case 'half-elf':
-        return mdiLeaf;
-      case 'half-orc':
-        return mdiFire;
-      case 'tiefling':
-        return mdiFire;
-      default:
-        return mdiAccountMultiple;
-    }
-  }
-
-  renderCard(
-    id: string,
-    title: string,
-    subtitle: string,
-    active: boolean,
-    event: string
-  ) {
-    return html`
-      <div
-        class="card ${active ? 'active' : ''}"
-        id=${id}
-        @click=${() => this.changeSelection(event, id)}
-      >
-        <mdi-icon
-          color="var(--theme-primary)"
-          background=${active
-            ? 'rgba(255, 255, 255, 0.8)'
-            : 'var(--theme-primary-light)'}
-          size="20"
-          icon=${this.getIcon(id)}
-        ></mdi-icon>
-        <div class="text">
-          <h1>${title}</h1>
-          <p>${subtitle}</p>
-        </div>
-      </div>
-    `;
-  }
-
-  constructor() {
-    super();
-    // Default
-    this.selectedRace = firstKey(RACES) as string;
-    this.selectedSubrace = firstKey(RACES[this.selectedRace].subraces);
-  }
-
-  get value(): { race: string; subrace: string | null } {
-    return {
-      race: this.selectedRace,
-      subrace: this.selectedSubrace,
-    };
-  }
-
-  set value(v: { race: string; subrace: string | null }) {
-    this.selectedRace = v.race;
-    this.selectedSubrace = v.subrace;
-  }
-
-  firstUpdated() {
-    const saved = localStorage.getItem(`saved-input-value(${this.id})`);
-    if (!saved) {
-      return;
-    }
-    const selected = JSON.parse(saved);
-    this.selectedRace = selected.race;
-    this.selectedSubrace = selected.subrace;
-  }
-
-  clear() {
-    // Default
-    this.selectedRace = firstKey(RACES) as string;
-    this.selectedSubrace = firstKey(RACES[this.selectedRace].subraces);
-  }
-
-  changeSelection(event: string, id: string) {
-    if (event === 'race') {
-      this.selectedRace = id;
-      this.selectedSubrace = firstKey(RACES[id].subraces);
-    } else if (event === 'subrace') {
-      this.selectedSubrace = id;
-    }
-    this.dispatchEvent(
-      new CustomEvent('value-updated', {
-        detail: {
-          id: this.id,
-          value: this.value,
-        },
-        composed: true,
-        bubbles: true,
-      })
-    );
-    this.backup();
-  }
-
-  backup() {
-    if (this.id === '') return;
-    localStorage.setItem(
-      `saved-input-value(${this.id})`,
-      JSON.stringify(this.value)
-    );
-  }
-
-  isValid() {
-    // Since there is always _something_ selected this field is always
-    // in a valid state.
-    return true;
-  }
-
   render() {
     const allRaces = Object.entries(RACES);
-    const allSubRaces = Object.entries(
-      RACES[this.selectedRace].subraces
-    );
+    const allSubRaces = Object.entries(RACES[this.value.race].subraces);
 
     return html`
       <div class="group">
@@ -265,7 +231,7 @@ export class RaceSelectionField extends LitElement {
               raceKey,
               race.name,
               race.tagline,
-              this.selectedRace === raceKey,
+              this.value.race === raceKey,
               'race'
             )
           )}
@@ -273,17 +239,17 @@ export class RaceSelectionField extends LitElement {
       </div>
       <div class="group">
         <label tabindex="0">Subrace</label>
-        <div class="list ${this.selectedSubrace ? '' : 'inactive'}">
+        <div class="list ${this.value.subrace ? '' : 'inactive'}">
           ${allSubRaces.map(([subRaceKey, subrace]) =>
             this.renderCard(
               subRaceKey,
               subrace.fullName,
               subrace.tagline,
-              this.selectedSubrace === subRaceKey,
+              this.value.subrace === subRaceKey,
               'subrace'
             )
           )}
-          ${this.selectedSubrace
+          ${this.value.subrace
             ? null
             : html`
                 <p>You don't need to pick a subrace for this one!</p>

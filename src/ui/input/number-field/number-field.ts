@@ -1,14 +1,12 @@
-import {
-  html,
-  customElement,
-  css,
-  property,
-  query,
-  LitElement,
-} from 'lit-element';
+import { html, customElement, css, property, query } from 'lit-element';
+import { BaseInput } from '../base-input';
+
+function notNum(v: string) {
+  return isNaN(parseInt(v));
+}
 
 @customElement('number-field')
-export class NumberField extends LitElement {
+export class NumberField extends BaseInput<number> {
   // User facing
   @property() name: string = 'numberField';
   @property() inital: number | null = null;
@@ -18,6 +16,73 @@ export class NumberField extends LitElement {
   @property() private help: string = '';
   @query('.group') private group!: HTMLDivElement;
   @query('input') private input!: HTMLInputElement;
+
+  // BaseInput Implementation:
+
+  validate() {
+    const value = this.input.value;
+    // Debounce calls made before object is ready
+    if (this.group === null) return;
+    let error = '';
+    this.help = '';
+
+    if (notNum(value)) {
+      error = 'Value must be a number';
+    } else if (!this.inRange(parseInt(value))) {
+      if (this.start !== null && this.stop !== null) {
+        error = `Value must be between ${this.start} and ${this.stop}`;
+      } else if (this.stop !== null) {
+        error = `Value must not exceed ${this.stop}`;
+      } else {
+        error = `Value must be at least ${this.start}`;
+      }
+    }
+    if (error) {
+      this.help = error;
+    }
+    this.group.classList.toggle('invalid', error !== '');
+  }
+
+  getValue() {
+    if (!this.input) return this.getInitialValue();
+    const v = parseInt(this.input.value);
+    if (isNaN(v)) return this.getInitialValue();
+    return v;
+  }
+
+  setValue(v: number) {
+    this.input.value = v.toString();
+  }
+
+  clearValue() {
+    this.value = this.getInitialValue();
+  }
+
+  valueValid() {
+    return this.help === '';
+  }
+
+  // NumberField Implementation:
+  getInitialValue() {
+    let initialValue = this.inital;
+    if (initialValue === null) {
+      initialValue = this.start === null ? 0 : this.start;
+    }
+    return initialValue;
+  }
+
+  inRange(v: number) {
+    let valid = true;
+    if (this.stop !== null) {
+      valid = valid && v <= this.stop;
+    }
+    if (this.start !== null) {
+      valid = valid && v >= this.start;
+    }
+    return valid;
+  }
+
+  // LitElement Implementation:
 
   static get styles() {
     return css`
@@ -88,108 +153,9 @@ export class NumberField extends LitElement {
     `;
   }
 
-  getInitialValue() {
-    let initialValue = this.inital;
-    if (initialValue === null) {
-      initialValue = this.start === null ? 0 : this.start;
-    }
-    return initialValue;
-  }
-  firstUpdated() {
-    const saved = localStorage.getItem(`saved-input-value(${this.id})`);
-    if (!saved) {
-      this.value = this.getInitialValue();
-      return;
-    }
-    this.value = parseInt(saved);
-    this.updateValue();
-  }
-
-  backup() {
-    localStorage.setItem(
-      `saved-input-value(${this.id})`,
-      this.value.toString()
-    );
-  }
-
-  notNum(v: string) {
-    return isNaN(parseInt(v));
-  }
-
-  inRange(v: number) {
-    let valid = true;
-    if (this.stop !== null) {
-      valid = valid && v <= this.stop;
-    }
-    if (this.start !== null) {
-      valid = valid && v >= this.start;
-    }
-    return valid;
-  }
-
-  validate() {
-    const value = this.input.value;
-    // Debounce calls made before object is ready
-    if (this.group === null) return;
-    let error = '';
-    this.help = '';
-
-    if (this.notNum(value)) {
-      error = 'Value must be a number';
-    } else if (!this.inRange(parseInt(value))) {
-      if (this.start !== null && this.stop !== null) {
-        error = `Value must be between ${this.start} and ${this.stop}`;
-      } else if (this.stop !== null) {
-        error = `Value must not exceed ${this.stop}`;
-      } else {
-        error = `Value must be at least ${this.start}`;
-      }
-    }
-    if (error) {
-      this.help = error;
-    }
-    this.group.classList.toggle('invalid', error !== '');
-  }
-
-  get value() {
-    if (!this.input) return this.getInitialValue();
-    const v = parseInt(this.input.value);
-    if (isNaN(v)) return this.start === null ? 0 : this.start;
-    return v;
-  }
-
-  set value(v: number) {
-    this.input.value = v.toString();
-    this.validate();
-  }
-
-  clear() {
-    this.value = this.getInitialValue();
-    localStorage.removeItem(`saved-input-value(${this.id})`);
-  }
-
-  isValid() {
-    return this.help === '';
-  }
-
-  updateValue() {
-    this.validate();
-    this.dispatchEvent(
-      new CustomEvent('value-updated', {
-        detail: {
-          id: this.id,
-          value: this.value,
-        },
-        composed: true,
-        bubbles: true,
-      })
-    );
-    this.backup();
-  }
-
   render() {
     return html`
-      <div class="group" @input=${this.updateValue}>
+      <div class="group">
         <label for="input">${this.name}</label>
         <input
           type="number"

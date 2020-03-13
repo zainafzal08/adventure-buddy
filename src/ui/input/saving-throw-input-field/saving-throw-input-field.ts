@@ -14,44 +14,15 @@ import {
 } from '../../../data/CharacterSheet';
 import { NumberProficientField } from '../number-proficient-field/number-proficient-field';
 import { all } from '../../../util';
+import { BaseInput } from '../base-input';
 
 @customElement('saving-throw-input-field')
-export class SavingThrowInputField extends LitElement {
-  static get styles() {
-    return css`
-      :host {
-        width: 100%;
-        height: fit-content;
-      }
-      .fields {
-        width: 100%;
-        height: fit-content;
-        display: flex;
-        justify-content: space-between;
-      }
-      .container {
-        width: calc(100% / 6 - 12px);
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-        box-sizing: border-box;
-      }
-      input {
-        width: 100%;
-        background: none;
-        outline: none;
-        border: none;
-        border-bottom: 2px solid #ebebeb;
-        text-align: center;
-        font-size: 1.2rem;
-        color: #444;
-        padding-bottom: 4px;
-        font-family: var(--font-stack);
-      }
-    `;
-  }
+export class SavingThrowInputField extends BaseInput<
+  SavingThrowsDeclaration
+> {
+  // BaseInput Implementation:
 
-  get values(): SavingThrowsDeclaration {
+  getValue(): SavingThrowsDeclaration {
     const savingThrows: Partial<SavingThrowsDeclaration> = {};
     for (const ability of allAbilities) {
       savingThrows[ability] = this.getValueForAbility(ability);
@@ -59,13 +30,13 @@ export class SavingThrowInputField extends LitElement {
     return savingThrows as SavingThrowsDeclaration;
   }
 
-  set values(savingThrows: SavingThrowsDeclaration) {
+  setValue(savingThrows: SavingThrowsDeclaration) {
     for (const ability of allAbilities) {
       this.setValueForAbility(ability, savingThrows[ability]);
     }
   }
 
-  clear() {
+  clearValue() {
     for (const a of allAbilities) {
       const input = this.shadowRoot?.getElementById(
         `new-character-saving-throw-${a}`
@@ -74,6 +45,12 @@ export class SavingThrowInputField extends LitElement {
     }
   }
 
+  valueValid() {
+    return all(allAbilities.map(a => this.isValueValid(a)));
+  }
+
+  // SavingThrowInputField Implementation:
+
   isValueValid(a: Ability) {
     const input = this.shadowRoot?.getElementById(
       `new-character-saving-throw-${a}`
@@ -81,15 +58,11 @@ export class SavingThrowInputField extends LitElement {
     return input.isValid();
   }
 
-  isValid() {
-    return all(allAbilities.map(a => this.isValueValid(a)));
-  }
-
   autofill(
     abilityScores: AbilityScoresDeclaration,
     proficiencyBonus: number
   ) {
-    this.values = this.generateValues(abilityScores, proficiencyBonus);
+    this.value = this.generateValues(abilityScores, proficiencyBonus);
   }
 
   autofillImpossible(
@@ -101,7 +74,7 @@ export class SavingThrowInputField extends LitElement {
       proficiencyBonus
     );
     return allAbilities
-      .map(a => this.values[a].value === generated[a].value)
+      .map(a => this.value[a].value === generated[a].value)
       .reduce((acc, v) => acc && v, true);
   }
 
@@ -143,6 +116,42 @@ export class SavingThrowInputField extends LitElement {
     }
 
     return generated as SavingThrowsDeclaration;
+  }
+
+  // LitElement Implementation:
+
+  static get styles() {
+    return css`
+      :host {
+        width: 100%;
+        height: fit-content;
+      }
+      .fields {
+        width: 100%;
+        height: fit-content;
+        display: flex;
+        justify-content: space-between;
+      }
+      .container {
+        width: calc(100% / 6 - 12px);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        box-sizing: border-box;
+      }
+      input {
+        width: 100%;
+        background: none;
+        outline: none;
+        border: none;
+        border-bottom: 2px solid #ebebeb;
+        text-align: center;
+        font-size: 1.2rem;
+        color: #444;
+        padding-bottom: 4px;
+        font-family: var(--font-stack);
+      }
+    `;
   }
 
   render() {

@@ -1,31 +1,28 @@
-import {
-  html,
-  customElement,
-  css,
-  property,
-  LitElement,
-  query,
-} from 'lit-element';
+import { html, customElement, css, property, query } from 'lit-element';
+import { BaseInput } from '../base-input';
 
 @customElement('selection-field')
-export class SelectionField extends LitElement {
+export class SelectionField extends BaseInput<string> {
   @property() name: string = 'selectionField';
   @property() options: string[] = [];
   @property() id: string = '';
 
   @query('select') select!: HTMLSelectElement;
 
-  firstUpdated() {
-    const saved = localStorage.getItem(`saved-input-value(${this.id})`);
-
-    if (!saved) {
-      this.value = this.options[0];
-      return;
-    }
-
-    this.value = saved;
+  // BaseInput Implementation:
+  getValue(): string {
+    return this.select.value;
   }
 
+  setValue(value: string) {
+    this.select.value = value;
+  }
+
+  clearValue() {
+    this.value = this.options[0];
+  }
+
+  // LitElement Implementation:
   static get styles() {
     return css`
       :host {
@@ -76,45 +73,9 @@ export class SelectionField extends LitElement {
     `;
   }
 
-  get value(): string {
-    return this.select.value;
-  }
-
-  set value(value: string) {
-    this.select.value = value;
-  }
-
-  isValid() {
-    return true;
-  }
-
-  clear() {
-    this.value = this.options[0];
-    localStorage.removeItem(`saved-input-value(${this.id})`);
-  }
-
-  updateValue() {
-    this.backup();
-    this.dispatchEvent(
-      new CustomEvent('value-updated', {
-        detail: {
-          id: this.id,
-          value: this.value,
-        },
-        composed: true,
-        bubbles: true,
-      })
-    );
-  }
-
-  backup() {
-    if (this.id === '') return;
-    localStorage.setItem(`saved-input-value(${this.id})`, this.value);
-  }
-
   render() {
     return html`
-      <div class="group" @input=${this.updateValue}>
+      <div class="group">
         <label for="input">${this.name}</label>
         <select>
           ${this.options.map(

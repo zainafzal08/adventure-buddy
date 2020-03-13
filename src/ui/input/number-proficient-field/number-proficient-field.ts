@@ -1,21 +1,66 @@
-import {
-  LitElement,
-  html,
-  customElement,
-  css,
-  property,
-  query,
-} from 'lit-element';
+import { html, customElement, css, property, query } from 'lit-element';
 import { ModifiableValue } from '../../../data/CharacterSheet';
+import { BaseInput } from '../base-input';
+
+function notNum(v: string) {
+  return isNaN(parseInt(v));
+}
 
 @customElement('number-proficient-field')
-export class NumberProficientField extends LitElement {
+export class NumberProficientField extends BaseInput<ModifiableValue> {
   @property({ attribute: true }) name: string = 'numberProficientField';
   @property() id: string = '';
 
   @query('input') input!: HTMLInputElement;
   @query('.group') group!: HTMLDivElement;
 
+  // BaseInput Implementation:
+  getValue() {
+    let v;
+    if (!this.input) {
+      v = 0;
+    } else {
+      v = parseInt(this.input.value);
+      if (isNaN(v)) v = 0;
+    }
+    return {
+      value: v,
+      proficient: this.hasAttribute('proficient'),
+    };
+  }
+
+  setValue(score: ModifiableValue) {
+    if (!this.input) return;
+    this.input.value = score.value.toString();
+    this.toggleAttribute('proficient', score.proficient);
+  }
+
+  clearValue() {
+    this.value = {
+      value: 0,
+      proficient: false,
+    };
+  }
+
+  validate() {
+    if (!this.group) return;
+    this.group.classList.toggle('invalid', notNum(this.input.value));
+  }
+
+  valueValid() {
+    if (!this.group) return false;
+    return !this.group.classList.contains('invalid');
+  }
+
+  // NumberProficientField Implementation:
+  toggleProficiency() {
+    this.value = {
+      ...this.value,
+      proficient: !this.value.proficient,
+    };
+  }
+
+  // LitElement Implementation:
   static get styles() {
     return css`
       :host {
@@ -135,100 +180,15 @@ export class NumberProficientField extends LitElement {
     `;
   }
 
-  notNum(v: string) {
-    return isNaN(parseInt(v));
-  }
-
-  validate() {
-    this.group.classList.toggle(
-      'invalid',
-      this.notNum(this.input.value)
-    );
-  }
-
-  get value() {
-    let v;
-    if (!this.input) {
-      v = 0;
-    } else {
-      v = parseInt(this.input.value);
-      if (isNaN(v)) v = 0;
-    }
-    return {
-      value: v,
-      proficient: this.hasAttribute('proficient'),
-    };
-  }
-
-  set value(score: ModifiableValue) {
-    this.input.value = score.value.toString();
-    this.toggleAttribute('proficient', score.proficient);
-    this.updateValue();
-  }
-
-  clear() {
-    this.value = {
-      value: 0,
-      proficient: false,
-    };
-    localStorage.removeItem(`saved-input-value(${this.id})`);
-  }
-
-  isValid() {
-    if (!this.group) return false;
-    return !this.group.classList.contains('invalid');
-  }
-
-  updateValue() {
-    this.validate();
-    this.backup();
-    this.dispatchEvent(
-      new CustomEvent('value-updated', {
-        detail: {
-          id: this.id,
-          value: this.value,
-        },
-        composed: true,
-        bubbles: true,
-      })
-    );
-  }
-
-  firstUpdated() {
-    const saved = localStorage.getItem(`saved-input-value(${this.id})`);
-    if (!saved) {
-      this.value = {
-        value: 0,
-        proficient: false,
-      };
-      return;
-    }
-    this.value = JSON.parse(saved);
-  }
-
-  backup() {
-    localStorage.setItem(
-      `saved-input-value(${this.id})`,
-      JSON.stringify(this.value)
-    );
-  }
-
   render() {
     return html`
       <div class="group">
         <label for="input">${this.name}</label>
-        <input
-          id="input"
-          type="number"
-          @input=${() => this.updateValue()}
-        />
+        <input id="input" type="number" />
         <div class="footer">
           <div
             class="prof-button"
-            @click=${() => {
-              this.toggleAttribute('proficient');
-              this.updateValue();
-            }}
+            @click=${() => this.toggleProficiency()}
           >
             Proficient
           </div>

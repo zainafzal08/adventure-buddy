@@ -1,6 +1,6 @@
 import '../number-field/number-field';
 
-import { LitElement, html, customElement, css } from 'lit-element';
+import { html, customElement, css } from 'lit-element';
 import {
   abilityShorthand,
   allAbilities,
@@ -9,9 +9,66 @@ import {
 import { AbilityScoresDeclaration } from '../../../data/CharacterSheet';
 import { NumberField } from '../number-field/number-field';
 import { all } from '../../../util';
+import { BaseInput } from '../base-input';
 
 @customElement('ability-score-input-field')
-export class AbilityScoreInputField extends LitElement {
+export class AbilityScoreInputField extends BaseInput<
+  AbilityScoresDeclaration
+> {
+  // BaseInput Implementation:
+  getValue(): AbilityScoresDeclaration {
+    const scores: Partial<AbilityScoresDeclaration> = {};
+    for (const a of allAbilities) {
+      scores[a] = this.getValueForAbility(a);
+    }
+    return scores as AbilityScoresDeclaration;
+  }
+
+  setValue(scores: AbilityScoresDeclaration) {
+    for (const a of allAbilities) {
+      this.setValueForAbility(a, scores[a]);
+    }
+  }
+
+  clearValue() {
+    for (const a of allAbilities) {
+      const input = this.shadowRoot?.getElementById(
+        `new-character-ability-${a}`
+      ) as NumberField;
+      input.clear();
+    }
+  }
+
+  valueValid() {
+    return all(allAbilities.map(a => this.isValueValid(a)));
+  }
+
+  // AbilityScoreInputField Implementation:
+
+  getValueForAbility(a: Ability): number {
+    const input = this.shadowRoot?.getElementById(
+      `new-character-ability-${a}`
+    ) as NumberField;
+    if (!input) return 10;
+    return input.value;
+  }
+
+  setValueForAbility(a: Ability, v: number) {
+    const input = this.shadowRoot?.getElementById(
+      `new-character-ability-${a}`
+    ) as NumberField;
+    input.value = v;
+  }
+
+  isValueValid(a: Ability) {
+    const input = this.shadowRoot?.getElementById(
+      `new-character-ability-${a}`
+    ) as NumberField;
+    return input.isValid();
+  }
+
+  // LitElement Implementation:
+
   static get styles() {
     return css`
       :host {
@@ -33,55 +90,6 @@ export class AbilityScoreInputField extends LitElement {
         width: calc(100% / var(--num-scores) - 12px);
       }
     `;
-  }
-
-  getValueForAbility(a: Ability): number {
-    const input = this.shadowRoot?.getElementById(
-      `new-character-ability-${a}`
-    ) as NumberField;
-    if (!input) return 10;
-    return input.value;
-  }
-
-  setValueForAbility(a: Ability, v: number) {
-    const input = this.shadowRoot?.getElementById(
-      `new-character-ability-${a}`
-    ) as NumberField;
-    input.value = v;
-  }
-
-  get value(): AbilityScoresDeclaration {
-    const scores: Partial<AbilityScoresDeclaration> = {};
-    for (const a of allAbilities) {
-      scores[a] = this.getValueForAbility(a);
-    }
-    return scores as AbilityScoresDeclaration;
-  }
-
-  set value(scores: AbilityScoresDeclaration) {
-    for (const a of allAbilities) {
-      this.setValueForAbility(a, scores[a]);
-    }
-  }
-
-  clear() {
-    for (const a of allAbilities) {
-      const input = this.shadowRoot?.getElementById(
-        `new-character-ability-${a}`
-      ) as NumberField;
-      input.clear();
-    }
-  }
-
-  isValueValid(a: Ability) {
-    const input = this.shadowRoot?.getElementById(
-      `new-character-ability-${a}`
-    ) as NumberField;
-    return input.isValid();
-  }
-
-  isValid() {
-    return all(allAbilities.map(a => this.isValueValid(a)));
   }
 
   render() {

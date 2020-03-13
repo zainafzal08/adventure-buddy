@@ -1,14 +1,9 @@
-import {
-  html,
-  customElement,
-  css,
-  property,
-  query,
-  LitElement,
-} from 'lit-element';
+import { html, customElement, css, property, query } from 'lit-element';
+
+import { BaseInput } from '../base-input';
 
 @customElement('text-field')
-export class TextField extends LitElement {
+export class TextField extends BaseInput<string> {
   @property() name: string = 'textField';
   @property() placeholder: string = 'Enter Text Here';
   @property() initial: string = '';
@@ -18,16 +13,31 @@ export class TextField extends LitElement {
 
   @query('input') input!: HTMLInputElement;
 
-  firstUpdated() {
-    const saved = localStorage.getItem(`saved-input-value(${this.id})`);
-    if (!saved) {
-      this.value = this.initial;
-      return;
-    }
-    this.value = saved;
-    this.validate();
+  // BaseInput Implemenetation:
+  getValue() {
+    return this.input.value;
   }
 
+  setValue(value: string) {
+    this.input.value = value;
+  }
+
+  clearValue() {
+    this.value = this.initial;
+  }
+
+  valueValid() {
+    return this.help === '';
+  }
+
+  validate() {
+    this.help = '';
+    if (!this.canBeEmpty && this.value === '') {
+      this.help = "This field can't be empty";
+    }
+  }
+
+  // LitElement Implementation:
   static get styles() {
     return css`
       :host {
@@ -46,12 +56,10 @@ export class TextField extends LitElement {
         font-size: 0.8rem;
         color: #aaa;
       }
-
       .group:focus-within label {
         color: var(--theme-primary);
         opacity: 0.7;
       }
-
       .group input[type='text'] {
         border: none;
         outline: none;
@@ -78,55 +86,15 @@ export class TextField extends LitElement {
     `;
   }
 
-  get value() {
-    return this.input.value;
-  }
-
-  set value(value: string) {
-    this.input.value = value;
-  }
-
-  validate() {
-    this.help = '';
-    if (!this.canBeEmpty && this.value === '') {
-      this.help = "This field can't be empty";
-    }
-  }
-
-  isValid() {
-    return this.help === '';
-  }
-
-  clear() {
-    this.value = this.initial;
-    localStorage.removeItem(`saved-input-value(${this.id})`);
-  }
-
-  updateValue() {
-    this.backup();
-    this.validate();
-    this.dispatchEvent(
-      new CustomEvent('value-updated', {
-        detail: {
-          id: this.id,
-          value: this.value,
-        },
-        composed: true,
-        bubbles: true,
-      })
-    );
-  }
-
-  backup() {
-    if (this.id === '') return;
-    localStorage.setItem(`saved-input-value(${this.id})`, this.value);
-  }
-
   render() {
     return html`
-      <div class="group" @input=${this.updateValue}>
+      <div class="group" @input=${this.valueChanged}>
         <label for="input">${this.name}</label>
-        <input type="text" placeholder=${this.placeholder} />
+        <input
+          type="text"
+          placeholder=${this.placeholder}
+          value=${this.initial}
+        />
         <small> ${this.help} </small>
       </div>
     `;

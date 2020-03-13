@@ -5,6 +5,7 @@ import { LitElement, html, customElement, css } from 'lit-element';
 import { DiceDescriptor } from '../../../data/CharacterSheet';
 import { NumberField } from '../number-field/number-field';
 import { DiceInput } from '../dice-input/dice-input';
+import { BaseInput } from '../base-input';
 
 interface BasicStats {
   maxHealth: number;
@@ -15,27 +16,58 @@ interface BasicStats {
 }
 
 @customElement('basic-stats-input-field')
-export class BasicStatsInputField extends LitElement {
-  static get styles() {
-    return css`
-      :host {
-        width: 100%;
-      }
-      .fields {
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-      }
-      .container-med {
-        width: calc(20% - 12px);
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-      }
-    `;
+export class BasicStatsInputField extends BaseInput<BasicStats> {
+  // BaseInput Implementation:
+  getValue(): BasicStats {
+    const diceInput = this.shadowRoot?.getElementById(
+      `new-character-hit-dice`
+    ) as DiceInput;
+    return {
+      maxHealth: this.getVal('max-health'),
+      hitDice: diceInput.value,
+      ac: this.getVal('ac'),
+      initative: this.getVal('initative'),
+      speed: this.getVal('speed'),
+    };
   }
 
+  setValue(stats: BasicStats) {
+    const diceInput = this.shadowRoot?.getElementById(
+      `new-character-hit-dice`
+    ) as DiceInput;
+    diceInput.value = stats.hitDice;
+
+    this.setVal('max-health', stats.maxHealth);
+    this.setVal('ac', stats.ac);
+    this.setVal('initative', stats.initative);
+    this.setVal('speed', stats.speed);
+  }
+
+  clearValue() {
+    const diceInput = this.shadowRoot?.getElementById(
+      `new-character-hit-dice`
+    ) as DiceInput;
+    diceInput.clear();
+    this.clearVal('max-health');
+    this.clearVal('ac');
+    this.clearVal('initative');
+    this.clearVal('speed');
+  }
+
+  valueValid() {
+    const diceInput = this.shadowRoot?.getElementById(
+      `new-character-hit-dice`
+    ) as DiceInput;
+    return (
+      diceInput.isValid() &&
+      this.isValValid('max-health') &&
+      this.isValValid('ac') &&
+      this.isValValid('initative') &&
+      this.isValValid('speed')
+    );
+  }
+
+  // BaseStatsInputField Implementation:
   getVal(id: string): number {
     const input = this.shadowRoot?.getElementById(
       `new-character-${id}`
@@ -64,53 +96,26 @@ export class BasicStatsInputField extends LitElement {
     return input.isValid();
   }
 
-  get value(): BasicStats {
-    const diceInput = this.shadowRoot?.getElementById(
-      `new-character-hit-dice`
-    ) as DiceInput;
-    return {
-      maxHealth: this.getVal('max-health'),
-      hitDice: diceInput.value,
-      ac: this.getVal('ac'),
-      initative: this.getVal('initative'),
-      speed: this.getVal('speed'),
-    };
-  }
-
-  set value(stats: BasicStats) {
-    const diceInput = this.shadowRoot?.getElementById(
-      `new-character-hit-dice`
-    ) as DiceInput;
-    diceInput.value = stats.hitDice;
-
-    this.setVal('max-health', stats.maxHealth);
-    this.setVal('ac', stats.ac);
-    this.setVal('initative', stats.initative);
-    this.setVal('speed', stats.speed);
-  }
-
-  clear() {
-    const diceInput = this.shadowRoot?.getElementById(
-      `new-character-hit-dice`
-    ) as DiceInput;
-    diceInput.clear();
-    this.clearVal('max-health');
-    this.clearVal('ac');
-    this.clearVal('initative');
-    this.clearVal('speed');
-  }
-
-  isValid() {
-    const diceInput = this.shadowRoot?.getElementById(
-      `new-character-hit-dice`
-    ) as DiceInput;
-    return (
-      diceInput.isValid() &&
-      this.isValValid('max-health') &&
-      this.isValValid('ac') &&
-      this.isValValid('initative') &&
-      this.isValValid('speed')
-    );
+  // LitElement Implementation:
+  static get styles() {
+    return css`
+      :host {
+        width: 100%;
+      }
+      .fields {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 24px;
+      }
+      .container-med {
+        width: calc(20% - 12px);
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+      }
+    `;
   }
 
   render() {

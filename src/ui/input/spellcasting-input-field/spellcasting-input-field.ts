@@ -1,42 +1,47 @@
 import '../selection-field/selection-field';
 import '../spell-input/spell-input';
 
-import {
-  css,
-  customElement,
-  LitElement,
-  html,
-  property,
-} from 'lit-element';
+import { css, customElement, html } from 'lit-element';
 import { NumberField } from '../number-field/number-field';
 import { SpellCastingDeclaration } from '../../../data/CharacterSheet';
 import { Ability, allAbilities } from '../../../data/ability';
 import { range } from '../../../util';
+import { BaseInput } from '../base-input';
 
 @customElement('spellcasting-input-field')
-export class SpellcastingInputField extends LitElement {
-  static get styles() {
-    return css`
-      :host {
-        width: 100%;
-      }
-      .row {
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-        margin-bottom: 16px;
-      }
-      .row:first-child {
-        margin-bottom: 48px;
-        margin-top: 32px;
-      }
-      .row * {
-        width: calc(100% / 3 - 12px);
-      }
-    `;
+export class SpellcastingInputField extends BaseInput<
+  SpellCastingDeclaration
+> {
+  // BaseInput Implementation:
+  getValue(): SpellCastingDeclaration {
+    // TODO
+    return {
+      slots: {
+        1: {
+          count: 3,
+          max: 3,
+        },
+      },
+      maxPrepared: 0,
+      prepared: [],
+      known: [],
+      ability: Ability.WIS,
+    };
   }
 
+  setValue(spellcasting: SpellCastingDeclaration) {
+    // TODO
+  }
+
+  clearValue() {
+    // TODO
+  }
+
+  validValue() {
+    // TODO
+  }
+
+  // SpellcastingInputField Implementation:
   generateValues() {
     // TODO
   }
@@ -71,30 +76,27 @@ export class SpellcastingInputField extends LitElement {
     return field.isValid();
   }
 
-  get values(): SpellCastingDeclaration {
-    return {
-      slots: {
-        1: {
-          count: 3,
-          max: 3,
-        },
-      },
-      maxPrepared: 0,
-      prepared: [],
-      known: [],
-      ability: Ability.WIS,
-    };
-  }
-
-  set values(spellcasting: SpellCastingDeclaration) {}
-
-  clear() {
-    // TODO
-  }
-
-  isValid() {
-    // TODO
-    return true;
+  // LitElement Implementation:
+  static get styles() {
+    return css`
+      :host {
+        width: 100%;
+      }
+      .row {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 16px;
+      }
+      .row:first-child {
+        margin-bottom: 48px;
+        margin-top: 32px;
+      }
+      .row * {
+        width: calc(100% / 3 - 12px);
+      }
+    `;
   }
 
   render() {
