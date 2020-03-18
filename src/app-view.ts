@@ -1,6 +1,11 @@
 // Imports with side effects.
 import './ui/components/app-nav/app-nav';
 import './router/app-router';
+import './pages/app-home/app-home';
+import './pages/login-page/login-page';
+import './pages/settings-page/settings-page';
+import './pages/help-page/help-page';
+import './pages/new-character/new-character';
 
 // Named imports.
 import {
@@ -12,11 +17,51 @@ import {
   LitElement,
 } from 'lit-element';
 
-import { THEMES } from './themes';
+import { THEMES } from './data/themes';
 import { connect } from 'pwa-helpers';
 import { store } from './redux/store';
-import { AppState } from './redux/reducer';
-import { ROUTES } from './routes';
+import { AppState } from './redux/appState';
+import { Route } from './router/app-router';
+import { initArtificer } from './data/artificer';
+
+export const ROUTES: Route[] = [
+  {
+    path: '/',
+    component: () =>
+      html`
+        <app-home></app-home>
+      `,
+  },
+  {
+    path: '/settings',
+    component: () =>
+      html`
+        <settings-page></settings-page>
+      `,
+  },
+  {
+    path: '/login',
+    public: true,
+    component: () =>
+      html`
+        <login-page></login-page>
+      `,
+  },
+  {
+    path: '/character/new',
+    component: () =>
+      html`
+        <new-character></new-character>
+      `,
+  },
+  {
+    path: '/help',
+    component: () =>
+      html`
+        <help-page></help-page>
+      `,
+  },
+];
 
 @customElement('app-view')
 export class AppView extends connect(store)(LitElement) {
@@ -54,6 +99,14 @@ export class AppView extends connect(store)(LitElement) {
         }
       }
     `;
+  }
+
+  firstUpdated() {
+    /**
+     * @todo Put a inital loading screen.
+     * @body We need to block UI while the artificer sets up with lunr.
+     */
+    initArtificer();
   }
 
   stateChanged(state: AppState) {

@@ -1,185 +1,80 @@
-import '../../ui/components/character-card/character-card';
 import '../../ui/input/text-field/text-field';
-import '../../ui/components/class-selector/class-selector';
+import '../../ui/input/class-selector-input/class-selector-input';
 import '../../ui/input/race-selection-field/race-selection-field';
 import '../../ui/input/ability-score-input-field/ability-score-input-field';
 import '../../ui/input/basic-stats-input-field/basic-stats-input-field';
 import '../../ui/input/additional-stats-input-field/additional-stats-input-field';
 import '../../ui/input/saving-throw-input-field/saving-throw-input-field';
 import '../../ui/input/skills-input-field/skills-input-field';
-import '../../ui/input/attacks-input-field/attacks-input-field';
+import '../../ui/input/spellcasting-input-field/spellcasting-input-field';
 
 import {
   LitElement,
   html,
   customElement,
   css,
-  TemplateResult,
+  query,
   property,
 } from 'lit-element';
-import { connect } from 'pwa-helpers';
-import { store } from '../../redux/store';
-import { CharacterSheetDraft } from '../../redux/characterDraft';
-import { AppState } from '../../redux/reducer';
-import { allAbilities } from '../../data/CharacterSheet';
 import {
-  mdiSword,
-  mdiDice5,
-  mdiPlusOne,
-  mdiAccount,
-  mdiBookOpenPageVariant,
   mdiAutoFix,
+  mdiChevronRight,
+  mdiDelete,
+  mdiCheck,
+  mdiCancel,
 } from '@mdi/js';
-
-/**
- * A field is simply some input field that generates mutations,
- * the field registers this mutations by calling the provided mutate
- * function.
- */
-interface Step {
-  title: TemplateResult;
-  valid: (draft: CharacterSheetDraft) => boolean;
-  fields: TemplateResult;
-}
-
-// Validation logic.
-
-function all(a: Array<boolean>) {
-  return a.reduce((acc, v) => acc && v, true);
-}
-function isNum(v: string) {
-  return !isNaN(parseInt(v));
-}
-function isPosNum(v: string, includeZero: boolean = false) {
-  if (includeZero) return isNum(v) && parseInt(v) >= 0;
-  return isNum(v) && parseInt(v) > 0;
-}
-
-function stepOneValid(d: CharacterSheetDraft) {
-  return (
-    d.name !== undefined &&
-    d.name.replace(/\s/g, '') !== '' &&
-    d.race !== undefined &&
-    d.subrace !== undefined &&
-    d.classes.length >= 1
-  );
-}
-
-function stepTwoValid(d: CharacterSheetDraft) {
-  const abilityScoreValid = all(
-    allAbilities.map(a => isPosNum(d.abilityScores[a]))
-  );
-  const basicStatsValid = all([
-    isPosNum(d.maxHealth),
-    isPosNum(d.hitDice.number),
-    isPosNum(d.hitDice.type),
-    isPosNum(d.ac),
-    isPosNum(d.initiative, true),
-    isPosNum(d.speed),
-  ]);
-  const additionalStatsValid = all([
-    isPosNum(d.inspiration, true),
-    isPosNum(d.profBonus, true),
-    isPosNum(d.passiveWisdom),
-    isPosNum(d.xp, true),
-  ]);
-  const savingThrowsValid = all(
-    allAbilities.map(a => isNum(d.savingThrows[a].value))
-  );
-
-  return (
-    abilityScoreValid &&
-    basicStatsValid &&
-    additionalStatsValid &&
-    savingThrowsValid
-  );
-}
-
-const NEW_CHARACTER_FLOW: Step[] = [
-  {
-    title: html`
-      Lets start with the <span>Basics<span></span> </span>
-    `,
-    valid: d => stepOneValid(d),
-    fields: html`
-      <text-field
-        name="Character Name"
-        reflect="characterDraft.name"
-      ></text-field>
-      <class-selector></class-selector>
-      <race-selection-field></race-selection-field>
-    `,
-  },
-  {
-    title: html`
-      Looking good, lets talk
-      <span>Numbers</span>.
-    `,
-    valid: d => stepTwoValid(d),
-    fields: html`
-      <ability-score-input-field></ability-score-input-field>
-      <basic-stats-input-field></basic-stats-input-field>
-      <additional-stats-input-field></additional-stats-input-field>
-      <saving-throw-input-field></saving-throw-input-field>
-    `,
-  },
-  {
-    title: html`
-      How about your <span>Skills</span>?
-    `,
-    valid: () => true,
-    fields: html`
-      <skills-input-field></skills-input-field>
-    `,
-  },
-  {
-    title: html`
-      Show me how you deal <span>Damage</span>!
-    `,
-    valid: () => true,
-    fields: html`
-      <attacks-input-field></attacks-input-field>
-    `,
-  },
-  {
-    title: html`
-      Do you weave the <span>Arcane</span>?
-    `,
-    valid: () => true,
-    fields: html`
-      <arcane-input-field></arcane-input-field>
-    `,
-  },
-  {
-    title: html`
-      Lastly, tell me your <span>Story</span>?
-    `,
-    valid: () => true,
-    fields: html`
-      <misc-input-field></misc-input-field>
-    `,
-  },
-];
+import { SavingThrowInputField } from '../../ui/input/saving-throw-input-field/saving-throw-input-field';
+import { TextField } from '../../ui/input/text-field/text-field';
+import { ClassSelectorInput } from '../../ui/input/class-selector-input/class-selector-input';
+import { RaceSelectionField } from '../../ui/input/race-selection-field/race-selection-field';
+import { AbilityScoreInputField } from '../../ui/input/ability-score-input-field/ability-score-input-field';
+import { BasicStatsInputField } from '../../ui/input/basic-stats-input-field/basic-stats-input-field';
+import { AdditionalStatsInputField } from '../../ui/input/additional-stats-input-field/additional-stats-input-field';
+import { SkillsInputField } from '../../ui/input/skills-input-field/skills-input-field';
+import { SpellcastingInputField } from '../../ui/input/spellcasting-input-field/spellcasting-input-field';
+import climbingHuman from '../../assets/humaaans/climbing.svg';
 
 @customElement('new-character')
-export class NewCharacter extends connect(store)(LitElement) {
-  @property() draft!: CharacterSheetDraft;
-  @property({ attribute: true, reflect: true }) currentStep: number = 1;
+export class NewCharacter extends LitElement {
+  @query('#new-character-name') characterNameInput!: TextField;
+  @query('#new-character-alignment')
+  characterAlignmentInput!: TextField;
+  @query('#new-character-background')
+  characterBackgroundInput!: TextField;
+  @query('class-selector-input')
+  characterClassInput!: ClassSelectorInput;
+  @query('race-selection-field')
+  characterRaceInput!: RaceSelectionField;
+  @query('ability-score-input-field')
+  abilityScoreInput!: AbilityScoreInputField;
+  @query('saving-throw-input-field')
+  characterSavingThrowInput!: SavingThrowInputField;
+  @query('basic-stats-input-field')
+  characterBasicStatsInput!: BasicStatsInputField;
+  @query('additional-stats-input-field')
+  characterAdditionalStatsInput!: AdditionalStatsInputField;
+  @query('skills-input-field')
+  characterSkillsInput!: SkillsInputField;
+  @query('spellcasting-input-field')
+  characterSpellcastingInput!: SpellcastingInputField;
+
+  @property() savingThrowAutofillDisabled: boolean = true;
+  @property() skillsAutofillDisabled: boolean = true;
+  @property() spellcastingAutofillDisabled: boolean = false;
+  @property() characterValid: boolean = false;
+  @property() spellcastingDisabled: boolean = false;
+
+  private id: string = 'new-character';
 
   static get styles() {
     return css`
       :host {
         font-family: var(--font-stack);
         width: 100%;
-        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
         --page-width: 800px;
-        --section-heading-height: 64px;
-        display: grid;
-        grid-template-rows: var(--section-heading-height) auto;
-        grid-template-columns: var(--page-width) auto;
-        grid-template-areas:
-          'header header'
-          'form progress';
       }
       h1 {
         margin: 0;
@@ -189,263 +84,311 @@ export class NewCharacter extends connect(store)(LitElement) {
         width: 100%;
         padding-bottom: 1rem;
         height: fit-content;
-        grid-area: header;
       }
       h1 span {
         color: var(--theme-primary);
       }
       .form-fields {
-        width: 100%;
-        grid-area: form;
-        box-sizing: border-box;
-        padding: 24px 32px;
-        display: flex;
-        align-items: flex-start;
-        justify-content: flex-start;
-        flex-direction: column;
+        width: var(--page-width);
+        margin-top: 24px;
       }
-      .navigation {
+      h2 {
+        margin: 0;
+        padding: 0;
+        color: var(--theme-primary);
+        font-weight: 500;
+        margin-top: 48px;
+        margin-bottom: 24px;
+        font-weight: 100;
+      }
+      .form-fields > h2:first-child {
+        margin-top: 24px;
+      }
+      .heading {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        margin-top: 48px;
+        margin-bottom: 24px;
+      }
+      .heading h2 {
+        margin: 0;
+      }
+      .v-bar {
+        margin: 0 16px 0 20px;
+        width: 3px;
+        height: 1.8rem;
+        background: #ebebeb;
+      }
+      .split {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+      }
+      .split * {
+        width: calc(50% - 12px);
+      }
+      .footer {
+        width: var(--page-width);
+        height: 64px;
+        margin-bottom: 24px;
         display: flex;
         align-items: center;
         justify-content: flex-end;
-        height: 60px;
+      }
+      .fabs {
+        position: fixed;
+        right: 48px;
+        bottom: 32px;
+      }
+      .backdrop {
         width: 100%;
-      }
-      .progress {
-        grid-area: progress;
+        height: 350px;
         display: flex;
         align-items: center;
         justify-content: center;
+        flex-direction: column;
       }
-      .progress .bounding {
-        width: 300px;
-        height: 300px;
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+      .backdrop img {
+        height: 200px;
+        opacity: 0.7;
       }
-      .progress svg {
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        z-index: 1;
-      }
-      .progress .step {
-        width: 32px;
-        height: 32px;
-        background: #efefef;
-        border-radius: 50%;
-        position: absolute;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 2;
-      }
-      .progress .step.done {
-        background: var(--theme-primary);
-      }
-      .progress .step.active {
-        background: var(--theme-primary);
-      }
-      .step.top {
-        top: -13px;
-        left: 135px;
-      }
-      .step.bottom {
-        bottom: -13px;
-        left: 135px;
-      }
-      .step.top-right {
-        right: 6px;
-        top: 69px;
-      }
-      .step.top-left {
-        left: 6px;
-        top: 69px;
-      }
-      .step.bottom-right {
-        right: 6px;
-        bottom: 62px;
-      }
-      .step.bottom-left {
-        left: 6px;
-        bottom: 62px;
-      }
-      .chip {
-        color: var(--theme-primary);
-        border: 2px solid var(--theme-primary);
-        border-radius: 15px;
-        padding: 4px 12px;
+      .backdrop p {
+        margin: 0;
+        margin-top: 32px;
+        padding: 0;
+        width: 400px;
+        color: #bbb;
+        text-align: center;
         font-size: 0.8rem;
-        margin: 0 4px;
-        background: none;
-        cursor: pointer;
-      }
-      .chip.disabled {
-        opacity: 0.5;
-        cursor: default;
-      }
-      .chip:hover {
-        background: var(--theme-primary-light);
-      }
-      .chip.disabled:hover {
-        background: none;
-      }
-      .chip.primary {
-        background: var(--theme-primary);
-        color: white;
-      }
-      .chip.primary:hover {
-        opacity: 0.8;
-      }
-      .chip.primary.disabled:hover {
-        background: var(--theme-primary);
-        opacity: 0.5;
       }
     `;
   }
 
-  stateChanged(state: AppState) {
-    this.draft = state.characterDraft;
+  toggleSpellcasting() {
+    this.spellcastingDisabled = !this.spellcastingDisabled;
+    this.backup();
   }
 
-  getTitle() {
-    return NEW_CHARACTER_FLOW[this.currentStep - 1].title;
-  }
-
-  getFields() {
-    return NEW_CHARACTER_FLOW[this.currentStep - 1].fields;
-  }
-
-  prevStep() {
-    if (this.currentStep < 2) {
-      return;
+  firstUpdated() {
+    const saved = localStorage.getItem(`saved-input-value(${this.id})`);
+    if (saved) {
+      this.spellcastingDisabled = JSON.parse(
+        saved
+      ).spellcastingDisabled;
     }
-    this.currentStep--;
+    this.valueUpdated();
   }
 
-  nextStep() {
-    if (!this.nextAllowed()) {
-      return;
+  backup() {
+    localStorage.setItem(
+      `saved-input-value(${this.id})`,
+      JSON.stringify({
+        spellcastingDisabled: this.spellcastingDisabled,
+      })
+    );
+  }
+
+  clear() {
+    this.characterNameInput.clear();
+    this.characterAlignmentInput.clear();
+    this.characterBackgroundInput.clear();
+    this.characterClassInput.clear();
+    this.characterRaceInput.clear();
+    this.abilityScoreInput.clear();
+    this.characterSavingThrowInput.clear();
+    this.characterBasicStatsInput.clear();
+    this.characterAdditionalStatsInput.clear();
+    this.characterSkillsInput.clear();
+    this.characterSpellcastingInput.clear();
+  }
+
+  savingThrowAutofill() {
+    const abilityScores = this.abilityScoreInput.value;
+    const profBonus = this.characterAdditionalStatsInput.value
+      .proficiencyBonus;
+    this.characterSavingThrowInput.autofill(abilityScores, profBonus);
+  }
+
+  skillsAutofill() {
+    const abilityScores = this.abilityScoreInput.value;
+    const profBonus = this.characterAdditionalStatsInput.value
+      .proficiencyBonus;
+    this.characterSkillsInput.autofill(abilityScores, profBonus);
+  }
+
+  spellcastingAutofill() {
+    const abilityScores = this.abilityScoreInput.value;
+    const profBonus = this.characterAdditionalStatsInput.value
+      .proficiencyBonus;
+    this.characterSpellcastingInput.autofill(abilityScores, profBonus);
+  }
+
+  valueUpdated() {
+    // Update autofill status.
+    const abilityScores = this.abilityScoreInput.value;
+    const profBonus = this.characterAdditionalStatsInput.value
+      .proficiencyBonus;
+
+    this.savingThrowAutofillDisabled = this.characterSavingThrowInput.autofillImpossible(
+      abilityScores,
+      profBonus
+    );
+
+    this.skillsAutofillDisabled = this.characterSkillsInput.autofillImpossible(
+      abilityScores,
+      profBonus
+    );
+
+    this.spellcastingAutofillDisabled = this.characterSpellcastingInput.autofillImpossible(
+      abilityScores,
+      profBonus
+    );
+
+    // Update validity status
+    this.characterValid =
+      this.characterNameInput.isValid() &&
+      this.characterAlignmentInput.isValid() &&
+      this.characterBackgroundInput.isValid() &&
+      this.characterClassInput.isValid() &&
+      this.characterRaceInput.isValid() &&
+      this.abilityScoreInput.isValid() &&
+      this.characterSavingThrowInput.isValid() &&
+      this.characterBasicStatsInput.isValid() &&
+      this.characterAdditionalStatsInput.isValid() &&
+      this.characterSkillsInput.isValid() &&
+      this.characterSpellcastingInput.isValid();
+  }
+
+  createCharacter() {}
+
+  renderSpellcastingInput() {
+    if (this.spellcastingDisabled) {
+      return html`
+        <div class="backdrop">
+          <img src=${climbingHuman} />
+          <p>
+            Click on the “i am a spellcaster” button above if your
+            character can do magic or else enjoy having one less step
+          </p>
+        </div>
+      `;
     }
-    this.currentStep++;
-  }
-
-  create() {}
-
-  nextAllowed() {
-    if (this.currentStep > NEW_CHARACTER_FLOW.length - 1) {
-      return false;
-    }
-
-    return NEW_CHARACTER_FLOW[this.currentStep - 1].valid(this.draft);
-  }
-
-  renderProgressPoint(icon: string, step: number, position: string) {
     return html`
-      <div
-        class="step ${position} ${this.currentStep > step
-          ? 'done'
-          : ''} ${this.currentStep === step ? 'active' : ''}"
-      >
-        <mdi-icon
-          color=${this.currentStep >= step ? '#fff' : '#bbb'}
-          icon=${icon}
-        ></mdi-icon>
-      </div>
+      <spellcasting-input-field></spellcasting-input-field>
     `;
-  }
-
-  getStepColor(step: number) {
-    if (step < this.currentStep) return 'var(--theme-primary)';
-    if (this.currentStep === 6 && step === 6) {
-      return 'var(--theme-primary)';
-    }
-    return '#efefef';
   }
 
   render() {
     return html`
-      <h1>${this.getTitle()}</h1>
-      <div class="form-fields">
-        ${this.getFields()}
-        <div class="navigation">
-          ${this.currentStep === 1
-            ? null
-            : html`
-                <button @click=${this.prevStep} class="chip">
-                  Previous Step
-                </button>
-              `}
-          ${this.currentStep === NEW_CHARACTER_FLOW.length
-            ? html`
-                <button
-                  @click=${this.create}
-                  class="chip primary ${this.nextAllowed()
-                    ? ''
-                    : 'disabled'}"
-                >
-                  Create Character
-                </button>
-              `
-            : html`
-                <button
-                  @click=${this.nextStep}
-                  class="chip primary ${this.nextAllowed()
-                    ? ''
-                    : 'disabled'}"
-                >
-                  Next Step
-                </button>
-              `}
+      <h1>Tell me a bit about <span>Yourself</span></h1>
+      <div class="form-fields" @value-updated=${this.valueUpdated}>
+        <h2>Basics</h2>
+        <text-field
+          id="new-character-name"
+          name="Character Name"
+          placeholder="Enter Name Here!"
+          initial="John Smith"
+        ></text-field>
+        <div class="split">
+          <text-field
+            id="new-character-background"
+            name="Background"
+            placeholder="Acolyte"
+            ?canBeEmpty=${true}
+          ></text-field>
+          <text-field
+            id="new-character-alignment"
+            name="Alignment"
+            placeholder="Chaotic Good"
+            ?canBeEmpty=${true}
+          ></text-field>
         </div>
-      </div>
-      <div class="progress">
-        <div class="bounding">
-          ${this.renderProgressPoint(mdiAccount, 1, 'top')}
-          ${this.renderProgressPoint(mdiDice5, 2, 'top-right')}
-          ${this.renderProgressPoint(mdiPlusOne, 3, 'bottom-right')}
-          ${this.renderProgressPoint(mdiSword, 4, 'bottom')}
-          ${this.renderProgressPoint(mdiAutoFix, 5, 'bottom-left')}
-          ${this.renderProgressPoint(
-            mdiBookOpenPageVariant,
-            6,
-            'top-left'
-          )}
-          <svg
-            width="80"
-            height="80"
-            viewBox="0 0 80 80"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
+        <class-selector-input
+          id="new-character-classes"
+        ></class-selector-input>
+        <race-selection-field
+          id="new-character-race"
+        ></race-selection-field>
+        <h2>Ability Scores</h2>
+        <ability-score-input-field></ability-score-input-field>
+        <h2>Core Details</h2>
+        <basic-stats-input-field></basic-stats-input-field>
+        <additional-stats-input-field></additional-stats-input-field>
+        <div class="heading">
+          <h2>Saving Throws</h2>
+          <div class="v-bar"></div>
+          <icon-btn
+            icon=${mdiAutoFix}
+            size="small"
+            ?disabled=${this.savingThrowAutofillDisabled}
+            @click=${() => {
+              this.savingThrowAutofill();
+            }}
+            >Autofill</icon-btn
           >
-            <path
-              stroke=${this.getStepColor(1)}
-              d="M40.4012 0L74.8022 21.9469V60.177"
-            />
-            <path
-              stroke=${this.getStepColor(2)}
-              d="M74.8022 21.9469V60.177"
-            />
-            <path
-              stroke=${this.getStepColor(3)}
-              d="M74.8022 60.177L40.4012 80"
-            />
-            <path
-              stroke=${this.getStepColor(4)}
-              d="M40.4012 80L6 60.177"
-            />
-            <path
-              stroke=${this.getStepColor(5)}
-              d="M6 60.177V21.9469"
-            />
-            <path
-              stroke=${this.getStepColor(6)}
-              d="M6 21.9469L40.4012 0"
-            />
-          </svg>
         </div>
+        <saving-throw-input-field></saving-throw-input-field>
+        <div class="heading">
+          <h2>Skills</h2>
+          <div class="v-bar"></div>
+          <icon-btn
+            icon=${mdiAutoFix}
+            size="small"
+            ?disabled=${this.skillsAutofillDisabled}
+            @click=${() => {
+              this.skillsAutofill();
+            }}
+            >Autofill</icon-btn
+          >
+        </div>
+        <skills-input-field></skills-input-field>
+        <div class="heading">
+          <h2>Spellcasting</h2>
+          <div class="v-bar"></div>
+          <icon-btn
+            icon=${this.spellcastingDisabled ? mdiCheck : mdiCancel}
+            size="small"
+            @click=${() => {
+              this.toggleSpellcasting();
+            }}
+            >${
+              this.spellcastingDisabled
+                ? 'I am a spellcaster'
+                : 'I am not a spellcaster'
+            }</icon-btn>
+          <icon-btn
+            icon=${mdiAutoFix}
+            size="small"
+            ?disabled=${this.spellcastingAutofillDisabled ||
+              this.spellcastingDisabled}
+            @click=${() => {
+              this.spellcastingAutofill();
+            }}
+            >Autofill</icon-btn>
+        </div>
+        ${this.renderSpellcastingInput()}
+      </div>
+      </div>
+      <div class="footer">
+        <icon-btn
+          icon=${mdiDelete}
+          size="large"
+          @click=${() => {
+            this.clear();
+          }}
+          >Clear</icon-btn
+        >
+        <icon-btn
+          icon=${mdiChevronRight}
+          size="large"
+          primary="true"
+          ?disabled=${!this.characterValid}
+          @click=${() => {
+            this.createCharacter();
+          }}
+          >Create Character</icon-btn
+        >
       </div>
     `;
   }

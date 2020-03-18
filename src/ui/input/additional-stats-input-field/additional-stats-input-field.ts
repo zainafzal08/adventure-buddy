@@ -1,20 +1,84 @@
 import '../number-field/number-field';
+import { html, customElement, css } from 'lit-element';
+import { NumberField } from '../number-field/number-field';
+import { BaseInput } from '../base-input';
 
-import { LitElement, html, customElement, css } from 'lit-element';
-import { connect } from 'pwa-helpers';
-import { store } from '../../../redux/store';
-import { AppState } from '../../../redux/reducer';
-import { CharacterSheetDraft } from '../../../redux/characterDraft';
+interface AdditionalStats {
+  inspiration: number;
+  proficiencyBonus: number;
+  passiveWisdom: number;
+  xp: number;
+}
 
 @customElement('additional-stats-input-field')
-export class AdditionalStatsInputField extends connect(store)(
-  LitElement
-) {
-  private draft!: CharacterSheetDraft;
-
-  stateChanged(state: AppState) {
-    this.draft = state.characterDraft;
+export class AdditionalStatsInputField extends BaseInput<
+  AdditionalStats
+> {
+  // BaseInput Implementation
+  getValue(): AdditionalStats {
+    return {
+      inspiration: this.getVal('inspiration'),
+      proficiencyBonus: this.getVal('prof-bonus'),
+      xp: this.getVal('xp'),
+      passiveWisdom: this.getVal('passive-wisdom'),
+    };
   }
+
+  setValue(stats: AdditionalStats) {
+    this.setVal('inspiration', stats.inspiration);
+    this.setVal('prof-bonus', stats.proficiencyBonus);
+    this.setVal('xp', stats.xp);
+    this.setVal('passive-wisdom', stats.passiveWisdom);
+  }
+
+  clearValue() {
+    this.clearVal('inspiration');
+    this.clearVal('prof-bonus');
+    this.clearVal('xp');
+    this.clearVal('passive-wisdom');
+  }
+
+  valueValid() {
+    return (
+      this.isValValid('inspiration') &&
+      this.isValValid('prof-bonus') &&
+      this.isValValid('xp') &&
+      this.isValValid('passive-wisdom')
+    );
+  }
+
+  // AdditionalStatsInputField Implementation:
+
+  getVal(id: string): number {
+    const input = this.shadowRoot?.getElementById(
+      `new-character-${id}`
+    ) as NumberField;
+    if (!input) return 0;
+    return input.value;
+  }
+
+  setVal(id: string, val: number) {
+    const input = this.shadowRoot?.getElementById(
+      `new-character-${id}`
+    ) as NumberField;
+    input.value = val;
+  }
+
+  clearVal(id: string) {
+    const input = this.shadowRoot?.getElementById(
+      `new-character-${id}`
+    ) as NumberField;
+    input.clear();
+  }
+
+  isValValid(id: string) {
+    const input = this.shadowRoot?.getElementById(
+      `new-character-${id}`
+    ) as NumberField;
+    return input.isValid();
+  }
+
+  // LitElement Implementation:
 
   static get styles() {
     return css`
@@ -24,68 +88,47 @@ export class AdditionalStatsInputField extends connect(store)(
       .fields {
         width: 100%;
         display: flex;
-        justify-content: flex-start;
+        justify-content: space-between;
       }
       .container-med {
-        width: 25%;
+        width: calc(25% - 8px);
         box-sizing: border-box;
         display: flex;
         flex-direction: column;
         justify-content: flex-end;
-        padding: 0 8px;
-      }
-      h3 {
-        margin: 0;
-        padding: 0;
-        color: var(--theme-primary);
-        opacity: 0.9;
-        font-weight: 500;
-        padding-left: 8px;
-        margin-bottom: 8px;
-        margin-top: 8px;
       }
     `;
   }
 
-  setStat(stat: string, v: number) {
-    store.dispatch({
-      type: 'UPDATE_DRAFT',
-      fields: {
-        [stat]: v,
-      },
-    });
-  }
-
   render() {
     return html`
-      <h3>Additional Stats</h3>
       <div class="fields">
         <div class="container-med">
           <number-field
+            id="new-character-inspiration"
             name="Inspiration"
-            .range=${[0]}
-            reflect="characterDraft.inspiration"
+            .start=${0}
           ></number-field>
         </div>
         <div class="container-med">
           <number-field
+            id="new-character-prof-bonus"
             name="Proficiency Bonus"
-            .range=${[0]}
-            reflect="characterDraft.profBonus"
+            .start=${0}
           ></number-field>
         </div>
         <div class="container-med">
           <number-field
+            id="new-character-passive-wisdom"
             name="Passive Wisdom"
-            .range=${[1]}
-            reflect="characterDraft.passiveWisdom"
+            .start=${0}
           ></number-field>
         </div>
         <div class="container-med">
           <number-field
+            id="new-character-xp"
             name="XP"
-            .range=${[0]}
-            reflect="characterDraft.xp"
+            .start=${0}
           ></number-field>
         </div>
       </div>

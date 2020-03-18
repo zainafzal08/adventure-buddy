@@ -1,46 +1,124 @@
 import '../number-proficient-field/number-proficient-field';
 
+import { LitElement, html, customElement, css } from 'lit-element';
 import {
-  LitElement,
-  html,
-  customElement,
-  css,
-  property,
-} from 'lit-element';
-import { connect } from 'pwa-helpers';
-import { store } from '../../../redux/store';
-import {
-  Ability,
-  toModifier,
+  allAbilities,
   abilityShorthand,
+  Ability,
+  getModifier,
+} from '../../../data/ability';
+import {
+  SavingThrowsDeclaration,
+  AbilityScoresDeclaration,
+  ModifiableValue,
 } from '../../../data/CharacterSheet';
-import { AppState } from '../../../redux/reducer';
-import { mdiAutoFix } from '@mdi/js';
-
-type DraftSavingThrows = {
-  [k in Ability]: { value: string; proficient: boolean };
-};
+import { NumberProficientField } from '../number-proficient-field/number-proficient-field';
+import { all } from '../../../util';
+import { BaseInput } from '../base-input';
 
 @customElement('saving-throw-input-field')
-export class SavingThrowInputField extends connect(store)(LitElement) {
-  private abilities = [
-    Ability.STR,
-    Ability.DEX,
-    Ability.CON,
-    Ability.INT,
-    Ability.WIS,
-    Ability.CHR,
-  ];
+export class SavingThrowInputField extends BaseInput<
+  SavingThrowsDeclaration
+> {
+  // BaseInput Implementation:
 
-  @property() private savingThrowScores!: DraftSavingThrows;
-  @property() private abilityScores!: { [k in Ability]: string };
-  @property() private proficiencyBonus!: string;
-
-  stateChanged(state: AppState) {
-    this.savingThrowScores = state.characterDraft.savingThrows;
-    this.abilityScores = state.characterDraft.abilityScores;
-    this.proficiencyBonus = state.characterDraft.profBonus;
+  getValue(): SavingThrowsDeclaration {
+    const savingThrows: Partial<SavingThrowsDeclaration> = {};
+    for (const ability of allAbilities) {
+      savingThrows[ability] = this.getValueForAbility(ability);
+    }
+    return savingThrows as SavingThrowsDeclaration;
   }
+
+  setValue(savingThrows: SavingThrowsDeclaration) {
+    for (const ability of allAbilities) {
+      this.setValueForAbility(ability, savingThrows[ability]);
+    }
+  }
+
+  clearValue() {
+    for (const a of allAbilities) {
+      const input = this.shadowRoot?.getElementById(
+        `new-character-saving-throw-${a}`
+      ) as NumberProficientField;
+      input.clear();
+    }
+  }
+
+  valueValid() {
+    return all(allAbilities.map(a => this.isValueValid(a)));
+  }
+
+  // SavingThrowInputField Implementation:
+
+  isValueValid(a: Ability) {
+    const input = this.shadowRoot?.getElementById(
+      `new-character-saving-throw-${a}`
+    ) as NumberProficientField;
+    return input.isValid();
+  }
+
+  autofill(
+    abilityScores: AbilityScoresDeclaration,
+    proficiencyBonus: number
+  ) {
+    this.value = this.generateValues(abilityScores, proficiencyBonus);
+  }
+
+  autofillImpossible(
+    abilityScores: AbilityScoresDeclaration,
+    proficiencyBonus: number
+  ) {
+    const generated = this.generateValues(
+      abilityScores,
+      proficiencyBonus
+    );
+    return allAbilities
+      .map(a => this.value[a].value === generated[a].value)
+      .reduce((acc, v) => acc && v, true);
+  }
+
+  private getValueForAbility(ability: Ability): ModifiableValue {
+    const field = this.shadowRoot?.getElementById(
+      `new-character-saving-throw-${ability}`
+    )! as NumberProficientField;
+    if (!field)
+      return {
+        value: 0,
+        proficient: false,
+      };
+    return field.value;
+  }
+
+  private setValueForAbility(ability: Ability, value: ModifiableValue) {
+    const field = this.shadowRoot?.getElementById(
+      `new-character-saving-throw-${ability}`
+    )! as NumberProficientField;
+    field.value = { ...value };
+  }
+
+  private generateValues(
+    abilityScores: AbilityScoresDeclaration,
+    proficiencyBonus: number
+  ): SavingThrowsDeclaration {
+    const generated: Partial<SavingThrowsDeclaration> = {};
+    for (const ability of allAbilities) {
+      const isProf = this.getValueForAbility(ability).proficient;
+      let profBonus = proficiencyBonus;
+      if (!isProf) {
+        profBonus = 0;
+      }
+
+      generated[ability] = {
+        proficient: isProf,
+        value: getModifier(abilityScores[ability]) + profBonus,
+      };
+    }
+
+    return generated as SavingThrowsDeclaration;
+  }
+
+  // LitElement Implementation:
 
   static get styles() {
     return css`
@@ -55,11 +133,11 @@ export class SavingThrowInputField extends connect(store)(LitElement) {
         justify-content: space-between;
       }
       .container {
+        width: calc(100% / 6 - 12px);
         display: flex;
         flex-direction: column;
         justify-content: flex-end;
         box-sizing: border-box;
-        padding: 0 8px;
       }
       input {
         width: 100%;
@@ -73,118 +151,18 @@ export class SavingThrowInputField extends connect(store)(LitElement) {
         padding-bottom: 4px;
         font-family: var(--font-stack);
       }
-      .heading {
-        width: 100%;
-        height: 28px;
-        margin-bottom: 8px;
-        padding-left: 8px;
-        display: flex;
-        align-items: center;
-      }
-      h3 {
-        margin: 0;
-        padding: 0;
-        color: var(--theme-primary);
-        opacity: 0.9;
-        font-weight: 500;
-        padding-right: 8px;
-      }
-      .bar {
-        width: 2px;
-        background: #ebebeb;
-        height: 100%;
-        margin: 0 8px;
-      }
     `;
-  }
-
-  setSavingThrow(ability: Ability, value: number) {
-    this.savingThrowScores = {
-      ...this.savingThrowScores,
-      [ability]: {
-        proficient: this.savingThrowScores[ability].proficient,
-        value,
-      },
-    };
-    this.syncInput();
-  }
-
-  setProficient(ability: Ability, proficient: boolean) {
-    this.savingThrowScores = {
-      ...this.savingThrowScores,
-      [ability]: {
-        proficient,
-        value: this.savingThrowScores[ability].value,
-      },
-    };
-    this.syncInput();
-  }
-
-  syncInput() {
-    store.dispatch({
-      type: 'UPDATE_DRAFT',
-      fields: {
-        savingThrows: this.savingThrowScores,
-      },
-    });
-  }
-
-  generateValues() {
-    const generated: Record<
-      string,
-      { proficient: boolean; value: string }
-    > = {};
-    for (const ability of this.abilities) {
-      let val = parseInt(this.abilityScores[ability]);
-      let profBonus = parseInt(this.proficiencyBonus);
-      if (isNaN(val)) val = 10;
-      if (isNaN(profBonus)) profBonus = 0;
-      const isProf = this.savingThrowScores[ability].proficient;
-      if (!isProf) {
-        profBonus = 0;
-      }
-
-      generated[ability] = {
-        proficient: isProf,
-        value: (toModifier(val) + profBonus).toString()!,
-      };
-    }
-    return generated;
-  }
-
-  autofill() {
-    if (this.autofillImpossible()) return;
-    this.savingThrowScores = this.generateValues() as DraftSavingThrows;
-    this.syncInput();
-  }
-
-  autofillImpossible() {
-    const generated = this.generateValues();
-    return this.abilities
-      .map(a => this.savingThrowScores[a].value === generated[a].value)
-      .reduce((acc, v) => acc && v);
   }
 
   render() {
     return html`
-      <div class="heading">
-        <h3>Saving Throws</h3>
-        <div class="bar"></div>
-        <icon-btn
-          icon=${mdiAutoFix}
-          size="small"
-          disabled=${this.autofillImpossible()}
-          @click=${() => this.autofill()}
-          >Autofill</icon-btn
-        >
-      </div>
       <div class="fields">
-        ${this.abilities.map(
+        ${allAbilities.map(
           ability => html`
             <div class="container">
               <number-proficient-field
                 name=${abilityShorthand[ability]}
-                reflect=${`characterDraft.savingThrows.${ability}`}
+                id=${`new-character-saving-throw-${ability}`}
               ></number-proficient-field>
             </div>
           `

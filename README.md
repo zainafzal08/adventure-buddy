@@ -30,6 +30,17 @@ This is the frontend which is build on Lit elements. We use babel and rollup to 
 3. to build do `npm run build`, output files are put into dist
 4. to run the dev server do `npm run dev`
 
+# Concepts
+
+Each character has a `CharacterSheet` object that encodes all information for that character.
+A new character is created when the new character form is correctly submitted. This character
+is appended into the redux state and will be available in the gallery. Edits on this character
+can then happen in the play UI via a mutation interface. During play all character mutations
+happen through a SheetMutator class instance. This is created with the player state and has
+the ability to accept character mutations. It will log all mutations in a session and disallow
+any mutation which puts the character in a invalid state. After any successful update it will update the
+redux state to match such that the redux character sheet is a source of VALID truth.
+
 # Milestones
 
 # V.0

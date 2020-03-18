@@ -1,31 +1,66 @@
-import {
-  LitElement,
-  html,
-  customElement,
-  css,
-  property,
-  query,
-} from 'lit-element';
-import { AppState } from '../../../redux/reducer';
-import { store } from '../../../redux/store';
-import { connect } from 'pwa-helpers';
+import { html, customElement, css, property, query } from 'lit-element';
+import { ModifiableValue } from '../../../data/CharacterSheet';
+import { BaseInput } from '../base-input';
 
-type Field = { proficient: boolean; value: string };
+function notNum(v: string) {
+  return isNaN(parseInt(v));
+}
 
 @customElement('number-proficient-field')
-export class NumberFieldProficient extends connect(store)(LitElement) {
-  // User facing
+export class NumberProficientField extends BaseInput<ModifiableValue> {
   @property({ attribute: true }) name: string = 'numberProficientField';
-  @property() reflect: string = '';
-  @property() data: Field = {
-    proficient: false,
-    value: '0',
-  };
-  @property() changeListener: (v: Field) => void = () => {};
+  @property() id: string = '';
 
   @query('input') input!: HTMLInputElement;
   @query('.group') group!: HTMLDivElement;
 
+  // BaseInput Implementation:
+  getValue() {
+    let v;
+    if (!this.input) {
+      v = 0;
+    } else {
+      v = parseInt(this.input.value);
+      if (isNaN(v)) v = 0;
+    }
+    return {
+      value: v,
+      proficient: this.hasAttribute('proficient'),
+    };
+  }
+
+  setValue(score: ModifiableValue) {
+    if (!this.input) return;
+    this.input.value = score.value.toString();
+    this.toggleAttribute('proficient', score.proficient);
+  }
+
+  clearValue() {
+    this.value = {
+      value: 0,
+      proficient: false,
+    };
+  }
+
+  validate() {
+    if (!this.group) return;
+    this.group.classList.toggle('invalid', notNum(this.input.value));
+  }
+
+  valueValid() {
+    if (!this.group) return false;
+    return !this.group.classList.contains('invalid');
+  }
+
+  // NumberProficientField Implementation:
+  toggleProficiency() {
+    this.value = {
+      ...this.value,
+      proficient: !this.value.proficient,
+    };
+  }
+
+  // LitElement Implementation:
   static get styles() {
     return css`
       :host {
@@ -145,78 +180,18 @@ export class NumberFieldProficient extends connect(store)(LitElement) {
     `;
   }
 
-  stateChanged(state: AppState) {
-    if (this.reflect === '') return;
-    // Sue me.
-    let val = state as any;
-    for (const field of this.reflect.split('.')) {
-      val = val[field];
-    }
-    this.data = val === undefined ? '' : val;
-    // Actually update the input field to match.
-    if (this.input && this.data.value !== '')
-      this.input.value = this.data.value;
-    this.validate();
-  }
-
-  change() {
-    const data = {
-      proficient: this.hasAttribute('proficient'),
-      value: this.input.value,
-    };
-    this.changeListener(data);
-
-    if (this.reflect) {
-      store.dispatch({
-        type: 'DIRECT_SET',
-        path: this.reflect,
-        value: data,
-      });
-    } else {
-      this.data = data;
-      this.validate();
-    }
-  }
-
-  notNum(v: string) {
-    return isNaN(parseInt(v));
-  }
-
-  validate() {
-    // Debounce calls made before object is ready
-    if (this.group === null) return;
-    this.group.classList.toggle(
-      'invalid',
-      this.notNum(this.data.value)
-    );
-  }
-
-  profToggle() {
-    return html`
-      <div
-        class="prof-button"
-        @click=${() => {
-          this.toggleAttribute('proficient');
-          this.change();
-        }}
-      >
-        Proficient
-      </div>
-    `;
-  }
-
   render() {
     return html`
       <div class="group">
         <label for="input">${this.name}</label>
-        <input
-          id="input"
-          type="number"
-          value=${this.data.value}
-          @input=${() => this.change()}
-        />
+        <input id="input" type="number" />
         <div class="footer">
-          ${this.profToggle()}
+          <div
+            class="prof-button"
+            @click=${() => this.toggleProficiency()}
+          >
+            Proficient
+          </div>
         </div>
       </div>
     `;

@@ -10,15 +10,21 @@ import {
 export class IconBtn extends LitElement {
   @property() icon = '';
   @property({ attribute: true }) size: 'large' | 'small' = 'large';
-  @property({ attribute: true }) primary: 'true' | 'false' = 'false';
-  @property({ attribute: true }) disabled: 'true' | 'false' = 'false';
+  @property({ attribute: true, type: Boolean })
+  primary: boolean = false;
+  @property({ attribute: true, type: Boolean })
+  danger: boolean = false;
+  @property({ attribute: true, type: Boolean })
+  disabled: boolean = false;
 
   static get styles() {
     return css`
-      .chip-button {
-        padding: 0.3rem 0.5rem;
-        border-radius: 15px;
+      :host {
         margin: 0 0.3rem;
+      }
+      .chip-button {
+        padding: 0.3rem 0.7rem 0.3rem 0.5rem;
+        border-radius: 15px;
         font-size: 0.9rem;
         color: var(--theme-primary);
         background: var(--theme-primary-light);
@@ -29,15 +35,30 @@ export class IconBtn extends LitElement {
         width: fit-content;
         --icon-ink: var(--theme-primary);
       }
-      :host([disabled='true']) {
+      :host([danger]) .chip-button {
+        color: var(--theme-emphasis-low);
+        background: var(--theme-emphasis-low-light);
+        --icon-ink: var(--theme-emphasis-low);
+      }
+
+      :host([disabled]) {
         opacity: 0.5;
       }
-      :host([primary='true']) .chip-button {
+      :host([primary]) .chip-button {
         background: var(--theme-primary);
         --icon-ink: #ffffff;
         color: white;
       }
-      :host([disabled='true']) .chip-button {
+      :host([primary][danger]) .chip-button {
+        background: var(--theme-emphasis-low);
+        --icon-ink: #ffffff;
+        color: white;
+      }
+
+      :host([disabled]) .chip-button {
+        cursor: default;
+      }
+      :host([disabled]) .chip-button mdi-icon {
         cursor: default;
       }
       :host([size='small']) .chip-button {
@@ -47,7 +68,11 @@ export class IconBtn extends LitElement {
       .chip-button:hover {
         box-shadow: var(--theme-primary-shadow);
       }
-      :host([disabled='true']) .chip-button:hover {
+      :host([danger]) .chip-button:hover {
+        box-shadow: var(--theme-emphasis-low-shadow);
+      }
+
+      :host([disabled]) .chip-button:hover {
         box-shadow: none;
       }
       .chip-button mdi-icon {
@@ -60,9 +85,15 @@ export class IconBtn extends LitElement {
     `;
   }
 
+  onClick(e: Event) {
+    if (this.disabled) {
+      e.stopPropagation();
+    }
+  }
+
   render() {
     return html`
-      <div class="chip-button">
+      <div class="chip-button" @click=${this.onClick}>
             <mdi-icon
               .color=${css`var(--icon-ink)`}
               size=${this.size === 'small' ? 12 : 16}
