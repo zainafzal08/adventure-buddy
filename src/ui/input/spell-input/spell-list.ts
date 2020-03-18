@@ -24,7 +24,7 @@ export class SpellList extends BaseInput<number[]> {
   }
 
   clearValue() {
-    this.list = [];
+    this.value = [];
   }
 
   // SpellList Implementation:
@@ -34,6 +34,10 @@ export class SpellList extends BaseInput<number[]> {
 
   add(spell: number) {
     this.value = [...this.value, spell];
+  }
+
+  removeSpell(spellId: number) {
+    this.value = this.value.filter(x => x !== spellId);
   }
 
   clearList() {
@@ -129,21 +133,15 @@ export class SpellList extends BaseInput<number[]> {
     return html`
       <div class="selected-spell">
         <p>${SPELLS[spell].name}</p>
-        <div class="btn">
+        <div class="btn" @click=${() => this.showInfo(spell)}>
           <mdi-icon
             color="#777"
             icon=${mdiHelpCircleOutline}
-            @click=${() => this.showInfo(spell)}
             size=${16}
           ></mdi-icon>
         </div>
-        <div class="btn">
-          <mdi-icon
-            color="#777"
-            icon=${mdiClose}
-            @click=${() => this.removeFromList(spell)}
-            size=${16}
-          ></mdi-icon>
+        <div class="btn" @click=${() => this.removeFromList(spell)}>
+          <mdi-icon color="#777" icon=${mdiClose} size=${16}></mdi-icon>
         </div>
       </div>
     `;
@@ -160,7 +158,7 @@ export class SpellList extends BaseInput<number[]> {
           size="small"
           color="var(--theme-primary)"
           icon=${mdiDelete}
-          @click=${this.clearValue}
+          @click=${() => this.clearList()}
           ?disabled=${this.list.length === 0}
           >Clear</icon-btn
         >
@@ -169,7 +167,7 @@ export class SpellList extends BaseInput<number[]> {
           color="var(--theme-primary)"
           icon=${mdiCheck}
           ?primary=${true}
-          @click=${this.done}
+          @click=${() => this.done()}
           >Done</icon-btn
         >
       </div>

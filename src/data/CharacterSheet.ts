@@ -57,12 +57,12 @@ export interface SpellSlotDeclaration {
 
 export interface SpellCastingDeclaration {
   /** spellSlots[5] gives us the number of 5th level spell slots */
-  slots: Record<number, SpellSlotDeclaration>;
-  maxPrepared: number;
-  prepared: number[];
-  /** Spells that the character knows and doesn't have to prepare. */
-  known: number[];
+  slots: SpellSlotDeclaration[];
+  maxAvailable: number;
+  available: number[];
   ability: Ability;
+  spellAttack: number;
+  spellSaveDC: number;
 }
 
 export interface Effect {

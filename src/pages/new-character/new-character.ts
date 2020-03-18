@@ -217,7 +217,12 @@ export class NewCharacter extends LitElement {
     this.characterSkillsInput.autofill(abilityScores, profBonus);
   }
 
-  spellcastingAutofill() {}
+  spellcastingAutofill() {
+    const abilityScores = this.abilityScoreInput.value;
+    const profBonus = this.characterAdditionalStatsInput.value
+      .proficiencyBonus;
+    this.characterSpellcastingInput.autofill(abilityScores, profBonus);
+  }
 
   valueUpdated() {
     // Update autofill status.
@@ -235,7 +240,10 @@ export class NewCharacter extends LitElement {
       profBonus
     );
 
-    this.spellcastingAutofillDisabled = this.characterSpellcastingInput.autofillImpossible();
+    this.spellcastingAutofillDisabled = this.characterSpellcastingInput.autofillImpossible(
+      abilityScores,
+      profBonus
+    );
 
     // Update validity status
     this.characterValid =

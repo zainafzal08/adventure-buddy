@@ -11,6 +11,7 @@ export class SelectionField extends BaseInput<string> {
 
   // BaseInput Implementation:
   getValue(): string {
+    if (!this.select) return '';
     return this.select.value;
   }
 

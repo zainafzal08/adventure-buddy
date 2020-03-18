@@ -1,5 +1,9 @@
 import { LitElement } from 'lit-element';
-import { dispatchUpdatedValue } from '../../util';
+import {
+  dispatchUpdatedValue,
+  dispatch,
+  ValueUpdatedEvent,
+} from '../../util';
 
 export class BaseInput<T> extends LitElement {
   // Functions that children should override.
@@ -94,8 +98,10 @@ export class BaseInput<T> extends LitElement {
     this.addEventListener('input', () => {
       this.valueChanged();
     });
-    this.addEventListener('value-updated', (e: Event) => {
-      if (e.target === this) return;
+
+    this.addEventListener('value-updated', (genericEvent: Event) => {
+      const e = genericEvent as ValueUpdatedEvent;
+      if (e.detail.source === this.tagName) return;
       this.valueChanged();
     });
 
@@ -104,5 +110,7 @@ export class BaseInput<T> extends LitElement {
 
     // Let element itself do any set up.
     this.setup();
+
+    dispatch(this, 'input-loaded');
   }
 }

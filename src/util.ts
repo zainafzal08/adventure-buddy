@@ -5,6 +5,13 @@ interface InputElement extends HTMLElement {
   value: any;
 }
 
+export interface ValueUpdatedDetail {
+  source: string;
+  id: string;
+  value: any;
+}
+export type ValueUpdatedEvent = CustomEvent<ValueUpdatedDetail>;
+
 export function exhaustiveCheck(param: never) {
   param;
 }
@@ -43,6 +50,7 @@ export function dispatch(
 /** Dispatches value changed event */
 export function dispatchUpdatedValue(target: InputElement) {
   dispatch(target, 'value-updated', {
+    source: target.tagName,
     id: target.id,
     value: target.value,
   });

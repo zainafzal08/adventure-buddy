@@ -10,6 +10,8 @@ interface Theme {
   emphasisBackground: string;
   emphasisHigh: string;
   emphasisLow: string;
+  emphasisLowShadow: string;
+  emphasisLowLight: string;
   emphasisShadow: string;
   emphasisShadowHigh: string;
 }
@@ -26,6 +28,8 @@ const PEACH_THEME: Theme = {
   emphasisBackground: '#6cbee60f',
   emphasisHigh: '#6fcf97',
   emphasisLow: '#ed6f6f',
+  emphasisLowLight: '#ed6f6f1a',
+  emphasisLowShadow: '1px 2px 4px #ed6f6f55',
   emphasisShadow: '1px 2px 4px #6cbee655',
   emphasisShadowHigh: '0px 4px 3px #6cbee685',
 };
@@ -41,6 +45,8 @@ const FRESH_THEME: Theme = {
   emphasis: '#6cbee6',
   emphasisHigh: '#6fcf97',
   emphasisLow: '#ed6f6f',
+  emphasisLowLight: '#ed6f6f1a',
+  emphasisLowShadow: '1px 2px 4px #ed6f6f55',
   emphasisBackground: '#6cbee60f',
   emphasisShadow: '1px 2px 4px #6cbee655',
   emphasisShadowHigh: '3px 3px 11px #6cbee695',

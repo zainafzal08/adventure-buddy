@@ -38,7 +38,7 @@ export class AppModal extends LitElement {
 
   firstUpdated() {
     this.addEventListener('modal-close', () => {
-      this.shown = false;
+      this.hide();
     });
 
     window.addEventListener('keydown', this.keyDownListener);

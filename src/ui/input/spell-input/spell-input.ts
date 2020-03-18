@@ -3,7 +3,7 @@ import './spell-list';
 import './spell-search';
 import './spell-info';
 
-import { html, customElement, css, query } from 'lit-element';
+import { html, customElement, css, query, property } from 'lit-element';
 
 import { AppModal } from '../../components/app-modal/app-modal';
 import { SpellList } from './spell-list';
@@ -13,6 +13,8 @@ import { SpellInfo } from './spell-info';
 
 @customElement('spell-input')
 export class SpellInput extends BaseInput<number[]> {
+  @property() id: string = '';
+
   @query('app-modal') modal!: AppModal;
   @query('spell-list') list!: SpellList;
   @query('spell-search') search!: SpellSearch;
@@ -20,19 +22,39 @@ export class SpellInput extends BaseInput<number[]> {
 
   // BaseInput Implementation
   getValue() {
-    return this.list.value;
+    if (!this.list) return [];
+    return [...this.list.value];
   }
 
   setValue(l: number[]) {
-    this.list.value = l;
+    this.list.value = [...l];
   }
 
   clearValue() {
     this.list.clear();
   }
 
+  setup() {
+    this.addEventListener('show-info', (e: Event) => {
+      const infoRequest = e as CustomEvent<{ spellId: number }>;
+      this.showInfo(infoRequest.detail.spellId);
+    });
+    this.addEventListener('show-search', () => {
+      this.showSearch();
+    });
+    this.addEventListener('add-spell', (e: Event) => {
+      const spellEvent = e as CustomEvent<{ spellId: number }>;
+      this.addToList(spellEvent.detail.spellId);
+    });
+    this.addEventListener('remove-spell', (e: Event) => {
+      const spellEvent = e as CustomEvent<{ spellId: number }>;
+      this.removeFromList(spellEvent.detail.spellId);
+    });
+    this.search.excluded = [...this.list.value];
+  }
+
   // SpellInput Implementation:
-  showSpellSearchCard() {
+  show() {
     this.modal.show();
   }
 
@@ -43,29 +65,25 @@ export class SpellInput extends BaseInput<number[]> {
 
   showInfo(id: number) {
     this.info.spellId = id;
+    this.info.inList = this.list.value.includes(id);
     this.search.collapsed = true;
     this.info.expanded = true;
   }
 
   addToList(id: number) {
     this.list.add(id);
-    this.search.excluded = [...this.list.value];
-    this.search.search();
+    this.spellListChanged();
   }
 
-  firstUpdated() {
-    this.addEventListener('show-info', (e: Event) => {
-      const infoRequest = e as CustomEvent<{ spellId: number }>;
-      this.showInfo(infoRequest.detail.spellId);
-    });
-    this.addEventListener('show-search', () => {
-      this.showSearch();
-    });
-    this.addEventListener('add-spell', (e: Event) => {
-      const addSpellEvent = e as CustomEvent<{ spellId: number }>;
-      this.addToList(addSpellEvent.detail.spellId);
-    });
+  removeFromList(id: number) {
+    this.list.removeSpell(id);
+    this.spellListChanged();
+  }
+
+  spellListChanged() {
     this.search.excluded = [...this.list.value];
+    this.search.search();
+    this.info.inList = this.list.value.includes(this.info.spellId);
   }
 
   // LitElement Implementation:
@@ -89,14 +107,15 @@ export class SpellInput extends BaseInput<number[]> {
 
   render() {
     return html`
-      <p @click=${this.showSpellSearchCard}>add</p>
       <app-modal>
         <div class="modal-container">
           <div class="spell-cards">
             <spell-search></spell-search>
             <spell-info></spell-info>
           </div>
-          <spell-list></spell-list>
+          <spell-list
+            @value-updated=${() => this.spellListChanged()}
+          ></spell-list>
         </div>
       </app-modal>
     `;

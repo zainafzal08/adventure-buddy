@@ -13,6 +13,8 @@ export class IconBtn extends LitElement {
   @property({ attribute: true, type: Boolean })
   primary: boolean = false;
   @property({ attribute: true, type: Boolean })
+  danger: boolean = false;
+  @property({ attribute: true, type: Boolean })
   disabled: boolean = false;
 
   static get styles() {
@@ -33,6 +35,12 @@ export class IconBtn extends LitElement {
         width: fit-content;
         --icon-ink: var(--theme-primary);
       }
+      :host([danger]) .chip-button {
+        color: var(--theme-emphasis-low);
+        background: var(--theme-emphasis-low-light);
+        --icon-ink: var(--theme-emphasis-low);
+      }
+
       :host([disabled]) {
         opacity: 0.5;
       }
@@ -41,6 +49,12 @@ export class IconBtn extends LitElement {
         --icon-ink: #ffffff;
         color: white;
       }
+      :host([primary][danger]) .chip-button {
+        background: var(--theme-emphasis-low);
+        --icon-ink: #ffffff;
+        color: white;
+      }
+
       :host([disabled]) .chip-button {
         cursor: default;
       }
@@ -54,6 +68,10 @@ export class IconBtn extends LitElement {
       .chip-button:hover {
         box-shadow: var(--theme-primary-shadow);
       }
+      :host([danger]) .chip-button:hover {
+        box-shadow: var(--theme-emphasis-low-shadow);
+      }
+
       :host([disabled]) .chip-button:hover {
         box-shadow: none;
       }

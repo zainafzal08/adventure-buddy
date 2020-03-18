@@ -48,6 +48,7 @@ export class SpellSearch extends LitElement {
   }
 
   search() {
+    if (!this.input) return;
     this.toggleAttribute('inactive', false);
     const query = this.input.value.toLowerCase();
     if (query === '') {

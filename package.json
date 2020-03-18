@@ -37,6 +37,7 @@
     "@types/redux-localstorage": "^1.0.8",
     "@vaadin/router": "^1.6.0",
     "@webcomponents/webcomponentsjs": "^2.4.0",
+    "clang-format": "^1.4.0",
     "firebase": "^7.5.0",
     "lit-element": "^2.2.1",
     "localforage": "^1.7.3",
