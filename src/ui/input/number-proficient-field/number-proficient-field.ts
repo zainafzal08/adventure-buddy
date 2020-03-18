@@ -184,7 +184,7 @@ export class NumberProficientField extends BaseInput<ModifiableValue> {
     return html`
       <div class="group">
         <label for="input">${this.name}</label>
-        <input id="input" type="number" />
+        <input id="input" type="number" value="0" />
         <div class="footer">
           <div
             class="prof-button"

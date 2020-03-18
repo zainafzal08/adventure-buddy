@@ -159,6 +159,7 @@ export class NumberField extends BaseInput<number> {
         <label for="input">${this.name}</label>
         <input
           type="number"
+          value=${this.getInitialValue()}
           min=${this.start === null ? '' : this.start}
           max=${this.stop === null ? '' : this.stop}
         />
