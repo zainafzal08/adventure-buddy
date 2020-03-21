@@ -6,6 +6,7 @@ import './pages/login-page/login-page';
 import './pages/settings-page/settings-page';
 import './pages/help-page/help-page';
 import './pages/new-character/new-character';
+import './pages/world-builder/world-builder';
 
 // Named imports.
 import {
@@ -59,6 +60,13 @@ export const ROUTES: Route[] = [
     component: () =>
       html`
         <help-page></help-page>
+      `,
+  },
+  {
+    path: '/build/world',
+    component: () =>
+      html`
+        <world-builder></world-builder>
       `,
   },
 ];

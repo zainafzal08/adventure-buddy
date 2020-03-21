@@ -9,6 +9,7 @@ import {
   mdiHome,
   mdiHelp,
   mdiHelpCircle,
+  mdiEarth,
 } from '@mdi/js';
 import { connect } from 'pwa-helpers';
 import { store } from '../../../redux/store';
@@ -56,6 +57,10 @@ export class AppNav extends connect(store)(LitElement) {
         handler: this.profile,
       },
       {
+        icon: mdiEarth,
+        handler: this.worldBuilder,
+      },
+      {
         icon: mdiHome,
         handler: this.home,
       },
@@ -64,6 +69,10 @@ export class AppNav extends connect(store)(LitElement) {
 
   home() {
     navigate('/');
+  }
+
+  worldBuilder() {
+    navigate('/build/world');
   }
 
   logout() {
