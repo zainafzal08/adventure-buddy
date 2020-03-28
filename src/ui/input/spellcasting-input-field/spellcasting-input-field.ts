@@ -46,6 +46,7 @@ export class SpellcastingInputField extends BaseInput<
     return {
       slots,
       maxAvailable: this.getNumberValue('max-available'),
+      maxCantrips: this.getNumberValue('max-cantrips'),
       available: this.spellInput?.value,
       ability: this.spellAbility?.value as Ability,
       spellAttack: this.getNumberValue('spell-attack'),
@@ -61,6 +62,7 @@ export class SpellcastingInputField extends BaseInput<
     this.setNumberValue(`max-available`, spellcasting.maxAvailable);
     this.setNumberValue(`spell-attack`, spellcasting.spellAttack);
     this.setNumberValue(`spell-save-dc`, spellcasting.spellSaveDC);
+    this.setNumberValue('max-cantrips', spellcasting.maxCantrips);
     this.spellInput.value = spellcasting.available;
     this.spellAbility.value = spellcasting.ability;
   }
@@ -72,6 +74,7 @@ export class SpellcastingInputField extends BaseInput<
     this.clearNumberValue(`max-available`);
     this.clearNumberValue(`spell-attack`);
     this.clearNumberValue(`spell-save-dc`);
+    this.clearNumberValue('max-cantrips');
     this.spellInput.clear();
     this.spellAbility.clear();
   }
@@ -84,6 +87,7 @@ export class SpellcastingInputField extends BaseInput<
       this.isNumberValValid('spell-attack'),
       this.isNumberValValid('spell-save-dc'),
       this.isNumberValValid('max-available'),
+      this.isNumberValValid('max-cantrips'),
       this.spellInput.isValid(),
       this.spellAbility.isValid(),
     ]);

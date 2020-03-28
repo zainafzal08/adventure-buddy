@@ -46,8 +46,12 @@ export interface HitDiceDeclaration {
   max: number;
 }
 
-export interface Equipment {
-  gold: number;
+export interface EquipmentItem {
+  id: string;
+  icon: string;
+  name: string;
+  shortDescription: string;
+  detailedDescription: string;
 }
 
 export interface SpellSlotDeclaration {
@@ -59,6 +63,7 @@ export interface SpellCastingDeclaration {
   /** spellSlots[5] gives us the number of 5th level spell slots */
   slots: SpellSlotDeclaration[];
   maxAvailable: number;
+  maxCantrips: number;
   available: number[];
   ability: Ability;
   spellAttack: number;
@@ -69,6 +74,14 @@ export interface Effect {
   name: string;
   field: string;
   change: number;
+}
+
+export interface Wallet {
+  platinum: number;
+  gold: number;
+  electrum: number;
+  silver: number;
+  copper: number;
 }
 
 export interface CharacterSheet {
@@ -94,7 +107,8 @@ export interface CharacterSheet {
   attacks: AttackDescriptor[];
   // null for peeps with no spells.
   spellCasting: SpellCastingDeclaration | null;
-  equipment: Equipment;
+  wallet: Wallet;
+  equipment: EquipmentItem[];
   /** Stuff like 'shield-of-faith' has +2 to AC. */
   effects: Effect[];
 }
