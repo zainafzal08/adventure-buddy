@@ -1,11 +1,8 @@
-import {
-  html,
-  customElement,
-  css,
-  LitElement,
-  property,
-} from 'lit-element';
-import { EquipmentItem } from '../../../data/CharacterSheet';
+import * as allIcons from '@mdi/js';
+import {css, customElement, html, LitElement, property, query,} from 'lit-element';
+
+import {EquipmentItem} from '../../../data/CharacterSheet';
+import {AppModal} from '../../components/app-modal/app-modal';
 
 const BLOBS: string[] = [
   'M189.2,-108.1C220.8,-54.5,205.2,27.5,165.8,98.6C126.4,169.7,63.2,229.8,-6.5,233.6C-76.2,237.3,-152.4,184.7,-189.7,114.8C-226.9,45,-225.2,-42,-187.1,-99.3C-149,-156.7,-74.5,-184.3,2.2,-185.6C78.8,-186.8,157.6,-161.7,189.2,-108.1Z',
@@ -27,11 +24,22 @@ function dumbHash(s: string) {
 }
 
 @customElement('equipment-item-card')
-export class EquipmentInputField extends LitElement {
-  @property({ type: Object }) item!: EquipmentItem;
+export class EquipmentItemCard extends LitElement {
+  @property({type: Object}) item!: EquipmentItem;
+
+  @query('app-modal') private modal!: AppModal;
+
+  show() {
+    this.modal.show();
+  }
+
+  hide() {
+    this.modal.hide();
+  }
 
   getBlob() {
-    console.log(BLOBS);
+    if (!this.item) return '';
+
     const blobIndex = dumbHash(this.item.id) % BLOBS.length;
     const blob = BLOBS[blobIndex];
     return html`
@@ -48,69 +56,138 @@ export class EquipmentInputField extends LitElement {
     `;
   }
 
-  deleteSelf() {}
-
-  expand() {}
-
   static get styles() {
     return css`
-      :host {
-        width: 300px;
-        height: 300px;
-        border-radius: 15px;
-        border: 2px solid #ebebeb;
+      .card {
+        width: 450px;
+        height: 550px;
         background: white;
-        --preview-description-height: 64px;
-        --blob-color: var(--theme-primary-medium);
+        box-shadow: var(--soft-box-shadow);
+        border-radius: 15px;
+        display: flex;
+        flex-direction: column;
+        font-style: var(--font-stack);
+        --blob-color: var(--theme-primary-light);
+        position: relative;
+        overflow: hidden;
       }
-      .preview-body {
+      .header {
         width: 100%;
-        height: calc(100% - var(--preview-description-height));
+        height: 250px;
+        box-sizing: border-box;
+        padding: 16px;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+      }
+      .body {
+        width: 100%;
+        height: calc(100% - 350px);
+        padding: 0 16px;
+        box-sizing: border-box;
+      }
+      svg {
+        width: 350px;
+        height: 350px;
+        position: absolute;
+        left: -115px;
+        top: -115px;
+      }
+      .header > mdi-icon {
+        margin-top: 32px;
+        margin-left: 32px;
+      }
+      .close-btn {
+        width: 34px;
+        height: 34px;
         display: flex;
         align-items: center;
         justify-content: center;
+        border-radius: 50%;
+        cursor: pointer;
       }
-      .preview-body svg {
-        width: 150px;
-        height: 150px;
+      .close-btn:hover {
+        background: #f6f6f6;
       }
-      .preview-description {
-        width: 100%;
-        height: var(--preview-description-height);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-start;
-      }
-      .preview-description h4 {
+      h1 {
+        font-size: 1.5rem;
+        padding: 0 0 0 16px;
+        margin: 0;
         color: var(--theme-primary);
-        width: 100%;
-        text-align: center;
-        margin: 0;
-        padding: 0;
       }
-      .preview-description p {
-        color: #bbb;
-        width: 100%;
-        text-align: center;
-        margin-top: 8px;
-        font-size: 0.8rem;
+      .subtitle {
+        padding: 8px 16px 0 16px;
         margin: 0;
-        padding: 0;
+        font-size: 1rem;
+        color: #999;
       }
+      .desc {
+        box-sizing: border-box;
+        padding: 16px 16px 0 16px;
+        margin: 0;
+        font-size: 1rem;
+        color: #777;
+        height: 200px;
+        overflow-y: scroll;
+      }
+      .empty {
+        color: #ddd;
+      }
+      sup {
+        margin-left: 8px;
+        font-size: .9rem;
+      }
+    `;
+  }
+
+  getSubtitle() {
+    if (this.item.shortDescription)
+      return html`<p class="subtitle">${this.item.shortDescription}</p>`;
+    return html`<p class="subtitle empty">No short description for this one</p>`;
+  }
+
+  getDescription() {
+    if (this.item.detailedDescription)
+      return html`<p class="desc">${this.item.detailedDescription}</p>`;
+    return html`<p class="desc empty">No detailed description for this one</p>`;
+  }
+
+  getCount() {
+    return html`<sup>x ${this.item.count}</sup>`;
+  }
+
+  card() {
+    return html`
+      <div class="card">
+        ${this.getBlob()}
+        <div class="header">
+          <mdi-icon
+            size="64"
+            color="var(--theme-primary"
+            icon=${this.item.icon}
+          ></mdi-icon>
+          <div class="close-btn" @click=${() => this.hide()}>
+            <mdi-icon
+              size="24"
+              color="#bbb"
+              icon=${allIcons.mdiClose}
+            ></mdi-icon>
+          </div>
+        </div>
+        <div class="body">
+          <h1>${this.item.name}${this.getCount()}</h1>
+          ${this.getSubtitle()}
+          ${this.getDescription()}
+        </div>
+      </div>
     `;
   }
 
   render() {
     return html`
-      <div class="preview-body">
-        ${this.getBlob()}
-      </div>
-      <div class="preview-description">
-        <h4>${this.item.name}</h4>
-        <p>${this.item.shortDescription}</p>
-      </div>
-      </div>
+      <app-modal>
+        ${this.item ? this.card() : ''}
+      </app-modal>
     `;
   }
 }

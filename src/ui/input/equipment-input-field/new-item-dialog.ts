@@ -1,32 +1,17 @@
 import '../icon-selector/icon-selector';
 import '../extended-text-field/extended-text-field';
+import '../text-field/text-field';
+import '../number-field/number-field';
 
-import {
-  html,
-  customElement,
-  css,
-  query,
-  LitElement,
-  property,
-} from 'lit-element';
-import { AppModal } from '../../components/app-modal/app-modal';
-import { dispatch, ValueUpdatedDetail } from '../../../util';
-import { IconSelector } from '../icon-selector/icon-selector';
-import {
-  mdiFlaskOutline,
-  mdiFoodAppleOutline,
-  mdiSword,
-  mdiCrystalBall,
-  mdiShieldHalfFull,
-  mdiScriptOutline,
-  mdiNecklace,
-  mdiSack,
-  mdiClose,
-  mdiCheck,
-} from '@mdi/js';
-import { BaseInput } from '../base-input';
-import { EquipmentItem } from '../../../data/CharacterSheet';
-import { uuid } from 'uuidv4';
+import {mdiCheck, mdiClose, mdiCrystalBall, mdiFlaskOutline, mdiFoodAppleOutline, mdiNecklace, mdiSack, mdiScriptOutline, mdiShieldHalfFull, mdiSword,} from '@mdi/js';
+import {css, customElement, html, LitElement, property, query,} from 'lit-element';
+import {uuid} from 'uuidv4';
+
+import {EquipmentItem} from '../../../data/CharacterSheet';
+import {dispatch, ValueUpdatedDetail} from '../../../util';
+import {AppModal} from '../../components/app-modal/app-modal';
+import {BaseInput} from '../base-input';
+import {IconSelector} from '../icon-selector/icon-selector';
 
 const ICONS = [
   mdiFlaskOutline,
@@ -42,33 +27,68 @@ const ICONS = [
 @customElement('new-item-dialog')
 export class NewItemDialog extends LitElement {
   @property() valid: Boolean = true;
+  @property() edit: Boolean = false;
+
+  private itemId: string|null = null;
 
   @query('app-modal') modal!: AppModal;
   @query('icon-selector') iconSelector!: IconSelector;
 
   show() {
+    this.itemId = uuid();
+    this.edit = false;
+    this.modal.show();
+  }
+
+  showEdit(item: EquipmentItem) {
+    // Prefil.
+    this.itemId = item.id;
+    this.setText('name', item.name);
+    this.setNum('count', item.count);
+    this.setText('short-description', item.shortDescription);
+    this.setText('detailed-description', item.detailedDescription);
+    this.iconSelector.value = item.icon;
+
+    this.edit = true;
     this.modal.show();
   }
 
   getText(id: string) {
-    const e = this.shadowRoot?.getElementById(
-      `new-item-${id}`
-    ) as BaseInput<string>;
+    const e =
+        this.shadowRoot?.getElementById(`new-item-${id}`) as BaseInput<string>;
     return e.value;
   }
 
-  clearText(id: string) {
-    const e = this.shadowRoot?.getElementById(
-      `new-item-${id}`
-    ) as BaseInput<string>;
+  setText(id: string, text: string) {
+    const e =
+        this.shadowRoot?.getElementById(`new-item-${id}`) as BaseInput<string>;
+    e.value = text;
+  }
+
+  getNum(id: string) {
+    const e =
+        this.shadowRoot?.getElementById(`new-item-${id}`) as BaseInput<number>;
+    return e.value;
+  }
+
+  setNum(id: string, num: number) {
+    const e =
+        this.shadowRoot?.getElementById(`new-item-${id}`) as BaseInput<number>;
+    e.value = num;
+  }
+
+  clearElem(id: string) {
+    const e =
+        this.shadowRoot?.getElementById(`new-item-${id}`) as BaseInput<unknown>;
     return e.clear();
   }
 
   clear() {
     this.iconSelector.clear();
-    this.clearText('name');
-    this.clearText('short-description');
-    this.clearText('detailed-description');
+    this.clearElem('name');
+    this.clearElem('count');
+    this.clearElem('short-description');
+    this.clearElem('detailed-description');
   }
 
   cancel() {
@@ -77,15 +97,19 @@ export class NewItemDialog extends LitElement {
 
   done() {
     this.modal.hide();
-    // Should be equipmentItem.
     const item: EquipmentItem = {
-      id: uuid(),
+      id: this.itemId!,
       icon: this.iconSelector.value,
       name: this.getText('name'),
+      count: this.getNum('count'),
       shortDescription: this.getText('short-description'),
       detailedDescription: this.getText('detailed-description'),
     };
-    dispatch(this, 'new-item', { item });
+    let type = 'new-item';
+    if (this.edit) {
+      type = 'update-item';
+    }
+    dispatch(this, type, {item});
     this.clear();
   }
 
@@ -95,7 +119,7 @@ export class NewItemDialog extends LitElement {
       }
       .card {
         width: 450px;
-        height: 550px;
+        height: 575px;
         background: white;
         box-shadow: var(--soft-box-shadow);
         border-radius: 15px;
@@ -122,6 +146,20 @@ export class NewItemDialog extends LitElement {
           100% - var(--header-height) - var(--footer-height)
         );
       }
+      .row {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+      }
+      .row *:first-child {
+        width: 60%;
+      }
+      .row *:last-child {
+        width: calc(40% - 8px);
+      }
+      number-field {
+        margin-top: 16px;
+      }
       h1 {
         color: var(--theme-primary);
         padding: 0;
@@ -143,7 +181,7 @@ export class NewItemDialog extends LitElement {
       <app-modal>
         <div class="card">
           <div class="header">
-            <h1>New Item</h1>
+            ${this.edit ? html`<h1>Edit Item</h1>` : html`<h1>New Item</h1>`}
           </div>
           <div class="body">
             <label>Icon</label>
@@ -151,17 +189,19 @@ export class NewItemDialog extends LitElement {
               id="new-item-icon"
               .options=${ICONS}
             ></icon-selector>
-            <text-field
-              id="new-item-name"
-              name="Item Name"
-              initial="My Item"
-              placeholder="Health Potion"
-              @value-updated=${(e: Event) => {
-                const v = (e as CustomEvent<ValueUpdatedDetail>).detail
-                  .value;
-                this.valid = v !== '';
-              }}
-            ></text-field>
+            <div class="row">
+              <text-field
+                id="new-item-name"
+                name="Item Name"
+                initial="My Item"
+                placeholder="Health Potion"
+                @value-updated=${(e: Event) => {
+      const v = (e as CustomEvent<ValueUpdatedDetail>).detail.value;
+      this.valid = v !== '';
+    }}></text-field>
+                <number-field id="new-item-count" name="Count" start=${
+        1}></number-field>
+            </div>
             <text-field
               id="new-item-short-description"
               name="Short Description"

@@ -10,49 +10,29 @@ import '../../ui/input/spellcasting-input-field/spellcasting-input-field';
 import '../../ui/input/currency-input-field/currency-input-field';
 import '../../ui/input/equipment-input-field/equipment-input-field';
 
-import {
-  LitElement,
-  html,
-  customElement,
-  css,
-  query,
-  property,
-  TemplateResult,
-} from 'lit-element';
-import {
-  mdiAutoFix,
-  mdiChevronRight,
-  mdiDelete,
-  mdiCheck,
-  mdiCancel,
-  mdiCoins,
-  mdiBriefcasePlus,
-} from '@mdi/js';
-import { SavingThrowInputField } from '../../ui/input/saving-throw-input-field/saving-throw-input-field';
-import { TextField } from '../../ui/input/text-field/text-field';
-import { ClassSelectorInput } from '../../ui/input/class-selector-input/class-selector-input';
-import { RaceSelectionField } from '../../ui/input/race-selection-field/race-selection-field';
-import { AbilityScoreInputField } from '../../ui/input/ability-score-input-field/ability-score-input-field';
-import { BasicStatsInputField } from '../../ui/input/basic-stats-input-field/basic-stats-input-field';
-import { AdditionalStatsInputField } from '../../ui/input/additional-stats-input-field/additional-stats-input-field';
-import { SkillsInputField } from '../../ui/input/skills-input-field/skills-input-field';
-import { SpellcastingInputField } from '../../ui/input/spellcasting-input-field/spellcasting-input-field';
-import { CurrencyInputField } from '../../ui/input/currency-input-field/currency-input-field';
-import { EquipmentInputField } from '../../ui/input/equipment-input-field/equipment-input-field';
+import {mdiAutoFix, mdiBriefcasePlus, mdiCancel, mdiCheck, mdiChevronRight, mdiCoins, mdiDelete,} from '@mdi/js';
+import {css, customElement, html, LitElement, property, query, TemplateResult,} from 'lit-element';
 
 import climbingHuman from '../../assets/humaaans/climbing.svg';
+import {AbilityScoreInputField} from '../../ui/input/ability-score-input-field/ability-score-input-field';
+import {AdditionalStatsInputField} from '../../ui/input/additional-stats-input-field/additional-stats-input-field';
+import {BasicStatsInputField} from '../../ui/input/basic-stats-input-field/basic-stats-input-field';
+import {ClassSelectorInput} from '../../ui/input/class-selector-input/class-selector-input';
+import {CurrencyInputField} from '../../ui/input/currency-input-field/currency-input-field';
+import {EquipmentInputField} from '../../ui/input/equipment-input-field/equipment-input-field';
+import {RaceSelectionField} from '../../ui/input/race-selection-field/race-selection-field';
+import {SavingThrowInputField} from '../../ui/input/saving-throw-input-field/saving-throw-input-field';
+import {SkillsInputField} from '../../ui/input/skills-input-field/skills-input-field';
+import {SpellcastingInputField} from '../../ui/input/spellcasting-input-field/spellcasting-input-field';
+import {TextField} from '../../ui/input/text-field/text-field';
 
 @customElement('new-character')
 export class NewCharacter extends LitElement {
   @query('#new-character-name') characterNameInput!: TextField;
-  @query('#new-character-alignment')
-  characterAlignmentInput!: TextField;
-  @query('#new-character-background')
-  characterBackgroundInput!: TextField;
-  @query('class-selector-input')
-  characterClassInput!: ClassSelectorInput;
-  @query('race-selection-field')
-  characterRaceInput!: RaceSelectionField;
+  @query('#new-character-alignment') characterAlignmentInput!: TextField;
+  @query('#new-character-background') characterBackgroundInput!: TextField;
+  @query('class-selector-input') characterClassInput!: ClassSelectorInput;
+  @query('race-selection-field') characterRaceInput!: RaceSelectionField;
   @query('ability-score-input-field')
   abilityScoreInput!: AbilityScoreInputField;
   @query('saving-throw-input-field')
@@ -61,12 +41,10 @@ export class NewCharacter extends LitElement {
   characterBasicStatsInput!: BasicStatsInputField;
   @query('additional-stats-input-field')
   characterAdditionalStatsInput!: AdditionalStatsInputField;
-  @query('skills-input-field')
-  characterSkillsInput!: SkillsInputField;
+  @query('skills-input-field') characterSkillsInput!: SkillsInputField;
   @query('spellcasting-input-field')
   characterSpellcastingInput!: SpellcastingInputField;
-  @query('currency-input-field')
-  characterCurrencyInput!: CurrencyInputField;
+  @query('currency-input-field') characterCurrencyInput!: CurrencyInputField;
   @query('equipment-input-field')
   characterEquipmentInputField!: EquipmentInputField;
 
@@ -186,20 +164,15 @@ export class NewCharacter extends LitElement {
   firstUpdated() {
     const saved = localStorage.getItem(`saved-input-value(${this.id})`);
     if (saved) {
-      this.spellcastingDisabled = JSON.parse(
-        saved
-      ).spellcastingDisabled;
+      this.spellcastingDisabled = JSON.parse(saved).spellcastingDisabled;
     }
     this.valueUpdated();
   }
 
   backup() {
-    localStorage.setItem(
-      `saved-input-value(${this.id})`,
-      JSON.stringify({
-        spellcastingDisabled: this.spellcastingDisabled,
-      })
-    );
+    localStorage.setItem(`saved-input-value(${this.id})`, JSON.stringify({
+      spellcastingDisabled: this.spellcastingDisabled,
+    }));
   }
 
   clear() {
@@ -221,22 +194,19 @@ export class NewCharacter extends LitElement {
 
   savingThrowAutofill() {
     const abilityScores = this.abilityScoreInput.value;
-    const profBonus = this.characterAdditionalStatsInput.value
-      .proficiencyBonus;
+    const profBonus = this.characterAdditionalStatsInput.value.proficiencyBonus;
     this.characterSavingThrowInput.autofill(abilityScores, profBonus);
   }
 
   skillsAutofill() {
     const abilityScores = this.abilityScoreInput.value;
-    const profBonus = this.characterAdditionalStatsInput.value
-      .proficiencyBonus;
+    const profBonus = this.characterAdditionalStatsInput.value.proficiencyBonus;
     this.characterSkillsInput.autofill(abilityScores, profBonus);
   }
 
   spellcastingAutofill() {
     const abilityScores = this.abilityScoreInput.value;
-    const profBonus = this.characterAdditionalStatsInput.value
-      .proficiencyBonus;
+    const profBonus = this.characterAdditionalStatsInput.value.proficiencyBonus;
     this.characterSpellcastingInput.autofill(abilityScores, profBonus);
   }
 
@@ -247,45 +217,38 @@ export class NewCharacter extends LitElement {
   valueUpdated() {
     // Update autofill status.
     const abilityScores = this.abilityScoreInput.value;
-    const profBonus = this.characterAdditionalStatsInput.value
-      .proficiencyBonus;
+    const profBonus = this.characterAdditionalStatsInput.value.proficiencyBonus;
 
-    this.savingThrowAutofillDisabled = this.characterSavingThrowInput.autofillImpossible(
-      abilityScores,
-      profBonus
-    );
+    this.savingThrowAutofillDisabled =
+        this.characterSavingThrowInput.autofillImpossible(
+            abilityScores, profBonus);
 
-    this.skillsAutofillDisabled = this.characterSkillsInput.autofillImpossible(
-      abilityScores,
-      profBonus
-    );
+    this.skillsAutofillDisabled =
+        this.characterSkillsInput.autofillImpossible(abilityScores, profBonus);
 
-    this.spellcastingAutofillDisabled = this.characterSpellcastingInput
-      ? this.characterSpellcastingInput.autofillImpossible(
-          abilityScores,
-          profBonus
-        )
-      : false;
+    this.spellcastingAutofillDisabled = this.characterSpellcastingInput ?
+        this.characterSpellcastingInput.autofillImpossible(
+            abilityScores, profBonus) :
+        false;
 
-    this.currencyAutoExchangeDisabled = this.characterCurrencyInput.autoExchangeImpossible();
+    this.currencyAutoExchangeDisabled =
+        this.characterCurrencyInput.autoExchangeImpossible();
 
     // Update validity status
-    this.characterValid =
-      this.characterNameInput.isValid() &&
-      this.characterAlignmentInput.isValid() &&
-      this.characterBackgroundInput.isValid() &&
-      this.characterClassInput.isValid() &&
-      this.characterRaceInput.isValid() &&
-      this.abilityScoreInput.isValid() &&
-      this.characterSavingThrowInput.isValid() &&
-      this.characterBasicStatsInput.isValid() &&
-      this.characterAdditionalStatsInput.isValid() &&
-      this.characterSkillsInput.isValid() &&
-      this.characterSpellcastingInput
-        ? this.characterSpellcastingInput.isValid()
-        : true &&
-          this.characterCurrencyInput.isValid() &&
-          this.characterEquipmentInputField.isValid();
+    this.characterValid = this.characterNameInput.isValid() &&
+            this.characterAlignmentInput.isValid() &&
+            this.characterBackgroundInput.isValid() &&
+            this.characterClassInput.isValid() &&
+            this.characterRaceInput.isValid() &&
+            this.abilityScoreInput.isValid() &&
+            this.characterSavingThrowInput.isValid() &&
+            this.characterBasicStatsInput.isValid() &&
+            this.characterAdditionalStatsInput.isValid() &&
+            this.characterSkillsInput.isValid() &&
+            this.characterSpellcastingInput ?
+        this.characterSpellcastingInput.isValid() :
+        true && this.characterCurrencyInput.isValid() &&
+            this.characterEquipmentInputField.isValid();
   }
 
   createCharacter() {}
@@ -347,8 +310,8 @@ export class NewCharacter extends LitElement {
           size="small"
           ?disabled=${this.savingThrowAutofillDisabled}
           @click=${() => {
-            this.savingThrowAutofill();
-          }}
+      this.savingThrowAutofill();
+    }}
           >Autofill</icon-btn
         >
       </div>
@@ -366,8 +329,8 @@ export class NewCharacter extends LitElement {
           size="small"
           ?disabled=${this.skillsAutofillDisabled}
           @click=${() => {
-            this.skillsAutofill();
-          }}
+      this.skillsAutofill();
+    }}
           >Autofill</icon-btn
         >
       </div>
@@ -401,20 +364,20 @@ export class NewCharacter extends LitElement {
           icon=${this.spellcastingDisabled ? mdiCheck : mdiCancel}
           size="small"
           @click=${() => {
-            this.toggleSpellcasting();
-          }}
-          >${this.spellcastingDisabled
-            ? 'I am a spellcaster'
-            : 'I am not a spellcaster'}</icon-btn
+      this.toggleSpellcasting();
+    }}
+          >${
+        this.spellcastingDisabled ? 'I am a spellcaster' :
+                                    'I am not a spellcaster'}</icon-btn
         >
         <icon-btn
           icon=${mdiAutoFix}
           size="small"
-          ?disabled=${this.spellcastingAutofillDisabled ||
-            this.spellcastingDisabled}
+          ?disabled=${
+        this.spellcastingAutofillDisabled || this.spellcastingDisabled}
           @click=${() => {
-            this.spellcastingAutofill();
-          }}
+      this.spellcastingAutofill();
+    }}
           >Autofill</icon-btn
         >
       </div>
@@ -432,8 +395,8 @@ export class NewCharacter extends LitElement {
           size="small"
           ?disabled=${this.currencyAutoExchangeDisabled}
           @click=${() => {
-            this.currencyAutoExchange();
-          }}
+      this.currencyAutoExchange();
+    }}
           >Auto Exchange</icon-btn
         >
       </div>
@@ -450,12 +413,12 @@ export class NewCharacter extends LitElement {
           icon=${mdiBriefcasePlus}
           size="small"
           @click=${() => {
-            this.characterEquipmentInputField.openNewItemDialog();
-          }}
+      this.characterEquipmentInputField.openNewItemDialog();
+    }}
           >Add Item</icon-btn
         >
       </div>
-      <equipment-input-field></equipment-input-field>
+      <equipment-input-field id="new-character-equipment"></equipment-input-field>
     `;
   }
 
@@ -478,8 +441,8 @@ export class NewCharacter extends LitElement {
           icon=${mdiDelete}
           size="large"
           @click=${() => {
-            this.clear();
-          }}
+      this.clear();
+    }}
           >Clear</icon-btn
         >
         <icon-btn
@@ -488,8 +451,8 @@ export class NewCharacter extends LitElement {
           primary="true"
           ?disabled=${!this.characterValid}
           @click=${() => {
-            this.createCharacter();
-          }}
+      this.createCharacter();
+    }}
           >Create Character</icon-btn
         >
       </div>
