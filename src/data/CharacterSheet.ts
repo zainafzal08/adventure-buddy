@@ -1,8 +1,9 @@
-import { Skill, allSkills } from './skills';
-import { ClassDescriptor, CLASSES } from './classes';
-import { Ability } from './ability';
-import { AttackDescriptor } from './attack';
-import { first } from '../util';
+import {first} from '../util';
+
+import {Ability} from './ability';
+import {AttackDescriptor} from './attack';
+import {ClassDescriptor, CLASSES} from './classes';
+import {allSkills, Skill} from './skills';
 
 export interface ModifiableValue {
   value: number;
@@ -17,7 +18,9 @@ export type SavingThrowsDeclaration = {
   [k in Ability]: ModifiableValue;
 };
 
-export type AbilityScoresDeclaration = { [k in Ability]: number };
+export type AbilityScoresDeclaration = {
+  [k in Ability]: number
+};
 
 export interface DiceDescriptor {
   count: number;
@@ -46,8 +49,13 @@ export interface HitDiceDeclaration {
   max: number;
 }
 
-export interface Equipment {
-  gold: number;
+export interface EquipmentItem {
+  id: string;
+  icon: string;
+  name: string;
+  count: number;
+  shortDescription: string;
+  detailedDescription: string;
 }
 
 export interface SpellSlotDeclaration {
@@ -59,6 +67,7 @@ export interface SpellCastingDeclaration {
   /** spellSlots[5] gives us the number of 5th level spell slots */
   slots: SpellSlotDeclaration[];
   maxAvailable: number;
+  maxCantrips: number;
   available: number[];
   ability: Ability;
   spellAttack: number;
@@ -71,12 +80,20 @@ export interface Effect {
   change: number;
 }
 
+export interface Wallet {
+  platinum: number;
+  gold: number;
+  electrum: number;
+  silver: number;
+  copper: number;
+}
+
 export interface CharacterSheet {
-  name: string | undefined;
+  name: string|undefined;
   /** Key in RACES which reresents this characters race. */
   race: string;
   /** Key which reresents this characters race, null means no subrace. */
-  subrace: string | null;
+  subrace: string|null;
   classes: ClassDescriptor[];
   abilityScores: AbilityScoresDeclaration;
   speed: number;
@@ -93,8 +110,9 @@ export interface CharacterSheet {
   skills: SkillsDeclaration;
   attacks: AttackDescriptor[];
   // null for peeps with no spells.
-  spellCasting: SpellCastingDeclaration | null;
-  equipment: Equipment;
+  spellCasting: SpellCastingDeclaration|null;
+  wallet: Wallet;
+  equipment: EquipmentItem[];
   /** Stuff like 'shield-of-faith' has +2 to AC. */
   effects: Effect[];
 }
@@ -169,9 +187,8 @@ const DEFAULT_CHARACTER_SHEET: CharacterSheet = {
     },
   },
   skills: allSkills.reduce(
-    (acc, v) => ({ ...acc, [v]: { value: 0, proficient: false } }),
-    {}
-  ) as SkillsDeclaration,
+              (acc, v) => ({...acc, [v]: {value: 0, proficient: false}}), {}) as
+      SkillsDeclaration,
   attacks: [],
 };
 

@@ -46,7 +46,7 @@
     "redux": "^4.0.5",
     "reselect": "^4.0.0",
     "tinygradient": "^1.1.1",
-    "uuidv4": "^6.0.0"
+    "uuidv4": "^6.0.6"
   },
   "prettier": {
     "trailingComma": "es5",
